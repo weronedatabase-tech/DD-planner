@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Different Dragons Planner</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#1e3a8a">
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background-color: #f3f4f6; }
+        iframe { border: none; width: 100%; height: 100%; display: block; }
+    </style>
+</head>
+<body>
+    <iframe src="https://script.google.com/macros/s/AKfycbyeqbYScoWtaC-CreDt_5eFof3bnY7m1-4pSR96Fb4td-g_U4gaGQaFUrgSGOuwfrOnrg/exec"></iframe>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
