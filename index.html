@@ -1,23 +1,1712 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Different Dragons Planner</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="theme-color" content="#1e3a8a">
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background-color: #f3f4f6; }
-        iframe { border: none; width: 100%; height: 100%; display: block; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+<title>Different Dragons Planner</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#1e3a8a">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+ tailwind.config = {
+   darkMode: 'class',
+   theme: {
+     extend: {
+       colors: {
+         bg: { light: '#f3f4f6', dark: '#111827' },
+         surface: { light: '#ffffff', dark: '#1f2937' },
+       }
+     }
+   }
+ }
+</script>
+
+<style>
+ :root { --seat-h: 30px; }
+  body, html { height: 100dvh; overflow: hidden; touch-action: pan-y; }
+ .seat {
+   height: var(--seat-h); width: 100%;
+   display: flex; flex-direction: column; align-items: center; justify-content: center;
+   font-size: 0.65rem;
+   border: 1px dashed #9ca3af;
+   cursor: grab; position: relative; overflow: visible;
+   transition: transform 0.1s, opacity 0.2s;
+   font-weight: 600;
+   user-select: none;
+   -webkit-user-select: none;
+   line-height: 1;
+   flex-shrink: 0;
+ }
+ .seat.locked-for-drag { opacity: 0.4; border: 2px dashed #6b7280; filter: grayscale(50%); }
+
+ .seat.seated-in-pool {
+     background-color: #d1d5db !important; 
+     color: #1f2937 !important;
+     border-color: #9ca3af !important;
+     opacity: 0.8;
+     pointer-events: none;
+     cursor: not-allowed;
+     text-decoration: line-through;
+ }
+ .dark .seat.seated-in-pool {
+     background-color: #4b5563 !important;
+     color: #e5e7eb !important;
+ }
+
+ .seat.paddler, .row-paddler { background-color: #bfdbfe; color: #1e3a8a; border: 1px solid #60a5fa; }
+ .dark .seat.paddler, .dark .row-paddler { background-color: #1e3a8a; color: #bfdbfe; border-color: #1d4ed8; }
+ 
+ .seat.volunteer, .row-volunteer { background-color: #bbf7d0; color: #14532d; border: 1px solid #4ade80; }
+ .dark .seat.volunteer, .dark .row-volunteer { background-color: #14532d; color: #bbf7d0; border-color: #15803d; }
+ 
+ .seat.drummer-helm { background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; }
+ .dark .seat.drummer-helm { background-color: #713f12; color: #fef08a; border-color: #a16207; }
+
+ .dark .seat { border-color: #4b5563; }
+ .seat span { pointer-events: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95%; }
+ .remove-x {
+     position: absolute; top: -3px; right: -3px;
+     width: 14px; height: 14px;
+     background-color: #ef4444; color: white;
+     border-radius: 50%; font-size: 9px; line-height: 14px;
+     text-align: center; cursor: pointer; z-index: 20;
+     box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+ }
+ #pool-container .remove-x { display: none !important; }
+
+ .pool-group {
+     border: 1px solid #cbd5e1;
+     border-left: 4px solid #3b82f6; 
+     background-color: #f8fafc;
+     padding: 4px;
+     border-radius: 4px;
+     margin-bottom: 4px;
+ }
+ .dark .pool-group {
+     border-color: #374151;
+     border-left-color: #60a5fa;
+     background-color: #111827;
+ }
+ .pool-group-label {
+     font-size: 8px;
+     text-transform: uppercase;
+     color: #64748b;
+     font-weight: bold;
+     margin-bottom: 2px;
+     padding-left: 2px;
+ }
+
+ .dragging-clone {
+     position: fixed; pointer-events: none; z-index: 9999;
+     opacity: 0.9; box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+     transform: scale(1.1); width: 80px; height: 48px;
+     display: flex; align-items: center; justify-content: center;
+     border-radius: 4px; font-weight: bold; font-size: 0.75rem;
+ }
+
+ .nav-btn { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-weight: 600; border-radius: 6px; transition: all 0.2s; }
+ .nav-btn.active { background-color: #dbeafe; color: #1e40af; }
+ .dark .nav-btn.active { background-color: #1e3a8a; color: #dbeafe; }
+ .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+ .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+ .spinner {
+     border: 4px solid rgba(255, 255, 255, 0.3);
+     border-radius: 50%;
+     border-top: 4px solid #ffffff;
+     width: 40px;
+     height: 40px;
+     animation: spin 1s linear infinite;
+ }
+ @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
 </head>
-<body>
-    <iframe src="https://script.google.com/macros/s/AKfycbw2IQxPX-Mn3Zy-8-YNHOrfOjsDGGWIBb0-xLp9g3DM1zcv4-DgsjhRG9RR0bc20Q1U/exec"></iframe>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+<body class="bg-bg-light dark:bg-bg-dark text-gray-900 dark:text-gray-100 select-none flex flex-col">
+
+<div id="dev-bar-container"></div>
+
+<div class="flex-none shadow z-30 flex text-sm items-center justify-between p-2 relative gap-2 bg-surface-light dark:bg-surface-dark">
+ <img src="https://drive.google.com/thumbnail?id=1zWXle0f60eKYSKMrlyUbfU8OyKJ_9oju&sz=h100" referrerpolicy="no-referrer" alt="Logo" class="h-10 w-auto rounded object-contain">
+ <div class="flex w-full gap-1">
+   <div onclick="switchView('roster')" id="nav-roster" class="nav-btn">Roster</div>
+   <div onclick="switchView('session')" id="nav-session" class="nav-btn active">Session</div>
+   <div onclick="switchView('planning')" id="nav-planning" class="nav-btn">Boats</div>
+ </div>
+ <button onclick="toggleTheme()" class="ml-2 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">🌗</button>
+</div>
+
+<div class="flex-none bg-white dark:bg-gray-900 border-b dark:border-gray-700 py-1 px-3 relative shadow-sm z-20 flex items-center justify-end h-10 gap-3">
+   <a id="sheet-link" href="#" target="_blank" class="flex-none text-[10px] font-bold px-3 py-1 rounded border transition-colors bg-white text-blue-600 border-blue-200 hover:bg-blue-50 dark:bg-gray-700 dark:text-blue-300 dark:border-gray-600 z-10 no-underline hidden">Open Sheet</a>
+   <div class="flex-grow flex justify-center gap-6 text-[10px] font-bold uppercase tracking-wider">
+       <div class="flex items-center gap-1.5 text-[#1e3a8a] dark:text-[#bfdbfe]"><div class="w-3 h-3 rounded-sm bg-[#bfdbfe] border border-[#60a5fa] dark:bg-[#1e3a8a] dark:border-[#1d4ed8]"></div> Paddler</div>
+       <div class="flex items-center gap-1.5 text-[#14532d] dark:text-[#bbf7d0]"><div class="w-3 h-3 rounded-sm bg-[#bbf7d0] border border-[#4ade80] dark:bg-[#14532d] dark:border-[#15803d]"></div> Volunteer</div>
+   </div>
+   
+   <svg onclick="refreshAppData()" class="w-6 h-6 cursor-pointer hover:opacity-80 transition-opacity z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" title="Update App & Refresh Data">
+        <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+        <path d="M4 12C4 16.4183 7.58172 20 12 20C14.5656 20 16.8481 18.7877 18.2868 16.9038M19.918 13C19.9729 12.6738 20 12.3397 20 12C20 7.58172 16.4183 4 12 4C9.56557 4 7.3779 5.09758 5.88235 6.82353" stroke="url(#grad1)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M16 16.5L18.5 16.5L18.5 19" stroke="url(#grad1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M8 7.5L5.5 7.5L5.5 5" stroke="url(#grad1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+   </svg>
+
+   <button id="save-btn" onclick="executeSave()" class="flex-none text-[10px] font-bold px-3 py-1 rounded border transition-colors bg-slate-200 text-slate-800 border-slate-300 dark:bg-slate-700 dark:text-white dark:border-gray-600 z-10 cursor-pointer">Save Now</button>
+</div>
+
+<!-- (Rest of the Body HTML structure - No Changes needed here until script) -->
+<div class="flex-grow overflow-hidden relative">
+
+ <!-- VIEW 1: ROSTER -->
+ <div id="view-roster" class="p-2 h-full hidden flex flex-col w-full max-w-6xl mx-auto">
+   <div class="flex justify-between items-center mb-2 flex-none px-1">
+     <h2 class="text-xl font-bold dark:text-white">Team Roster</h2>
+     <button onclick="openMemberModal()" class="bg-blue-600 text-white px-3 py-1 rounded shadow hover:bg-blue-700 font-bold text-sm cursor-pointer">+ Add</button>
+   </div>
+   <div class="flex-grow flex flex-row gap-2 min-h-0">
+     <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-gray-800 rounded shadow border dark:border-gray-700 overflow-hidden">
+         <div class="p-2 bg-blue-100 dark:bg-blue-800 border-b border-blue-200 dark:border-blue-700 font-bold text-center text-blue-900 dark:text-blue-100 uppercase text-xs sticky top-0 z-10">Paddlers</div>
+         <div id="roster-paddlers" class="overflow-y-auto p-1 space-y-1 custom-scroll flex-grow pb-24"></div>
+     </div>
+     <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-gray-800 rounded shadow border dark:border-gray-700 overflow-hidden">
+         <div class="p-2 bg-green-100 dark:bg-green-800 border-b border-green-200 dark:border-green-700 font-bold text-center text-green-900 dark:text-green-100 uppercase text-xs sticky top-0 z-10">Volunteers</div>
+         <div id="roster-volunteers" class="overflow-y-auto p-1 space-y-1 custom-scroll flex-grow pb-24"></div>
+     </div>
+   </div>
+ </div>
+
+ <!-- VIEW 2: SESSION -->
+ <div id="view-session" class="h-full flex flex-col max-w-lg mx-auto">
+   <div class="flex-none p-2 pb-1">
+     <div class="bg-surface-light dark:bg-surface-dark rounded shadow border dark:border-gray-700 overflow-hidden">
+         <div class="flex border-b dark:border-gray-600">
+             <button id="tab-new" onclick="switchSessionTab('new')" class="flex-1 py-2 text-xs font-bold uppercase transition-colors cursor-pointer">New Session</button>
+             <button id="tab-load" onclick="switchSessionTab('load')" class="flex-1 py-2 text-xs font-bold uppercase transition-colors cursor-pointer">Load Saved</button>
+         </div>
+         <div class="p-2">
+             <div id="panel-new" class="block">
+                 <label class="block text-[10px] font-bold text-gray-500 uppercase dark:text-gray-300 mb-1">Pick Date</label>
+                 <div class="flex gap-2 h-9">
+                     <div class="relative flex-1 h-full">
+                         <div id="new-session-display" class="w-full h-full border p-2 rounded dark:bg-gray-800 dark:border-gray-600 text-sm flex items-center dark:text-white truncate"><span class="text-gray-400 italic">Select Date...</span></div>
+                         <input type="date" id="new-session-date" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="updateNewSessionPickerDisplay(this)" onclick="try{this.showPicker()}catch(e){}">
+                     </div>
+                     <button onclick="createNewSession()" class="bg-blue-600 text-white px-3 rounded text-xs font-bold shadow hover:bg-blue-700 h-full cursor-pointer">CREATE & START</button>
+                 </div>
+             </div>
+             <div id="panel-load" class="hidden">
+                 <label class="block text-[10px] font-bold text-gray-500 uppercase dark:text-gray-300 mb-1">Select File</label>
+                 <div class="flex gap-2 h-9">
+                     <select id="load-select" class="flex-1 h-full border px-2 rounded dark:bg-gray-800 dark:border-gray-600 text-sm dark:text-white"><option value="">Loading list...</option></select>
+                     <button onclick="loadSelectedSession()" class="bg-gray-700 text-white px-3 rounded text-xs font-bold shadow hover:bg-gray-600 h-full cursor-pointer">LOAD</button>
+                 </div>
+             </div>
+         </div>
+         <div id="active-session-bar" class="bg-blue-50 dark:bg-gray-800 border-t dark:border-gray-600 p-1.5 text-center text-xs hidden">
+             <span class="text-gray-500 uppercase font-bold mr-2">Active:</span><span id="active-session-display" class="font-bold text-blue-700 dark:text-blue-400 text-sm"></span>
+         </div>
+     </div>
+   </div>
+   <div id="attendance-section" class="flex-grow flex flex-col p-2 pt-0 min-h-0 hidden">
+     <div class="bg-surface-light dark:bg-surface-dark rounded shadow border dark:border-gray-700 flex flex-col h-full overflow-hidden">
+         <div class="flex text-xs font-bold uppercase">
+             <div class="w-1/2 p-2 pl-3 bg-blue-100 text-blue-900 dark:bg-blue-800 dark:text-blue-100 border-b border-blue-200 dark:border-blue-700 flex items-center gap-2">
+                 <input type="checkbox" onchange="toggleGroup('Paddler', this.checked)" class="w-4 h-4 rounded"><span>Paddlers</span>
+             </div>
+             <div class="w-1/2 p-2 pl-3 bg-green-100 text-green-900 dark:bg-green-800 dark:text-green-100 border-b border-green-200 dark:border-green-700 border-l dark:border-l-gray-600 flex items-center gap-2">
+                 <input type="checkbox" onchange="toggleGroup('Volunteer', this.checked)" class="w-4 h-4 rounded"><span>Volunteers</span>
+             </div>
+         </div>
+         <div class="flex-grow flex overflow-hidden">
+             <div id="list-paddlers" class="w-1/2 overflow-y-auto p-1 custom-scroll border-r dark:border-gray-600 pb-24"></div>
+             <div id="list-volunteers" class="w-1/2 overflow-y-auto p-1 custom-scroll pb-24"></div>
+         </div>
+     </div>
+   </div>
+ </div>
+
+ <!-- VIEW 3: BOATS -->
+ <div id="view-planning" class="h-full flex flex-col hidden">
+   <div class="flex-none z-20 shadow-sm bg-surface-light dark:bg-surface-dark pb-2">
+       <div class="bg-gray-100 dark:bg-gray-900 p-1 text-[10px] flex justify-between px-2 border-b dark:border-gray-700 font-mono">
+          <div class="flex gap-3">
+             <span class="text-gray-500 uppercase font-bold">Pool:</span>
+             <span class="text-gray-600 dark:text-gray-300">P:<b id="pool-paddlers" class="text-blue-600 dark:text-blue-400">0</b></span>
+             <span class="text-gray-600 dark:text-gray-300">V:<b id="pool-vols" class="text-green-600 dark:text-green-400">0</b></span>
+          </div>
+          <div class="flex gap-3">
+             <span class="text-gray-500 uppercase font-bold">Total:</span>
+             <span class="text-gray-600 dark:text-gray-300">P:<b id="total-paddlers" class="text-blue-600 dark:text-blue-400">0</b></span>
+             <span class="text-gray-600 dark:text-gray-300">V:<b id="total-vols" class="text-green-600 dark:text-green-400">0</b></span>
+          </div>
+       </div>
+       <div class="px-2 mt-2 flex flex-col gap-2">
+         <div class="flex gap-2 w-full">
+            <div class="w-1/3 flex gap-1">
+                <button id="undo-btn" onclick="performUndo()" class="flex-1 bg-orange-500 text-white py-2 rounded-l text-xs font-bold shadow cursor-pointer opacity-50 pointer-events-none transition-opacity flex items-center justify-center" title="Undo">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>
+                </button>
+                <button id="redo-btn" onclick="performRedo()" class="flex-1 bg-orange-500 text-white py-2 rounded-r text-xs font-bold shadow cursor-pointer opacity-50 pointer-events-none transition-opacity flex items-center justify-center" title="Redo">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3" /></svg>
+                </button>
+            </div>
+            <button onclick="addBoat('standard')" class="flex-1 bg-gray-700 text-white py-2 rounded text-xs font-bold shadow cursor-pointer">+ Standard (20)</button>
+            <button onclick="addBoat('small')" class="flex-1 bg-gray-700 text-white py-2 rounded text-xs font-bold shadow cursor-pointer">+ Small (10)</button>
+         </div>
+         <div class="bg-white dark:bg-gray-800 p-1 rounded border dark:border-gray-700">
+             <div class="text-[10px] font-bold text-gray-500 uppercase px-1 mb-1 dark:text-gray-300">Auto-Balancing</div>
+             <div class="flex items-center gap-2">
+                 <select id="balance-mode" class="flex-1 text-xs p-1 border rounded dark:bg-gray-900 dark:border-gray-600 font-medium dark:text-white">
+                     <option value="stability">Stability (L/R)</option>
+                     <option value="rocket">Rocket (Engine)</option>
+                 </select>
+                 <button onclick="showAlgoInfo()" class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs cursor-pointer">i</button>
+                 <button onclick="runAutoBalance()" class="bg-purple-600 text-white px-3 py-1 rounded text-xs font-bold cursor-pointer">GO</button>
+             </div>
+         </div>
+       </div>
+   </div>
+   <div class="flex-grow flex overflow-hidden">
+       <div id="pool-container" class="w-[28%] min-w-[90px] bg-gray-200 dark:bg-gray-900 border-r dark:border-gray-700 overflow-y-auto p-2 flex flex-col gap-1 droppable custom-scroll pb-24" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
+       <div id="boats-area" class="flex-1 bg-gray-50 dark:bg-gray-900 overflow-y-auto p-2 flex flex-col gap-6 pb-24 custom-scroll"></div>
+   </div>
+ </div>
+</div>
+
+<div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex flex-col items-center justify-center hidden"><div class="spinner mb-4"></div><div class="text-white font-bold text-lg tracking-wider" id="loading-text">Loading...</div></div>
+<div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 p-4"><div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-sm shadow-xl"><h3 class="font-bold text-lg mb-2 dark:text-white">Delete Member</h3><p class="text-sm text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to remove <span id="delete-member-name" class="font-bold text-gray-900 dark:text-white"></span>? This action cannot be undone.</p><div class="flex justify-end gap-3"><button onclick="document.getElementById('delete-modal').classList.add('hidden')" class="px-4 py-2 rounded text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700">Cancel</button><button onclick="confirmDelete()" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 font-bold shadow">Delete</button></div></div></div>
+<div id="link-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50 p-4"><div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-sm shadow-xl text-center"><div class="text-green-500 mb-2 text-4xl">✓</div><h3 class="font-bold text-lg mb-2 dark:text-white">Image Uploaded</h3><p class="text-sm text-gray-600 dark:text-gray-300 mb-4">The boat configuration has been saved to Google Drive.</p><a id="drive-link" href="#" target="_blank" class="block w-full bg-blue-600 text-white py-2 rounded font-bold mb-3 hover:bg-blue-700 truncate px-2">Open Image</a><button onclick="document.getElementById('link-modal').classList.add('hidden')" class="w-full bg-gray-200 dark:bg-gray-700 py-2 rounded text-sm font-bold dark:text-white">Close</button></div></div>
+<div id="assign-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50"><div class="bg-surface-light dark:bg-surface-dark p-4 rounded-lg w-11/12 max-w-sm h-3/4 flex flex-col shadow-2xl"><div class="flex justify-between items-center mb-3"><h3 class="font-bold dark:text-white">Select Person</h3><button id="btn-clear-seat" onclick="clearCurrentSeat()" class="text-xs bg-red-500 text-white px-2 py-1 rounded hidden">Remove</button><button onclick="document.getElementById('assign-modal').classList.add('hidden')" class="text-2xl p-2 dark:text-white">&times;</button></div><div id="assign-list" class="overflow-y-auto flex-1 space-y-1 custom-scroll dark:text-gray-100 pb-24"></div></div></div>
+<div id="member-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50"><div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg w-11/12 max-w-sm shadow-2xl"><h3 class="font-bold mb-4 dark:text-white">Manage Member</h3><input type="hidden" id="m-index"><label class="block text-xs font-bold text-gray-500 uppercase mt-2 dark:text-gray-300">Full Name</label><input id="m-name" class="w-full border p-2 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white" placeholder="e.g. John Doe"><div class="flex gap-2 mt-2"><div class="w-1/2"><label class="block text-xs font-bold text-gray-500 uppercase dark:text-gray-300">Role</label><select id="m-type" onchange="refreshLinkSection()" class="w-full border p-2 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"><option>Paddler</option><option>Volunteer</option></select></div><div class="w-1/2"><label class="block text-xs font-bold text-gray-500 uppercase dark:text-gray-300">Side Pref</label><select id="m-side" class="w-full border p-2 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"><option>Any</option><option>Left</option><option>Right</option></select></div></div><div class="flex gap-2 mt-2 mb-4"><div class="w-1/2"><label class="block text-xs font-bold text-gray-500 uppercase dark:text-gray-300">Gender</label><select id="m-gender" class="w-full border p-2 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"><option>M</option><option>F</option></select></div><div class="w-1/2"><label class="block text-xs font-bold text-gray-500 uppercase dark:text-gray-300">Weight (kg)</label><input type="number" id="m-weight" class="w-full border p-2 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white" placeholder="e.g. 75"></div></div><div id="m-link-section" class="mb-4 border-t pt-2 dark:border-gray-700"><label id="m-link-label" class="block text-xs font-bold text-gray-500 uppercase mb-2 dark:text-gray-300">Linked Members</label><div id="m-link-list" class="max-h-32 overflow-y-auto border rounded p-2 bg-gray-50 dark:bg-gray-900 dark:border-gray-700 space-y-1"></div></div><div class="flex justify-end gap-2"><button onclick="document.getElementById('member-modal').classList.add('hidden')" class="px-4 py-2 dark:text-white">Cancel</button><button onclick="saveMemberData()" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button></div></div></div>
+<div id="info-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-[9999] p-4"><div class="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-sm shadow-xl"><h3 class="font-bold text-lg mb-4 dark:text-white">Balancing Modes</h3><div class="space-y-4 text-xs dark:text-gray-300"><p><strong class="block text-blue-600">Stability (L/R):</strong> Balances weight equally between Left and Right sides.</p><p><strong class="block text-blue-600">Rocket (Engine):</strong> Places heaviest paddlers in the middle rows (Engine Room).</p><p class="italic mt-2 border-t pt-2">* Rules: Paddlers must sit with a Volunteer. Linked groups are prioritized. Coach/Steer seats are locked.</p></div><button onclick="document.getElementById('info-modal').classList.add('hidden')" class="w-full bg-gray-200 dark:bg-gray-700 py-3 rounded text-sm font-bold mt-6 dark:text-white">Close</button></div></div>
+
+<script>
+// ============================================
+// CONFIGURATION
+// ============================================
+
+// 1. SET ENVIRONMENT: "DEV" OR "PROD"
+const ENV = "PROD"; 
+
+// 2. PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+const API_URL = "https://script.google.com/macros/s/AKfycbw2IQxPX-Mn3Zy-8-YNHOrfOjsDGGWIBb0-xLp9g3DM1zcv4-DgsjhRG9RR0bc20Q1U/exec"; 
+
+// 3. FRONTEND CONFIGURATION MAPPING
+const FRONTEND_CONFIG = {
+  PROD: {
+    SHEET_ID: "1JKHOx-53BbL3XfP1RqYQ7QLmb2vg1q_rlvnXda5ervw"
+  },
+  DEV: {
+    SHEET_ID: "11l1q5YSfAtp897hPvNgb8Ak7DXmJ6l7FJ9mV6QniEDY"
+  }
+};
+
+if (API_URL === "PASTE_YOUR_GAS_WEB_APP_URL_HERE") {
+    alert("Please update the API_URL in index.html with your Google Apps Script Web App URL.");
+}
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
+
+// ============================================
+// API HANDLER (Replaces google.script.run)
+// ============================================
+async function apiCall(action, data = {}) {
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            redirect: 'follow', // Important for GAS redirects
+            body: JSON.stringify({ action: action, data: data }),
+            headers: { "Content-Type": "text/plain;charset=utf-8" } 
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+            return result.data;
+        } else {
+            throw new Error(result.message);
         }
-    </script>
+    } catch (error) {
+        console.error("API Error:", error);
+        throw error;
+    }
+}
+
+// ============================================
+// APP LOGIC
+// ============================================
+
+function showAlgoInfo() { document.getElementById('info-modal').classList.remove('hidden'); }
+
+let roster = [];
+let autosaveTimer = null;
+let currentSeatForAssign = null;
+let currentSessionDate = null;
+let draggedEl = null;
+let memberToDeleteIndex = null;
+let boatUndoStack = [];
+let boatRedoStack = [];
+let isRestoring = false;
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+window.onload = function() {
+ // 1. Set up Environment UI
+ const activeConfig = FRONTEND_CONFIG[ENV];
+ 
+ if (ENV === 'DEV') {
+    document.getElementById('dev-bar-container').innerHTML = 
+        '<div class="flex-none bg-red-600 text-white text-center text-xs font-bold py-1 z-50">DEV MODE</div>';
+ }
+
+ // 2. Set up Sheet Link
+ if (activeConfig && activeConfig.SHEET_ID) {
+    const link = document.getElementById('sheet-link');
+    link.href = `https://docs.google.com/spreadsheets/d/${activeConfig.SHEET_ID}`;
+    link.classList.remove('hidden');
+ }
+
+ loadRoster();
+ loadSessionList();
+ if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+ switchView('session');
+ switchSessionTab('new');
+};
+
+window.onbeforeunload = function() {
+  const btn = document.getElementById('save-btn');
+  if (autosaveTimer || btn.innerText === "Saving..." || btn.innerText === "Waiting...") {
+      return "Changes are not yet saved. Are you sure you want to leave?";
+  }
+};
+
+/* ================= SESSION WORKFLOW UI ================= */
+function switchSessionTab(tab) {
+  const tNew = document.getElementById('tab-new');
+  const tLoad = document.getElementById('tab-load');
+  const pNew = document.getElementById('panel-new');
+  const pLoad = document.getElementById('panel-load');
+  const inactiveClass = ['bg-gray-100', 'dark:bg-gray-900', 'text-gray-500', 'border-transparent'];
+  const activeClass = ['bg-blue-600', 'dark:bg-blue-800', 'text-white', 'border-blue-800'];
+  if(tab === 'new') {
+      tNew.classList.add(...activeClass); tNew.classList.remove(...inactiveClass);
+      tLoad.classList.add(...inactiveClass); tLoad.classList.remove(...activeClass);
+      pNew.classList.remove('hidden'); pLoad.classList.add('hidden');
+  } else {
+      tLoad.classList.add(...activeClass); tLoad.classList.remove(...inactiveClass);
+      tNew.classList.add(...inactiveClass); tNew.classList.remove(...activeClass);
+      pLoad.classList.remove('hidden'); pNew.classList.add('hidden');
+  }
+}
+
+function updateNewSessionPickerDisplay(input) {
+  const val = input.value;
+  const disp = document.getElementById('new-session-display');
+  if(!val) { disp.innerHTML = '<span class="text-gray-400 italic">Select Date...</span>'; return; }
+  const [y, m, d] = val.split('-').map(Number);
+  const dateObj = new Date(y, m-1, d);
+  const dayName = DAYS[dateObj.getDay()];
+  disp.innerText = `${d} ${MONTHS[m-1]} ${y} (${dayName})`;
+  disp.classList.remove('text-gray-400', 'italic');
+}
+
+function showLoading(msg) { document.getElementById('loading-text').innerText = msg; document.getElementById('loading-overlay').classList.remove('hidden'); }
+function hideLoading() { document.getElementById('loading-overlay').classList.add('hidden'); }
+
+function resetBoard() {
+  document.querySelectorAll('.att-chk').forEach(c => c.checked = false);
+  document.getElementById('pool-container').innerHTML = "";
+  document.getElementById('boats-area').innerHTML = "";
+  updatePoolCounts();
+  document.getElementById('attendance-section').classList.add('hidden');
+  document.getElementById('active-session-bar').classList.add('hidden');
+  boatUndoStack = [];
+  boatRedoStack = [];
+  updateUndoRedoUI();
+}
+
+function stopAutosave() { if(autosaveTimer) { clearTimeout(autosaveTimer); autosaveTimer = null; } updateSaveButton('idle'); }
+
+/* ================= UNDO / REDO SYSTEM ================= */
+function pushUndo() {
+    const state = serializeState();
+    boatUndoStack.push(JSON.stringify(state));
+    if (boatUndoStack.length > 20) boatUndoStack.shift(); 
+    boatRedoStack = [];
+    updateUndoRedoUI();
+}
+
+function performUndo() {
+    if (boatUndoStack.length === 0) return;
+    if(autosaveTimer) { clearTimeout(autosaveTimer); autosaveTimer = null; }
+
+    const currentState = serializeState();
+    boatRedoStack.push(JSON.stringify(currentState));
+
+    const prevState = JSON.parse(boatUndoStack.pop());
+    isRestoring = true; 
+    restoreState(prevState);
+    isRestoring = false;
+    
+    updateUndoRedoUI();
+    triggerAutosave();
+}
+
+function performRedo() {
+    if (boatRedoStack.length === 0) return;
+    if(autosaveTimer) { clearTimeout(autosaveTimer); autosaveTimer = null; }
+
+    const currentState = serializeState();
+    boatUndoStack.push(JSON.stringify(currentState));
+
+    const nextState = JSON.parse(boatRedoStack.pop());
+    isRestoring = true;
+    restoreState(nextState);
+    isRestoring = false;
+
+    updateUndoRedoUI();
+    triggerAutosave();
+}
+
+function updateUndoRedoUI() {
+    const undoBtn = document.getElementById('undo-btn');
+    if (boatUndoStack.length > 0) {
+        undoBtn.classList.remove('opacity-50', 'pointer-events-none');
+        undoBtn.classList.add('hover:bg-orange-600');
+    } else {
+        undoBtn.classList.add('opacity-50', 'pointer-events-none');
+        undoBtn.classList.remove('hover:bg-orange-600');
+    }
+
+    const redoBtn = document.getElementById('redo-btn');
+    if (boatRedoStack.length > 0) {
+        redoBtn.classList.remove('opacity-50', 'pointer-events-none');
+        redoBtn.classList.add('hover:bg-orange-600');
+    } else {
+        redoBtn.classList.add('opacity-50', 'pointer-events-none');
+        redoBtn.classList.remove('hover:bg-orange-600');
+    }
+}
+
+/* ================= SESSION LOGIC ================= */
+function createNewSession() {
+  const dateVal = document.getElementById('new-session-date').value;
+  if(!dateVal) { alert("Please pick a date first."); return; }
+  showLoading("Checking date...");
+  
+  apiCall('checkSessionExists', dateVal)
+      .then((exists) => {
+          if(exists) {
+            hideLoading();
+            if(!confirm(`A session for ${dateVal} already exists. Overwrite?`)) return;
+            showLoading("Creating Session...");
+          }
+         
+          stopAutosave();
+          resetBoard();
+         
+          currentSessionDate = dateVal;
+          updateDateDisplay(dateVal);
+          document.getElementById('attendance-section').classList.remove('hidden');
+          hideLoading();
+         
+          const emptyState = { date: dateVal, attendance: [], boats: [] };
+          apiCall('saveSessionToDrive', { dateStr: dateVal, jsonContent: JSON.stringify(emptyState) })
+              .then(() => loadSessionList())
+              .catch(err => alert("Background Save Failed: " + err));
+      })
+      .catch(err => { hideLoading(); alert("Server check failed: " + err); });
+}
+
+function loadSelectedSession() {
+  const id = document.getElementById('load-select').value;
+  if(!id) return;
+  stopAutosave(); showLoading("Loading Data..."); resetBoard();
+  
+  apiCall('loadSessionFile', id)
+      .then(json => {
+          if (!json || json.trim() === "") { console.warn("Empty file."); hideLoading(); return; }
+          try { 
+              const data = JSON.parse(json); 
+              isRestoring = true; 
+              restoreState(data); 
+              isRestoring = false;
+          }
+          catch(e) { console.error(e); alert("Error reading file."); }
+          hideLoading();
+      })
+      .catch(err => { hideLoading(); alert("Failed: " + err); });
+}
+
+function loadSessionList() {
+  apiCall('listSessions')
+      .then(files => {
+          const sel = document.getElementById('load-select');
+          if(files.length===0) { sel.innerHTML=`<option value="">No files</option>`; return; }
+          sel.innerHTML=`<option value="">Select session...</option>`+files.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
+      })
+      .catch(() => { document.getElementById('load-select').innerHTML=`<option>Error</option>`; });
+}
+
+function updateDateDisplay(isoDate) {
+  if(!isoDate) return;
+  const [y, m, d] = isoDate.split('-').map(Number);
+  const dateObj = new Date(y, m-1, d);
+  document.getElementById('active-session-display').innerText = `${d} ${MONTHS[m-1]} ${y} (${DAYS[dateObj.getDay()]})`;
+  document.getElementById('active-session-bar').classList.remove('hidden');
+  currentSessionDate = isoDate;
+}
+
+function refreshAppData() {
+    const btnText = document.getElementById('save-btn').innerText;
+    if(autosaveTimer || btnText.includes("Saving") || btnText.includes("Waiting")) {
+        if(!confirm("Saving is in progress. Reloading now might lose unsaved changes. Continue?")) return;
+    }
+    window.location.reload(true); 
+}
+
+function updateSaveButton(status) {
+  const btn = document.getElementById('save-btn');
+  btn.disabled = false; btn.onclick = executeSave;
+  btn.className = "flex-none text-[10px] font-bold px-3 py-1 rounded border transition-colors cursor-pointer ";
+  if (status === 'idle') {
+      btn.innerText = "Save Now"; btn.classList.add("bg-slate-200", "text-slate-800", "border-slate-300", "dark:bg-slate-700", "dark:text-white", "dark:border-gray-600");
+  } else if (status === 'waiting') {
+      btn.innerText = "Waiting..."; btn.classList.add("bg-amber-100", "text-amber-700", "border-amber-200");
+  } else if (status === 'saving') {
+      btn.innerText = "Saving..."; btn.disabled = true; btn.classList.add("bg-blue-100", "text-blue-700", "border-blue-200");
+  } else if (status === 'saved') {
+      btn.innerText = "Saved"; btn.classList.add("bg-green-100", "text-green-700", "border-green-200");
+  } else if (status === 'error') {
+      btn.innerText = "Retry Save"; btn.classList.add("bg-red-100", "text-red-700", "border-red-200");
+  }
+}
+
+function triggerAutosave() {
+  if(!currentSessionDate) return;
+  updateSaveButton('waiting');
+  if(autosaveTimer) clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(executeSave, 2000);
+}
+
+function executeSave() {
+  if(!currentSessionDate) return;
+  
+  if(autosaveTimer) {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = null;
+  }
+
+  updateSaveButton('saving');
+  const data = serializeState();
+  
+  apiCall('saveSessionToDrive', { dateStr: currentSessionDate, jsonContent: JSON.stringify(data) })
+      .then(() => {
+          updateSaveButton('saved');
+          setTimeout(() => { if(document.getElementById('save-btn').innerText === "Saved") updateSaveButton('idle'); }, 2000);
+      })
+      .catch((err) => { console.error(err); updateSaveButton('error'); });
+}
+
+function serializeState() {
+const attendance = Array.from(document.querySelectorAll('.att-chk:checked')).map(c => c.value);
+const boatData = [];
+document.querySelectorAll('.boat-wrapper').forEach(b => {
+  const seats = [];
+  b.querySelectorAll('.droppable').forEach(s => {
+     seats.push({ role: s.dataset.role, row: s.dataset.row, side: s.dataset.side, occupant: s.firstElementChild ? s.firstElementChild.dataset.name : null });
+  });
+  boatData.push({ type: b.dataset.type, seats: seats });
+});
+return { date: currentSessionDate, attendance: attendance, boats: boatData };
+}
+
+function restoreState(data) {
+    updateDateDisplay(data.date);
+    document.getElementById('attendance-section').classList.remove('hidden');
+    document.querySelectorAll('.att-chk').forEach(c => c.checked = data.attendance.includes(c.value));
+    
+    const pool = document.getElementById('pool-container');
+    pool.innerHTML = "";
+    document.getElementById('boats-area').innerHTML = "";
+
+    data.attendance.forEach(idx => { const p = roster[idx]; pool.innerHTML += createSeatElement(p); });
+    
+    data.boats.forEach(b => {
+       addBoat(b.type); 
+       const newBoat = document.getElementById('boats-area').lastElementChild;
+       
+       b.seats.forEach(ss => {
+          if(ss.occupant) {
+             const pEl = document.querySelector(`.seat[data-name="${ss.occupant}"]`);
+             if(pEl) {
+                let t; 
+                if(ss.role) t = newBoat.querySelector(`[data-role="${ss.role}"]`); 
+                else t = newBoat.querySelector(`[data-row="${ss.row}"][data-side="${ss.side}"]`);
+                if(t) t.appendChild(pEl);
+             }
+          }
+       });
+       calcBoatStats(newBoat.id);
+    });
+    
+    syncPoolWithAttendance(); 
+    renumberBoats();
+}
+
+function sortPool() {
+  const pool = document.getElementById('pool-container');
+  const existingSeats = Array.from(pool.children);
+ 
+  const paddlers = [];
+  const volunteers = [];
+ 
+  existingSeats.forEach(el => {
+      if (el.classList.contains('seat')) {
+          if (el.dataset.type === 'Paddler') paddlers.push(el);
+          else volunteers.push(el);
+      }
+  });
+ 
+  paddlers.sort((a,b) => a.dataset.name.localeCompare(b.dataset.name));
+ 
+  const volMap = {};
+  volunteers.forEach(v => volMap[v.dataset.name] = v);
+
+  pool.innerHTML = '';
+ 
+  const displayedVols = new Set();
+
+  paddlers.forEach(p => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'pool-group';
+      wrapper.innerHTML = `<div class="pool-group-label">Linked Group</div>`;
+     
+      wrapper.appendChild(p);
+     
+      const rosterMember = roster.find(r => r.name === p.dataset.name);
+      if (rosterMember && rosterMember.volunteers) {
+          const links = rosterMember.volunteers.split(',').map(s=>s.trim());
+          links.forEach(linkName => {
+              if (volMap[linkName]) {
+                  const clone = volMap[linkName].cloneNode(true);
+                  wrapper.appendChild(clone);
+                  displayedVols.add(linkName);
+              }
+          });
+      }
+      pool.appendChild(wrapper);
+  });
+
+  const orphanWrapper = document.createElement('div');
+  orphanWrapper.className = 'mt-2 border-t border-gray-300 dark:border-gray-600 pt-2';
+  let hasOrphans = false;
+ 
+  const allVols = Object.values(volMap).sort((a,b) => a.dataset.name.localeCompare(b.dataset.name));
+ 
+  allVols.forEach(v => {
+      if (!displayedVols.has(v.dataset.name)) {
+          orphanWrapper.appendChild(v);
+          hasOrphans = true;
+      }
+  });
+
+  if (hasOrphans) pool.appendChild(orphanWrapper);
+ 
+  updatePoolStatus();
+}
+
+function updatePoolStatus() {
+   const boatSeats = document.querySelectorAll('.boat-wrapper .seat span:first-child');
+   const seatedNames = new Set();
+   boatSeats.forEach(span => seatedNames.add(span.innerText));
+
+   const poolSeats = document.querySelectorAll('#pool-container .seat');
+   poolSeats.forEach(seat => {
+       const name = seat.dataset.name;
+       if (seatedNames.has(name)) {
+           seat.classList.add('seated-in-pool');
+           seat.draggable = false;
+       } else {
+           seat.classList.remove('seated-in-pool');
+           seat.draggable = true;
+       }
+   });
+}
+
+function syncPoolWithAttendance() {
+  const pool = document.getElementById('pool-container');
+  pool.innerHTML = "";
+ 
+  document.querySelectorAll('.att-chk:checked').forEach(chk => {
+      const p = roster[chk.value];
+      pool.innerHTML += createSeatElement(p);
+  });
+ 
+  sortPool();
+  updatePoolCounts();
+  if (!isRestoring) triggerAutosave();
+}
+
+function updateActiveSeats(p, oldName) {
+    const selector = oldName ? `.seat[data-name="${oldName}"]` : `.seat[data-name="${p.name}"]`;
+    document.querySelectorAll(selector).forEach(seat => {
+        seat.dataset.name = p.name;
+        seat.dataset.weight = p.weight;
+        seat.dataset.side = p.side;
+        seat.dataset.type = p.type;
+        
+        const baseClass = "seat rounded shadow-sm z-10 w-full mb-1 flex-shrink-0 cursor-grab";
+        const typeClass = p.type === 'Volunteer' ? 'volunteer' : (p.type==='Paddler'?'paddler':'drummer-helm');
+        const statusClass = seat.classList.contains('seated-in-pool') ? ' seated-in-pool' : '';
+        seat.className = `${baseClass} ${typeClass}${statusClass}`;
+
+        if(seat.closest('#pool-container')) {
+             if(document.querySelector('.boat-wrapper .seat[data-name="'+p.name+'"]')) {
+                 seat.classList.add('seated-in-pool');
+                 seat.draggable = false;
+             } else {
+                 seat.draggable = true;
+             }
+        }
+
+        const nameSpan = seat.querySelector('span:first-child');
+        if(nameSpan) nameSpan.innerText = p.name;
+        
+        const weightSpan = seat.querySelector('.weight-text');
+        if(weightSpan) weightSpan.innerText = `${p.weight}kg ${p.side.substring(0,1)}`;
+        
+        const boat = seat.closest('.boat-wrapper');
+        if(boat) calcBoatStats(boat.id);
+    });
+    updatePoolCounts();
+}
+
+function removeMemberFromSession(name) {
+    document.querySelectorAll(`.seat[data-name="${name}"]`).forEach(seat => {
+        const boat = seat.closest('.boat-wrapper');
+        seat.remove();
+        if(boat) calcBoatStats(boat.id);
+    });
+    updatePoolCounts();
+}
+
+document.addEventListener('touchstart', function(e) {
+  if(e.target.classList.contains('remove-x')) return;
+  const target = e.target.closest('.seat');
+  if (target && target.getAttribute('data-name') && !target.classList.contains('seated-in-pool')) {
+      touchEl = target; touchEl.setAttribute('draggable', 'false');
+      longPressTimer = setTimeout(() => {
+          isDragging = true; touchEl.classList.add('locked-for-drag');
+          if(navigator.vibrate) navigator.vibrate(50);
+          const rect = touchEl.getBoundingClientRect();
+          touchOffsetX = e.touches[0].clientX - rect.left; touchOffsetY = e.touches[0].clientY - rect.top;
+          cloneEl = touchEl.cloneNode(true);
+          const xBtn = cloneEl.querySelector('.remove-x'); if(xBtn) xBtn.remove();
+          cloneEl.classList.add('dragging-clone'); cloneEl.classList.remove('locked-for-drag');
+          cloneEl.style.backgroundColor = getComputedStyle(touchEl).backgroundColor;
+          cloneEl.style.color = getComputedStyle(touchEl).color;
+          cloneEl.style.border = getComputedStyle(touchEl).border;
+          cloneEl.style.width = rect.width + 'px';
+          document.body.appendChild(cloneEl);
+          moveClone(e.touches[0].clientX, e.touches[0].clientY);
+      }, 300);
+  }
+}, {passive: false});
+document.addEventListener('touchmove', function(e) {
+  if (isDragging && cloneEl) { e.preventDefault(); moveClone(e.touches[0].clientX, e.touches[0].clientY); }
+  else { clearTimeout(longPressTimer); if(touchEl) touchEl.classList.remove('locked-for-drag'); }
+}, {passive: false});
+document.addEventListener('touchend', cleanupDrag);
+document.addEventListener('touchcancel', cleanupDrag);
+function cleanupDrag(e) {
+  clearTimeout(longPressTimer);
+  if(touchEl) { touchEl.classList.remove('locked-for-drag'); touchEl.setAttribute('draggable', 'true'); }
+  if (isDragging && cloneEl) {
+      cloneEl.style.display = 'none';
+      let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+      let clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+      let dropTarget = document.elementFromPoint(clientX, clientY);
+      cloneEl.remove(); cloneEl = null;
+      if (dropTarget && !dropTarget.classList.contains('droppable')) dropTarget = dropTarget.closest('.droppable');
+      let oldParent = touchEl.closest('.boat-wrapper') ? touchEl.closest('.boat-wrapper').id : null;
+     
+      if (dropTarget) {
+           if (!isRestoring) pushUndo(); 
+           let elementToDrop = touchEl;
+           if (!oldParent) {
+               elementToDrop = touchEl.cloneNode(true);
+               elementToDrop.classList.remove('seated-in-pool');
+               elementToDrop.draggable = true;
+           }
+          
+           if (dropTarget.children.length > 0 && dropTarget.id !== 'pool-container') {
+                const existing = dropTarget.children[0];
+                existing.remove();
+           }
+          
+           if (dropTarget.id !== 'pool-container') {
+               dropTarget.appendChild(elementToDrop);
+               if(dropTarget.closest('.boat-wrapper')) calcBoatStats(dropTarget.closest('.boat-wrapper').id);
+           } else {
+               if (!oldParent) {
+                   elementToDrop.remove();
+               } else {
+                   touchEl.remove();
+               }
+           }
+      } else if (oldParent) {
+          if (!isRestoring) pushUndo();
+          touchEl.remove();
+          calcBoatStats(oldParent);
+      }
+     
+      updatePoolStatus();
+      updatePoolCounts();
+      if (!isRestoring) triggerAutosave();
+  }
+  touchEl = null; isDragging = false;
+  document.querySelectorAll('.dragging-clone').forEach(el => el.remove());
+}
+function moveClone(x, y) { if(cloneEl) { cloneEl.style.left = (x - touchOffsetX) + 'px'; cloneEl.style.top = (y - touchOffsetY) + 'px'; } }
+function returnToPool(el) {
+  if (!isRestoring) pushUndo();
+  const seat = el.closest('.seat');
+  const boatId = seat.closest('.boat-wrapper').id;
+  seat.remove(); 
+  calcBoatStats(boatId);
+  updatePoolStatus();
+  if (!isRestoring) triggerAutosave();
+}
+
+function loadRoster() {
+   const currentlyChecked = new Set();
+   document.querySelectorAll('.att-chk:checked').forEach(c => {
+       const nameSpan = c.nextElementSibling;
+       if(nameSpan) currentlyChecked.add(nameSpan.innerText);
+   });
+
+   apiCall('getRosterData')
+       .then(data => {
+           roster = data.sort((a,b) => a.name.localeCompare(b.name));
+           renderRosterTable();
+           renderAttendanceList();
+          
+           if (currentlyChecked.size > 0) {
+               document.querySelectorAll('.att-chk').forEach(c => {
+                   const nameSpan = c.nextElementSibling;
+                   if(nameSpan && currentlyChecked.has(nameSpan.innerText)) {
+                       c.checked = true;
+                   }
+               });
+               syncPoolWithAttendance();
+           }
+       })
+       .catch(err => alert("Error loading roster: " + err));
+}
+
+function renderRosterTable() {
+  const padContainer = document.getElementById('roster-paddlers');
+  const volContainer = document.getElementById('roster-volunteers');
+  padContainer.innerHTML = ""; volContainer.innerHTML = "";
+  const trashIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`;
+  roster.forEach((p, i) => {
+      let typeClass = p.type === 'Volunteer' ? 'row-volunteer' : 'row-paddler';
+      const html = `<div class="p-2 rounded shadow flex justify-between items-center border dark:border-gray-700 ${typeClass}"><div><div class="font-bold text-sm truncate w-24">${p.name}</div><div class="text-[10px] opacity-80 truncate w-24">${p.weight}kg | ${p.side}</div></div><div class="flex gap-2 items-center"><button onclick="editMember(${i})" class="text-amber-600 dark:text-amber-400 font-bold text-xs hover:text-amber-800 dark:hover:text-amber-300">Edit</button><button onclick="openDeleteModal(${i})" class="text-red-500 hover:text-red-700 p-1" title="Delete Member">${trashIcon}</button></div></div>`;
+      if (p.type === 'Volunteer') volContainer.innerHTML += html; else padContainer.innerHTML += html;
+  });
+}
+
+function openDeleteModal(index) {
+  memberToDeleteIndex = index;
+  const p = roster[index];
+  document.getElementById('delete-member-name').innerText = p.name;
+  document.getElementById('delete-modal').classList.remove('hidden');
+}
+
+function confirmDelete() {
+  if (memberToDeleteIndex === null) return;
+  const p = roster[memberToDeleteIndex];
+  document.getElementById('delete-modal').classList.add('hidden');
+  
+  const activeNames = new Set();
+  document.querySelectorAll('.seat').forEach(s => {
+     if(s.dataset.name && s.dataset.name !== p.name) activeNames.add(s.dataset.name);
+  });
+  
+  removeMemberFromSession(p.name);
+  roster.splice(memberToDeleteIndex, 1);
+  renderRosterTable();
+  renderAttendanceList();
+  
+  document.querySelectorAll('.att-chk').forEach(chk => {
+     const name = chk.nextElementSibling.innerText;
+     if(activeNames.has(name)) chk.checked = true;
+  });
+
+  executeSave();
+  
+  apiCall('deleteMember', p.rowIndex).then(() => loadRoster());
+}
+
+function renderAttendanceList() {
+const padContainer = document.getElementById('list-paddlers'); const volContainer = document.getElementById('list-volunteers');
+padContainer.innerHTML = ""; volContainer.innerHTML = "";
+roster.forEach((p, i) => {
+  let typeClass = p.type === 'Volunteer' ? 'bg-[#bbf7d0] dark:bg-green-900 text-[#14532d]' : 'bg-[#bfdbfe] dark:bg-blue-900 text-[#1e3a8a]';
+  const html = `<label class="flex items-center space-x-3 p-3 rounded cursor-pointer text-xs border-b dark:border-gray-700 ${typeClass} mb-1"><input type="checkbox" class="att-chk w-4 h-4" value="${i}" data-type="${p.type}" onchange="handleAttendanceChange(this)"><span class="truncate font-bold dark:text-gray-100">${p.name}</span></label>`;
+  if (p.type === 'Volunteer') volContainer.innerHTML += html; else padContainer.innerHTML += html;
+});
+}
+
+function toggleGroup(type, state) {
+  document.querySelectorAll(type==='Volunteer'?'.att-chk[data-type="Volunteer"]':'.att-chk:not([data-type="Volunteer"])').forEach(c => { c.checked = state; });
+  syncPoolWithAttendance();
+}
+
+function handleAttendanceChange(chk) {
+  if(!chk.checked) {
+      const pIndex = chk.value;
+      const p = roster[pIndex];
+      if(p) removeMemberFromSession(p.name);
+  }
+  syncPoolWithAttendance();
+}
+
+function createSeatElement(p) {
+let typeClass = p.type === 'Volunteer' ? 'volunteer' : (p.type==='Paddler'?'paddler':'drummer-helm');
+let sideDisplay = (p.side && p.side.length > 0) ? p.side.substring(0,1) : '?';
+let weightDisplay = p.weight || 0;
+return `<div draggable="true" ondragstart="drag(event)" onclick="seatClicked(this, event)"
+        data-name="${p.name}" data-weight="${weightDisplay}" data-type="${p.type}" data-side="${p.side || 'Any'}"
+        class="seat ${typeClass} rounded shadow-sm z-10 w-full mb-1 flex-shrink-0 cursor-grab">
+          <span>${p.name}</span>
+          <span class="opacity-75 text-[10px] weight-text">${weightDisplay}kg ${sideDisplay}</span>
+          <div class="remove-x" onclick="event.stopPropagation(); returnToPool(this)">×</div>
+        </div>`;
+}
+
+function createSeatNode(p) {
+    const temp = document.createElement('div');
+    temp.innerHTML = createSeatElement(p);
+    return temp.firstElementChild;
+}
+
+function updatePoolCounts() {
+   const totalP = document.querySelectorAll('#list-paddlers .att-chk:checked').length;
+   const totalV = document.querySelectorAll('#list-volunteers .att-chk:checked').length;
+
+   let seatedP = 0;
+   let seatedV = 0;
+
+   document.querySelectorAll('.boat-wrapper .seat').forEach(s => {
+       if(s.firstElementChild && s.firstElementChild.dataset.type === 'Paddler') seatedP++;
+       if(s.firstElementChild && s.firstElementChild.dataset.type === 'Volunteer') seatedV++;
+   });
+
+   const poolP = Math.max(0, totalP - seatedP);
+   const poolV = Math.max(0, totalV - seatedV);
+
+   document.getElementById('pool-paddlers').innerText = poolP;
+   document.getElementById('pool-vols').innerText = poolV;
+   document.getElementById('total-paddlers').innerText = totalP;
+   document.getElementById('total-vols').innerText = totalV;
+}
+
+function allowDrop(ev) { ev.preventDefault(); }
+function drag(ev) {
+   if (ev.target.classList.contains('seated-in-pool')) {
+       ev.preventDefault();
+       return;
+   }
+   draggedEl = ev.target;
+}
+
+function drop(ev) {
+   ev.preventDefault();
+   let target = ev.target;
+   if (!target.classList.contains('droppable')) target = target.closest('.droppable');
+  
+   if (!target || !draggedEl) return;
+  
+   const isFromPool = draggedEl.closest('#pool-container') !== null;
+  
+   let elementToUse;
+   if (isFromPool) {
+       elementToUse = draggedEl.cloneNode(true);
+       elementToUse.classList.remove('seated-in-pool');
+       elementToUse.draggable = true;
+   } else {
+       elementToUse = draggedEl;
+   }
+
+   if (target.children.length > 0 && target.id !== 'pool-container') {
+        const existing = target.children[0];
+        existing.remove();
+   }
+  
+   if (target.id !== 'pool-container') {
+       target.appendChild(elementToUse);
+       if(target.closest('.boat-wrapper')) calcBoatStats(target.closest('.boat-wrapper').id);
+   } else {
+       if (!isFromPool) draggedEl.remove();
+   }
+  
+   updatePoolStatus();
+   updatePoolCounts();
+   if (!isRestoring) triggerAutosave();
+}
+
+function addBoat(type, existingId=null) {
+if (!isRestoring) pushUndo();
+const id = existingId || 'boat-' + Date.now() + Math.floor(Math.random() * 1000);
+const rows = type === 'standard' ? 10 : 5;
+const area = document.getElementById('boats-area');
+const dlIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" /></svg>`;
+let displayDate = "";
+if (currentSessionDate) {
+    const [y, m, d] = currentSessionDate.split('-').map(Number);
+    const dateObj = new Date(y, m-1, d);
+    displayDate = `${d} ${MONTHS[m-1]} ${y} (${DAYS[dateObj.getDay()]})`;
+} else if (document.getElementById('active-session-display').innerText) {
+    displayDate = document.getElementById('active-session-display').innerText;
+}
+
+let html = `<div class="boat-wrapper bg-blue-50 dark:bg-gray-800 border-2 border-blue-600 dark:border-blue-900 rounded-lg p-3 w-full flex-shrink-0" id="${id}" data-type="${type}">
+    <div class="flex justify-between items-center mb-1">
+      <h4 class="font-bold dark:text-white text-sm boat-title">Boat</h4>
+      <div class="flex gap-2">
+         <button onclick="generateBoatCanvas('${id}')" class="text-blue-600 border border-blue-200 bg-white p-1 rounded hover:bg-blue-50 cursor-pointer" title="Save to Drive">${dlIcon}</button>
+         <button onclick="removeBoat('${id}')" class="text-red-500 text-xs font-bold px-2 border border-red-200 rounded bg-white cursor-pointer">Remove</button>
+      </div>
+    </div>
+    <div class="text-center text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 boat-date">${displayDate}</div>
+    <div class="grid grid-cols-[45px_1fr_1fr] gap-1 mb-1">
+        <div class="flex items-center justify-center text-[9px] font-bold text-gray-500 dark:text-gray-400 leading-tight text-center">Coach/ Drum</div>
+        <div class="col-span-2 seat drummer-helm droppable" data-role="drummer" ondrop="drop(event)" ondragover="allowDrop(event)"></div>`;
+ for(let i=1; i<=rows; i++) {
+  html += `<div class="flex items-center justify-center font-bold text-gray-500 dark:text-gray-400">${i}</div>
+      <div class="seat droppable" data-row="${i}" data-side="Left" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+      <div class="seat droppable" data-row="${i}" data-side="Right" ondrop="drop(event)" ondragover="allowDrop(event)"></div>`;
+}
+  html += `<div class="flex items-center justify-center text-[10px] font-bold text-gray-500 dark:text-gray-400">Steer</div>
+        <div class="col-span-2 seat drummer-helm droppable" data-role="helm" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        <div class="col-start-2 col-span-2 mt-1 text-[10px] flex justify-between font-mono p-1.5 bg-white dark:bg-gray-900 rounded border dark:border-gray-700 dark:text-gray-300 shadow-sm boat-stats-bar">
+            <span id="${id}-stats-l" class="font-bold">L: 0</span> <span id="${id}-stats-bal" class="font-bold">Bal: 0</span> <span id="${id}-stats-r" class="font-bold">R: 0</span>
+        </div>
+    </div></div>`;
+area.insertAdjacentHTML('beforeend', html);
+renumberBoats(); 
+if (!isRestoring) triggerAutosave();
+}
+
+function removeBoat(id) { 
+    if(!confirm("Are you sure you want to remove this boat?")) return;
+    if (!isRestoring) pushUndo();
+    const boat = document.getElementById(id); 
+    boat.remove(); 
+    renumberBoats(); 
+    updatePoolStatus(); 
+    updatePoolCounts(); 
+    if (!isRestoring) triggerAutosave(); 
+}
+function renumberBoats() { document.querySelectorAll('.boat-wrapper').forEach((b, index) => { b.querySelector('.boat-title').innerText = `Boat ${index + 1} (${b.dataset.type})`; }); }
+
+function generateBoatCanvas(boatId) {
+  const boatEl = document.getElementById(boatId); if (!boatEl) return;
+  const overlay = document.createElement('div');
+  overlay.className = "absolute inset-0 bg-white/70 dark:bg-black/70 flex items-center justify-center z-50 rounded-lg";
+  overlay.innerHTML = `<span class="font-bold text-blue-600 dark:text-blue-400">Uploading...</span>`;
+  boatEl.style.position = 'relative'; boatEl.appendChild(overlay);
+
+  try {
+      const scale = 3;
+      const canvasWidth = 280;
+      const rowHeight = 35;
+      const col1W = 40; 
+      const seatW = 115;
+      const gap = 2;
+     
+      const type = boatEl.getAttribute('data-type');
+      const numRows = (type === 'standard') ? 10 : 5;
+      const totalHeight = 40 + (rowHeight + gap) * (numRows + 1) + rowHeight + 20;
+     
+      const canvas = document.createElement('canvas');
+      canvas.width = canvasWidth * scale;
+      canvas.height = totalHeight * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(scale, scale);
+
+      ctx.fillStyle = '#f0f9ff';
+      ctx.fillRect(0, 0, canvasWidth, totalHeight);
+     
+      ctx.fillStyle = '#eff6ff';
+      ctx.fillRect(0, 0, canvasWidth, 40);
+     
+      const boatTitle = boatEl.querySelector('.boat-title').innerText;
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(boatTitle, 10, 20);
+     
+      let dateText = "";
+      if(currentSessionDate) {
+          const [y, m, d] = currentSessionDate.split('-').map(Number);
+          const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+          dateText = `${d} ${months[m-1]} ${y}`;
+      }
+      ctx.font = '12px sans-serif';
+      ctx.fillStyle = '#6b7280';
+      ctx.textAlign = 'right';
+      ctx.fillText(dateText, canvasWidth - 10, 20);
+     
+      let currY = 40;
+     
+      ctx.fillStyle = '#eff6ff';
+      ctx.fillRect(5, currY, col1W, rowHeight);
+      ctx.fillStyle = '#6b7280';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText("Coach", 5 + col1W/2, currY + 10);
+      ctx.fillText("Drum", 5 + col1W/2, currY + 22);
+     
+      function drawBox(x, y, w, h, color, text) {
+          ctx.fillStyle = color;
+          ctx.fillRect(x, y, w, h);
+          if(text) {
+              ctx.fillStyle = '#000000';
+              ctx.font = 'bold 12px sans-serif';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              if (ctx.measureText(text).width > w - 10) {
+                  const words = text.split(' ');
+                  if(words.length >= 2) {
+                      const mid = Math.floor(words.length / 2);
+                      const line1 = words.slice(0, mid + 1).join(' ');
+                      const line2 = words.slice(mid + 1).join(' ');
+                      ctx.fillText(line1, x + w/2, y + h/2 - 7);
+                      ctx.fillText(line2, x + w/2, y + h/2 + 7);
+                      return;
+                  }
+              }
+              ctx.fillText(text, x + w/2, y + h/2);
+          }
+      }
+     
+      function getSeatName(el) {
+          if (!el || !el.firstElementChild) return "";
+          const span = el.firstElementChild.querySelector('span:first-child');
+          return span ? span.innerText : "";
+      }
+
+      const coachSeat = boatEl.querySelector('[data-role="drummer"]');
+      let coachName = getSeatName(coachSeat);
+      let coachColor = "#fde047";
+      if(coachSeat && coachSeat.firstElementChild) {
+          if(coachSeat.firstElementChild.classList.contains('paddler')) coachColor = '#bae6fd';
+          else if(coachSeat.firstElementChild.classList.contains('volunteer')) coachColor = '#bbf7d0';
+      }
+      drawBox(5 + col1W + gap, currY, (seatW * 2) + gap, rowHeight, coachColor, coachName);
+     
+      currY += rowHeight + gap;
+     
+      for(let i=1; i<=numRows; i++) {
+          ctx.fillStyle = '#6b7280';
+          ctx.font = 'bold 14px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(i, 5 + col1W/2, currY + rowHeight/2);
+         
+          const leftEl = boatEl.querySelector(`[data-row="${i}"][data-side="Left"]`);
+          let leftName = getSeatName(leftEl);
+          let leftColor = "#ffffff";
+          if(leftEl && leftEl.firstElementChild) {
+              if(leftEl.firstElementChild.classList.contains('volunteer')) leftColor = '#bbf7d0';
+              else if(leftEl.firstElementChild.classList.contains('drummer-helm')) leftColor = '#fde047';
+              else leftColor = '#bae6fd';
+          }
+          drawBox(5 + col1W + gap, currY, seatW, rowHeight, leftColor, leftName);
+         
+          const rightEl = boatEl.querySelector(`[data-row="${i}"][data-side="Right"]`);
+          let rightName = getSeatName(rightEl);
+          let rightColor = "#ffffff";
+          if(rightEl && rightEl.firstElementChild) {
+              if(rightEl.firstElementChild.classList.contains('volunteer')) rightColor = '#bbf7d0';
+              else if(rightEl.firstElementChild.classList.contains('drummer-helm')) rightColor = '#fde047';
+              else rightColor = '#bae6fd';
+          }
+          drawBox(5 + col1W + gap + seatW + gap, currY, seatW, rowHeight, rightColor, rightName);
+         
+          currY += rowHeight + gap;
+      }
+     
+      ctx.fillStyle = '#6b7280';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText("Steer", 5 + col1W/2, currY + rowHeight/2);
+     
+      const steerSeat = boatEl.querySelector('[data-role="helm"]');
+      let steerName = getSeatName(steerSeat);
+      let steerColor = "#fde047";
+      if(steerSeat && steerSeat.firstElementChild) {
+          if(steerSeat.firstElementChild.classList.contains('paddler')) steerColor = '#bae6fd';
+          else if(steerSeat.firstElementChild.classList.contains('volunteer')) steerColor = '#bbf7d0';
+      }
+      drawBox(5 + col1W + gap, currY, (seatW * 2) + gap, rowHeight, steerColor, steerName);
+
+      const base64Data = canvas.toDataURL('image/jpeg', 1.0);
+      const dateSuffix = document.getElementById('active-session-display').innerText;
+      let datePrefix = "";
+      if(currentSessionDate) {
+          const [y, m, d] = currentSessionDate.split('-').map(Number);
+          datePrefix = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      }
+      const filename = `${datePrefix} ${boatTitle} ${dateSuffix}.jpg`;
+     
+      apiCall('saveBoatImageToDrive', { base64Data: base64Data, filename: filename })
+          .then(result => {
+              overlay.remove();
+              const link = document.getElementById('drive-link');
+              link.href = `https://drive.google.com/uc?export=view&id=${result.id}`;
+              document.getElementById('link-modal').classList.remove('hidden');
+          })
+          .catch(err => {
+              overlay.remove();
+              alert("Upload Failed: " + err);
+          });
+
+  } catch (e) {
+      overlay.remove();
+      alert("Canvas Error: " + e.message);
+  }
+}
+
+function runAutoBalance() {
+ try {
+     if (!isRestoring) pushUndo();
+     const mode = document.getElementById('balance-mode').value;
+     const pool = document.getElementById('pool-container');
+     const boats = document.querySelectorAll('.boat-wrapper');
+     if (boats.length === 0) return;
+
+     const protectedNames = new Set();
+     document.querySelectorAll('[data-role="drummer"], [data-role="helm"]').forEach(el => {
+         if(el.firstElementChild) protectedNames.add(el.firstElementChild.dataset.name);
+     });
+
+     let allPeople = [];
+     document.querySelectorAll('.att-chk:checked').forEach(chk => {
+         const idx = parseInt(chk.value);
+         const p = roster[idx];
+         if (p && !protectedNames.has(p.name)) {
+             allPeople.push({
+                 name: p.name,
+                 wt: p.weight || 0,
+                 side: p.side || 'Any',
+                 type: p.type,
+                 links: p.volunteers || "",
+                 el: createSeatNode(p)
+             });
+         }
+     });
+
+     boats.forEach(b => {
+         b.querySelectorAll('.seat[data-row]').forEach(s => s.innerHTML = ""); 
+     });
+     pool.innerHTML = "";
+
+     let paddlers = allPeople.filter(p => p.type === 'Paddler');
+     let volunteers = allPeople.filter(p => p.type === 'Volunteer');
+     let pairs = [];
+
+     paddlers = paddlers.filter(p => {
+         if (!p.links) return true;
+         const linkedNames = p.links.split(',').map(s=>s.trim());
+         const volIndex = volunteers.findIndex(v => linkedNames.includes(v.name));
+         if (volIndex !== -1) {
+             const v = volunteers.splice(volIndex, 1)[0];
+             pairs.push({ p1: p, p2: v, combinedWt: p.wt + v.wt });
+             return false; 
+         }
+         return true;
+     });
+
+     const isComp = (s1, s2) => (s1 === 'Any' || s2 === 'Any' || s1 !== s2);
+     paddlers = paddlers.sort((a,b) => b.wt - a.wt);
+     paddlers = paddlers.filter(p => {
+         if (volunteers.length === 0) return true;
+         const volIndex = volunteers.sort((a,b) => b.wt - a.wt).findIndex(v => isComp(p.side, v.side));
+         if (volIndex !== -1) {
+             const v = volunteers.splice(volIndex, 1)[0];
+             pairs.push({ p1: p, p2: v, combinedWt: p.wt + v.wt });
+             return false;
+         }
+         return true;
+     });
+
+     while (volunteers.length >= 2) {
+         const v1 = volunteers.shift();
+         const v2Index = volunteers.findIndex(v => isComp(v1.side, v.side));
+         if(v2Index !== -1) {
+             const v2 = volunteers.splice(v2Index, 1)[0];
+             pairs.push({ p1: v1, p2: v2, combinedWt: v1.wt + v2.wt });
+         } else {
+             pairs.push({ p1: v1, p2: null, combinedWt: v1.wt });
+         }
+     }
+     if(volunteers.length === 1) pairs.push({ p1: volunteers[0], p2: null, combinedWt: volunteers[0].wt });
+
+     pairs.sort((a, b) => b.combinedWt - a.combinedWt);
+
+     let allSlots = [];
+
+     boats.forEach((b, boatIdx) => {
+         const rowCount = b.querySelectorAll('[data-row]').length / 2;
+         let rowOrder = [];
+         
+         if (mode === 'rocket') {
+             let mid = (rowCount + 1) / 2;
+             for (let i = 1; i <= rowCount; i++) rowOrder.push(i);
+             rowOrder.sort((a, b) => Math.abs(a - mid) - Math.abs(b - mid));
+         } else {
+             for (let i = 1; i <= rowCount; i++) rowOrder.push(i);
+         }
+
+         rowOrder.forEach((r, priorityIdx) => {
+             allSlots.push({
+                 boatId: b.id,
+                 row: r,
+                 priority: priorityIdx,
+                 boatIdx: boatIdx 
+             });
+         });
+     });
+
+     allSlots.sort((a, b) => {
+         if (a.priority !== b.priority) return a.priority - b.priority;
+         return a.boatIdx - b.boatIdx;
+     });
+
+     allSlots.forEach(slot => {
+         if (pairs.length === 0) return;
+         
+         const b = document.getElementById(slot.boatId);
+         const seatL = b.querySelector(`[data-row="${slot.row}"][data-side="Left"]`);
+         const seatR = b.querySelector(`[data-row="${slot.row}"][data-side="Right"]`);
+         
+         const targetPaddlerSide = (slot.row % 2 !== 0) ? 'Left' : 'Right';
+         
+         let pairIndex = -1;
+         
+         pairIndex = pairs.findIndex(p => {
+             const paddler = (p.p1.type === 'Paddler') ? p.p1 : (p.p2 && p.p2.type === 'Paddler' ? p.p2 : null);
+             if (!paddler) return false; 
+             return (paddler.side === 'Any' || paddler.side === targetPaddlerSide);
+         });
+
+         if (pairIndex === -1) pairIndex = 0;
+         
+         const pair = pairs.splice(pairIndex, 1)[0];
+         
+         const p1 = pair.p1;
+         const p2 = pair.p2;
+         
+         if (!p2) {
+             const boatWt = getBoatWeight(b.id);
+             if (boatWt.l <= boatWt.r) seatL.appendChild(p1.el);
+             else seatR.appendChild(p1.el);
+         } else {
+             const isPV = (p1.type === 'Paddler' && p2.type === 'Volunteer') || (p1.type === 'Volunteer' && p2.type === 'Paddler');
+             let placementDecided = false;
+
+             if (isPV) {
+                 const paddler = p1.type === 'Paddler' ? p1 : p2;
+                 const volunteer = p1.type === 'Paddler' ? p2 : p1;
+                 
+                 const pFits = (paddler.side === 'Any' || paddler.side === targetPaddlerSide);
+                 const vFits = (volunteer.side === 'Any' || volunteer.side !== targetPaddlerSide); 
+                 
+                 if (pFits && vFits) {
+                     if (targetPaddlerSide === 'Left') {
+                         seatL.appendChild(paddler.el);
+                         seatR.appendChild(volunteer.el);
+                     } else {
+                         seatR.appendChild(paddler.el);
+                         seatL.appendChild(volunteer.el);
+                     }
+                     placementDecided = true;
+                 }
+             }
+
+             if (!placementDecided) {
+                 let p1L = (p1.side === 'Left');
+                 let p1R = (p1.side === 'Right');
+                 let p2L = (p2.side === 'Left');
+                 let p2R = (p2.side === 'Right');
+
+                 if (p1L) { seatL.appendChild(p1.el); seatR.appendChild(p2.el); }
+                 else if (p1R) { seatR.appendChild(p1.el); seatL.appendChild(p2.el); }
+                 else if (p2L) { seatR.appendChild(p1.el); seatL.appendChild(p2.el); } 
+                 else if (p2R) { seatL.appendChild(p1.el); seatR.appendChild(p2.el); } 
+                 else {
+                     const boatWt = getBoatWeight(b.id);
+                     if (boatWt.l > boatWt.r) {
+                         if (p1.wt > p2.wt) { seatR.appendChild(p1.el); seatL.appendChild(p2.el); }
+                         else { seatL.appendChild(p1.el); seatR.appendChild(p2.el); }
+                     } else {
+                         if (p1.wt > p2.wt) { seatL.appendChild(p1.el); seatR.appendChild(p2.el); }
+                         else { seatR.appendChild(p1.el); seatL.appendChild(p2.el); }
+                     }
+                 }
+             }
+         }
+     });
+
+     boats.forEach(b => calcBoatStats(b.id));
+     syncPoolWithAttendance();
+     if (!isRestoring) triggerAutosave();
+     
+ } catch(e) {
+     console.error("Auto Balance Error:", e);
+     alert("Error during auto-balance: " + e.message);
+     syncPoolWithAttendance(); 
+ }
+}
+
+function getBoatWeight(boatId) {
+  const boat = document.getElementById(boatId);
+  let l=0, r=0;
+  boat.querySelectorAll('[data-side="Left"]').forEach(s => {
+      if(s.firstElementChild && s.firstElementChild.dataset.weight) l += parseFloat(s.firstElementChild.dataset.weight) || 0;
+  });
+  boat.querySelectorAll('[data-side="Right"]').forEach(s => {
+      if(s.firstElementChild && s.firstElementChild.dataset.weight) r += parseFloat(s.firstElementChild.dataset.weight) || 0;
+  });
+  return {l, r};
+}
+
+function calcBoatStats(boatId) {
+  const w = getBoatWeight(boatId);
+  const round = (num) => Math.round(num * 10) / 10;
+  
+  const roundedL = round(w.l);
+  const roundedR = round(w.r);
+  
+  document.getElementById(`${boatId}-stats-l`).innerText = `L: ${roundedL}`;
+  document.getElementById(`${boatId}-stats-r`).innerText = `R: ${roundedR}`;
+  
+  const diff = round(roundedL - roundedR);
+  
+  const balEl = document.getElementById(`${boatId}-stats-bal`);
+  balEl.innerText = diff === 0 ? "OK" : (diff > 0 ? `L+${diff}` : `R+${Math.abs(diff)}`);
+  balEl.className = Math.abs(diff) > 10 ? 'font-bold text-red-600' : 'font-bold text-green-600';
+}
+
+function seatClicked(el, e) { e.stopPropagation(); }
+function openAssignModal(seatEl) {
+if (!isRestoring) pushUndo();
+currentSeatForAssign = seatEl;
+const checks = document.querySelectorAll('.att-chk:checked');
+const list = document.getElementById('assign-list');
+const clearBtn = document.getElementById('btn-clear-seat');
+if (seatEl.children.length > 0) clearBtn.classList.remove('hidden'); else clearBtn.classList.add('hidden');
+list.innerHTML = "";
+ Array.from(checks).map(c => roster[c.value]).forEach(p => {
+  const existingEl = document.querySelector(`.seat[data-name="${p.name}"]`);
+  let isSeated = existingEl && existingEl.closest('.boat-wrapper');
+  let status = isSeated ? "Seated" : "In Pool";
+  let typeClass = p.type === 'Volunteer' ? 'bg-[#bbf7d0] text-[#14532d] dark:bg-green-900 dark:text-green-100 border-green-200 dark:border-green-700' : 'bg-[#bae6fd] text-[#0c4a6e] dark:bg-blue-900 dark:text-blue-100 border-blue-200 dark:border-blue-700';
+  let div = document.createElement('div');
+  div.className = `p-3 border-b flex justify-between items-center cursor-pointer hover:opacity-80 ${typeClass}`;
+  div.innerHTML = `<span>${p.name}</span> <span class="text-xs font-bold opacity-75">${status}</span>`;
+  div.onclick = () => {
+    document.getElementById('assign-modal').classList.add('hidden');
+    let el = document.querySelector(`.seat[data-name="${p.name}"]`);
+    if (!el) { let temp = document.createElement('div'); temp.innerHTML = createSeatElement(p); el = temp.firstChild; }
+    if (currentSeatForAssign.children.length>0) document.getElementById('pool-container').appendChild(currentSeatForAssign.children[0]);
+    currentSeatForAssign.appendChild(el);
+    calcBoatStats(currentSeatForAssign.closest('.boat-wrapper').id);
+    sortPool(); updatePoolCounts(); triggerAutosave();
+  };
+  list.appendChild(div);
+});
+document.getElementById('assign-modal').classList.remove('hidden');
+}
+function clearCurrentSeat() {
+  if(currentSeatForAssign && currentSeatForAssign.children.length > 0) {
+      document.getElementById('pool-container').appendChild(currentSeatForAssign.children[0]);
+      calcBoatStats(currentSeatForAssign.closest('.boat-wrapper').id);
+      sortPool(); updatePoolCounts(); triggerAutosave();
+      document.getElementById('assign-modal').classList.add('hidden');
+  }
+}
+function toggleTheme() { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light'); }
+function switchView(v) { ['roster','session','planning'].forEach(x => { document.getElementById('view-'+x).classList.add('hidden'); document.getElementById('nav-'+x).classList.remove('active'); }); document.getElementById('view-'+v).classList.remove('hidden'); document.getElementById('nav-'+v).classList.add('active'); }
+function editMember(i) { const p = roster[i];
+ document.getElementById('m-index').value = p.rowIndex;
+ document.getElementById('m-name').value = p.name;
+ document.getElementById('m-type').value = p.type;
+ document.getElementById('m-side').value = p.side;
+ document.getElementById('m-gender').value = p.gender;
+ document.getElementById('m-weight').value = p.weight;
+
+ refreshLinkSection();
+
+ document.getElementById('member-modal').classList.remove('hidden');
+}
+
+function refreshLinkSection() {
+   const role = document.getElementById('m-type').value;
+   const label = document.getElementById('m-link-label');
+   const listContainer = document.getElementById('m-link-list');
+  
+   listContainer.innerHTML = '';
+
+   let targetType = '';
+   if(role === 'Paddler') {
+       label.innerText = "Linked Volunteers";
+       targetType = 'Volunteer';
+   } else if (role === 'Volunteer') {
+       label.innerText = "Linked Paddlers";
+       targetType = 'Paddler';
+   } else {
+       document.getElementById('m-link-section').classList.add('hidden');
+       return;
+   }
+
+   document.getElementById('m-link-section').classList.remove('hidden');
+
+   const memberIndex = document.getElementById('m-index').value;
+   let currentLinks = [];
+  
+   if(memberIndex) {
+       const p = roster.find(r => r.rowIndex == memberIndex);
+       if(p && p.volunteers) currentLinks = p.volunteers.split(',').map(s=>s.trim());
+   }
+
+   const targets = roster.filter(m => m.type === targetType).sort((a,b)=>a.name.localeCompare(b.name));
+  
+   if(targets.length === 0) {
+       listContainer.innerHTML = `<span class="text-xs italic text-gray-400">No ${targetType}s found in roster.</span>`;
+       return;
+   }
+
+   targets.forEach(t => {
+       const isChecked = currentLinks.includes(t.name) ? 'checked' : '';
+       const div = document.createElement('div');
+       div.className = 'flex items-center space-x-2';
+       div.innerHTML = `<input type="checkbox" class="vol-chk" value="${t.name}" ${isChecked}> <span class="text-xs dark:text-white">${t.name}</span>`;
+       listContainer.appendChild(div);
+   });
+}
+
+function openMemberModal() {
+ document.getElementById('m-index').value = "";
+ document.getElementById('m-name').value = "";
+ document.getElementById('m-type').value = "Paddler";
+ document.getElementById('m-side').value = "Any";
+ document.getElementById('m-gender').value = "M";
+ document.getElementById('m-weight').value = "";
+ refreshLinkSection();
+ document.getElementById('member-modal').classList.remove('hidden');
+}
+
+function saveMemberData() {
+ const volChecks = document.querySelectorAll('.vol-chk:checked');
+ const linkedVols = Array.from(volChecks).map(c => c.value).join(',');
+
+ const mIndexVal = document.getElementById('m-index').value;
+ const oldName = mIndexVal ? roster.find(r => r.rowIndex == mIndexVal)?.name : null;
+
+ const member = {
+   rowIndex: mIndexVal || null,
+   name: document.getElementById('m-name').value,
+   type: document.getElementById('m-type').value,
+   side: document.getElementById('m-side').value,
+   gender: document.getElementById('m-gender').value,
+   weight: Number(document.getElementById('m-weight').value),
+   active: true,
+   volunteers: linkedVols
+ };
+ document.getElementById('member-modal').classList.add('hidden');
+
+ const activeNames = new Set();
+ document.querySelectorAll('.seat').forEach(s => {
+    if(s.dataset.name) activeNames.add(s.dataset.name);
+ });
+ 
+ if (member.rowIndex) {
+    const idx = roster.findIndex(r => r.rowIndex == member.rowIndex);
+    if(idx !== -1) roster[idx] = member;
+    
+    if (activeNames.has(oldName)) {
+        activeNames.delete(oldName);
+        activeNames.add(member.name);
+        updateActiveSeats(member, oldName);
+    }
+ } else {
+    member.rowIndex = "TEMP_" + Date.now(); 
+    roster.push(member);
+ }
+
+ const linkedNames = member.volunteers ? member.volunteers.split(',').map(s=>s.trim()).filter(s=>s) : [];
+ const myName = member.name;
+
+ roster.forEach(r => {
+    if(r.rowIndex == member.rowIndex) return;
+
+    let otherLinks = r.volunteers ? r.volunteers.split(',').map(s=>s.trim()).filter(s=>s) : [];
+    let modified = false;
+
+    if (linkedNames.includes(r.name)) {
+        if (!otherLinks.includes(myName)) {
+            otherLinks.push(myName);
+            modified = true;
+        }
+    } else if (otherLinks.includes(myName)) {
+        otherLinks = otherLinks.filter(n => n !== myName);
+        modified = true;
+    }
+
+    if (modified) r.volunteers = otherLinks.join(',');
+ });
+ 
+ roster.sort((a,b) => a.name.localeCompare(b.name));
+ renderRosterTable();
+ renderAttendanceList();
+ 
+ document.querySelectorAll('.att-chk').forEach(chk => {
+     const name = chk.nextElementSibling.innerText;
+     if(activeNames.has(name)) chk.checked = true;
+ });
+ 
+ if (currentSessionDate) {
+     executeSave();
+ } else {
+     updateSaveButton('saving');
+ }
+
+ const memberForServer = { ...member };
+ if (String(member.rowIndex).startsWith("TEMP_")) {
+    memberForServer.rowIndex = null;
+ }
+
+ apiCall('saveMember', memberForServer)
+     .then(() => {
+         if (!currentSessionDate) updateSaveButton('saved');
+         loadRoster(); 
+         setTimeout(() => { 
+            if(document.getElementById('save-btn').innerText === "Saved") updateSaveButton('idle'); 
+         }, 2000);
+     })
+     .catch(err => alert("Error saving member: " + err));
+}
+</script>
 </body>
 </html>
