@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Boat, BoatSeat, Member, BalanceMode, CollaboratorPresence } from '../types';
 import { calculateBoatWeight } from '../utils/balancer';
 import { formatDisplayDate } from '../utils/date';
@@ -87,9 +87,156 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
     fromBoatId?: string;
     startX: number;
     startY: number;
+    lastX: number;
+    lastY: number;
     active: boolean;
+    scrolling: boolean;
     timer: ReturnType<typeof setTimeout> | null;
   } | null>(null);
+  const hoveredSeatElRef = useRef<HTMLElement | null>(null);
+  const justDraggedRef = useRef(false);
+  const callbacksRef = useRef({
+    onDropMemberToSeat,
+    onDropMemberToPool,
+    onDragStateChange,
+  });
+  callbacksRef.current = {
+    onDropMemberToSeat,
+    onDropMemberToPool,
+    onDragStateChange,
+  };
+
+  const clearHoveredSeatHighlight = () => {
+    if (hoveredSeatElRef.current) {
+      hoveredSeatElRef.current.classList.remove('ring-2', 'ring-sky-500', 'scale-[1.02]');
+      hoveredSeatElRef.current = null;
+    }
+  };
+
+  // Native non-passive touch listeners so active drags never trigger vertical page scroll
+  useEffect(() => {
+    const onWindowTouchMove = (e: TouchEvent) => {
+      const state = touchDragStateRef.current;
+      if (!state || state.scrolling) return;
+      const touch = e.touches[0];
+      if (!touch) return;
+
+      const x = touch.clientX;
+      const y = touch.clientY;
+      state.lastX = x;
+      state.lastY = y;
+      const dx = Math.abs(x - state.startX);
+      const dy = Math.abs(y - state.startY);
+
+      if (!state.active) {
+        // If user swipes predominantly vertically, let native vertical scroll handle it seamlessly
+        if (dy > 8 && dy > dx * 1.35) {
+          if (state.timer) clearTimeout(state.timer);
+          state.scrolling = true;
+          touchDragStateRef.current = null;
+          return;
+        }
+        // Activate drag immediately on any horizontal/diagonal movement (no long press needed)
+        if (dx >= 5 && dx >= dy * 0.65) {
+          if (state.timer) clearTimeout(state.timer);
+          state.active = true;
+          callbacksRef.current.onDragStateChange?.(true);
+        } else {
+          return;
+        }
+      }
+
+      // Prevent vertical scroll once drag is active
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+
+      setTouchGhost({ name: state.name, x, y });
+
+      // Highlight seat under finger
+      const el = document.elementFromPoint(x, y);
+      const seatEl = (el?.closest('[data-boat-id]') as HTMLElement | null) || null;
+      if (hoveredSeatElRef.current !== seatEl) {
+        clearHoveredSeatHighlight();
+        if (seatEl) {
+          seatEl.classList.add('ring-2', 'ring-sky-500', 'scale-[1.02]');
+          hoveredSeatElRef.current = seatEl;
+        }
+      }
+
+      // Smoothly auto-scroll #boats-area when dragging near top or bottom edges
+      const boatsArea = document.getElementById('boats-area');
+      if (boatsArea) {
+        const rect = boatsArea.getBoundingClientRect();
+        const edgeThreshold = 56;
+        if (x >= rect.left && x <= rect.right) {
+          if (y < rect.top + edgeThreshold && y > rect.top - 20) {
+            boatsArea.scrollTop -= 10;
+          } else if (y > rect.bottom - edgeThreshold && y < rect.bottom + 20) {
+            boatsArea.scrollTop += 10;
+          }
+        }
+      }
+    };
+
+    const finishTouchDrag = (e: TouchEvent) => {
+      const state = touchDragStateRef.current;
+      if (!state) return;
+      if (state.timer) clearTimeout(state.timer);
+      touchDragStateRef.current = null;
+      clearHoveredSeatHighlight();
+
+      if (!state.active) return;
+
+      justDraggedRef.current = true;
+      setTimeout(() => {
+        justDraggedRef.current = false;
+      }, 120);
+
+      setTouchGhost(null);
+      callbacksRef.current.onDragStateChange?.(false);
+
+      const touch = e.changedTouches[0];
+      const dropX = touch ? touch.clientX : state.lastX;
+      const dropY = touch ? touch.clientY : state.lastY;
+
+      const el = document.elementFromPoint(dropX, dropY);
+      if (!el) return;
+
+      const seatEl = el.closest('[data-boat-id]') as HTMLElement | null;
+      if (seatEl) {
+        const targetBoatId = seatEl.getAttribute('data-boat-id')!;
+        const roleAttr = seatEl.getAttribute('data-role') as 'drummer' | 'helm' | null;
+        const rowAttr = seatEl.getAttribute('data-row');
+        const sideAttr = seatEl.getAttribute('data-side') as 'Left' | 'Right' | null;
+
+        callbacksRef.current.onDropMemberToSeat(
+          state.name,
+          targetBoatId,
+          roleAttr || undefined,
+          rowAttr ? Number(rowAttr) : undefined,
+          sideAttr || undefined,
+          state.fromBoatId || null
+        );
+        setSelectedPoolMember(null);
+        return;
+      }
+
+      const poolEl = el.closest('#pool-container');
+      if (poolEl && state.fromBoatId) {
+        callbacksRef.current.onDropMemberToPool(state.name, state.fromBoatId);
+      }
+    };
+
+    window.addEventListener('touchmove', onWindowTouchMove, { passive: false });
+    window.addEventListener('touchend', finishTouchDrag, { passive: true });
+    window.addEventListener('touchcancel', finishTouchDrag, { passive: true });
+    return () => {
+      window.removeEventListener('touchmove', onWindowTouchMove);
+      window.removeEventListener('touchend', finishTouchDrag);
+      window.removeEventListener('touchcancel', finishTouchDrag);
+    };
+  }, []);
 
   const memberMap = new Map<string, Member>();
   roster.forEach((m) => memberMap.set(m.name, m));
@@ -231,7 +378,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
     onDragStateChange?.(false);
   };
 
-  // Mobile Touch Drag handlers (long-press 180ms to drag on mobile without blocking vertical scroll)
+  // Mobile Touch Drag start (activates immediately on horizontal/diagonal movement without long-press, or after 110ms for vertical seat moves)
   const handleTouchStart = (e: React.TouchEvent, name: string, fromBoatId?: string) => {
     if (seatedNames.has(name) && !fromBoatId) return;
     if (e.touches.length !== 1) return;
@@ -243,87 +390,36 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
       clearTimeout(touchDragStateRef.current.timer);
     }
 
-    const timer = setTimeout(() => {
-      if (touchDragStateRef.current) {
-        touchDragStateRef.current.active = true;
-        onDragStateChange?.(true);
-        setTouchGhost({ name, x: startX, y: startY });
-      }
-    }, 180);
+    const timer = fromBoatId
+      ? setTimeout(() => {
+          if (touchDragStateRef.current && !touchDragStateRef.current.scrolling) {
+            touchDragStateRef.current.active = true;
+            onDragStateChange?.(true);
+            setTouchGhost({
+              name,
+              x: touchDragStateRef.current.lastX,
+              y: touchDragStateRef.current.lastY,
+            });
+          }
+        }, 110)
+      : null;
 
     touchDragStateRef.current = {
       name,
       fromBoatId,
       startX,
       startY,
+      lastX: startX,
+      lastY: startY,
       active: false,
+      scrolling: false,
       timer,
     };
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const state = touchDragStateRef.current;
-    if (!state) return;
-    const touch = e.touches[0];
-    const dx = Math.abs(touch.clientX - state.startX);
-    const dy = Math.abs(touch.clientY - state.startY);
-
-    if (!state.active) {
-      // If user is scrolling vertically before long-press activates, cancel drag
-      if (dx > 8 || dy > 8) {
-        if (state.timer) clearTimeout(state.timer);
-        touchDragStateRef.current = null;
-      }
-      return;
-    }
-
-    setTouchGhost({ name: state.name, x: touch.clientX, y: touch.clientY });
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const state = touchDragStateRef.current;
-    if (!state) return;
-    if (state.timer) clearTimeout(state.timer);
-    touchDragStateRef.current = null;
-
-    if (!state.active) return;
-
-    setTouchGhost(null);
-    onDragStateChange?.(false);
-
-    const touch = e.changedTouches[0];
-    if (!touch) return;
-
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!el) return;
-
-    const seatEl = el.closest('[data-boat-id]') as HTMLElement | null;
-    if (seatEl) {
-      const targetBoatId = seatEl.getAttribute('data-boat-id')!;
-      const roleAttr = seatEl.getAttribute('data-role') as 'drummer' | 'helm' | null;
-      const rowAttr = seatEl.getAttribute('data-row');
-      const sideAttr = seatEl.getAttribute('data-side') as 'Left' | 'Right' | null;
-
-      onDropMemberToSeat(
-        state.name,
-        targetBoatId,
-        roleAttr || undefined,
-        rowAttr ? Number(rowAttr) : undefined,
-        sideAttr || undefined,
-        state.fromBoatId || null
-      );
-      setSelectedPoolMember(null);
-      return;
-    }
-
-    const poolEl = el.closest('#pool-container');
-    if (poolEl && state.fromBoatId) {
-      onDropMemberToPool(state.name, state.fromBoatId);
-    }
-  };
-
   // Handle Seat Tap (places selected pool member immediately, or opens AssignModal)
   const handleBenchSeatInteraction = (boatId: string, seat: BoatSeat) => {
+    if (justDraggedRef.current) return;
     if (selectedPoolMember) {
       onDropMemberToSeat(
         selectedPoolMember,
@@ -376,10 +472,9 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
         onDragStart={(e) => handleDragStart(e, member.name, fromBoatId)}
         onDragEnd={handleDragEnd}
         onTouchStart={(e) => handleTouchStart(e, member.name, fromBoatId)}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
         onClick={(e) => {
           e.stopPropagation();
+          if (justDraggedRef.current) return;
           if (fromBoatId && seatRef) {
             handleBenchSeatInteraction(fromBoatId, seatRef);
           } else if (!fromBoatId && !isSeatedInPool) {
@@ -394,21 +489,32 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
           isSeatedInPool ? 'seated-in-pool' : ''
         } ${isPoolSelected ? 'ring-2 ring-sky-500 dark:ring-white scale-[1.02]' : ''}`}
       >
-        <span className="font-bold text-xs sm:text-[13px] leading-tight">{member.name}</span>
+        <span
+          className={`font-bold text-xs sm:text-[13px] leading-tight ${
+            fromBoatId ? 'max-w-[calc(100%-22px)]' : ''
+          }`}
+        >
+          {member.name}
+        </span>
         <span className="opacity-95 text-[11px] font-semibold font-mono tabular-nums weight-text">
           {weightDisplay}kg · {sideDisplay}
         </span>
         {fromBoatId && seatRef && (
-          <div
+          <button
+            type="button"
             className="remove-x"
+            onTouchStart={(e) => {
+              e.stopPropagation();
+            }}
             onClick={(e) => {
               e.stopPropagation();
               onReturnToPool(fromBoatId, seatRef);
             }}
             title="Return to pool"
+            aria-label={`Remove ${member.name}`}
           >
-            ×
-          </div>
+            <X className="w-3.5 h-3.5 stroke-[2.5]" />
+          </button>
         )}
       </div>
     );

@@ -35,7 +35,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app.bundle.js app.bundle.css
+          git add app.bundle.js app.bundle.css sw.js index.html
           if ! git diff --cached --quiet; then
             git commit -m "Build static frontend bundle for GitHub Pages [skip ci]"
             git push
