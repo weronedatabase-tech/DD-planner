@@ -23,10 +23,10 @@ export function generateBoatCanvasDataUrl(
     : true
 ): string {
   const scale = 3;
-  const canvasWidth = 300;
-  const rowHeight = 36;
-  const col1W = 44;
-  const seatW = 120;
+  const canvasWidth = 340;
+  const rowHeight = 42;
+  const col1W = 46;
+  const seatW = 138;
   const gap = 3;
 
   const numRows = boat.type === 'standard' ? 10 : 5;
@@ -115,6 +115,31 @@ export function generateBoatCanvasDataUrl(
 
   let currY = 48;
 
+  function wrapTextIntoLines(text: string, maxWidth: number, fontSize: number): string[] {
+    if (!ctx) return [text];
+    ctx.font = `bold ${fontSize}px sans-serif`;
+    if (ctx.measureText(text).width <= maxWidth) {
+      return [text];
+    }
+    const words = text.split(/\s+/).filter(Boolean);
+    if (words.length <= 1) {
+      return [text];
+    }
+    const lines: string[] = [];
+    let currentLine = words[0];
+    for (let i = 1; i < words.length; i++) {
+      const candidate = `${currentLine} ${words[i]}`;
+      if (ctx.measureText(candidate).width <= maxWidth) {
+        currentLine = candidate;
+      } else {
+        lines.push(currentLine);
+        currentLine = words[i];
+      }
+    }
+    if (currentLine) lines.push(currentLine);
+    return lines;
+  }
+
   function drawBox(
     x: number,
     y: number,
@@ -134,17 +159,28 @@ export function generateBoatCanvasDataUrl(
 
     if (text) {
       ctx.fillStyle = textColor;
-      ctx.font = 'bold 12px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      let displayName = text;
-      if (ctx.measureText(displayName).width > w - 10) {
-        while (displayName.length > 4 && ctx.measureText(displayName + '…').width > w - 10) {
-          displayName = displayName.slice(0, -1);
-        }
-        displayName += '…';
+      const maxTextW = w - 8;
+
+      let fontSize = 12;
+      let lines = wrapTextIntoLines(text, maxTextW, fontSize);
+      while (
+        fontSize > 8 &&
+        (lines.length > 2 || lines.some((line) => ctx.measureText(line).width > maxTextW))
+      ) {
+        fontSize -= 1;
+        lines = wrapTextIntoLines(text, maxTextW, fontSize);
       }
-      ctx.fillText(displayName, x + w / 2, y + h / 2);
+
+      ctx.font = `bold ${fontSize}px sans-serif`;
+      const lineHeight = fontSize + 2;
+      const totalTextH = (lines.length - 1) * lineHeight;
+      const startY = y + h / 2 - totalTextH / 2;
+
+      lines.forEach((line, idx) => {
+        ctx.fillText(line, x + w / 2, startY + idx * lineHeight);
+      });
     }
   }
 
@@ -207,8 +243,8 @@ export function generateBoatCanvasDataUrl(
     ctx.textBaseline = 'middle';
     if (line2) {
       ctx.font = 'bold 9px sans-serif';
-      ctx.fillText(line1, 6 + col1W / 2, y + 13);
-      ctx.fillText(line2, 6 + col1W / 2, y + 24);
+      ctx.fillText(line1, 6 + col1W / 2, y + 15);
+      ctx.fillText(line2, 6 + col1W / 2, y + 27);
     } else {
       ctx.font = line1 === 'STEER' ? 'bold 9px sans-serif' : 'bold 12px monospace';
       ctx.fillText(line1, 6 + col1W / 2, y + rowHeight / 2);

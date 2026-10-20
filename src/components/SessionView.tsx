@@ -150,14 +150,14 @@ export const SessionView: React.FC<SessionViewProps> = ({
                         dateInputRef.current?.showPicker();
                       } catch {}
                     }}
-                    className="w-full h-full border border-zinc-300 dark:border-zinc-700 px-3 sm:px-3.5 rounded-lg bg-zinc-50 dark:bg-[#14141b] text-sm sm:text-base font-mono font-bold tabular-nums flex items-center justify-between text-zinc-950 dark:text-white truncate cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors"
+                    className="w-full h-full border border-zinc-300 dark:border-zinc-700 px-3 sm:px-3.5 rounded-lg bg-zinc-50 dark:bg-[#14141b] text-sm sm:text-base font-mono font-bold tabular-nums flex items-center justify-between text-zinc-950 dark:text-white cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors"
                   >
                     <span>
                       {pickedDate ? (
                         formatDisplayDate(pickedDate)
                       ) : (
                         <span className="text-zinc-500 dark:text-zinc-300 font-sans">
-                          Select Date...
+                          Select Date
                         </span>
                       )}
                     </span>
@@ -222,13 +222,13 @@ export const SessionView: React.FC<SessionViewProps> = ({
 
         <div
           id="active-session-bar"
-          className="bg-zinc-100 dark:bg-[#111116] border-t border-zinc-200 dark:border-zinc-800 px-3 sm:px-4 py-2 flex items-center justify-between text-xs sm:text-sm"
+          className="bg-zinc-100 dark:bg-[#111116] border-t border-zinc-200 dark:border-zinc-800 px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm"
         >
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 min-w-0">
             <span className="text-zinc-700 dark:text-zinc-200 font-bold">Active Session:</span>
             <span
               id="active-session-display"
-              className="font-mono font-bold text-sky-700 dark:text-sky-300 truncate"
+              className="font-mono font-bold text-sky-700 dark:text-sky-300 break-words"
             >
               {currentSessionDate ? formatDisplayDate(currentSessionDate) : ''}
             </span>
@@ -262,11 +262,11 @@ export const SessionView: React.FC<SessionViewProps> = ({
               <span>{attendance.length} Present</span>
               <span aria-hidden="true">·</span>
               <span className="text-sky-700 dark:text-sky-300">
-                {attendingPaddlersCount} P
+                {attendingPaddlersCount} Paddlers
               </span>
               <span aria-hidden="true">·</span>
               <span className="text-emerald-700 dark:text-emerald-300">
-                {attendingVolunteersCount} V
+                {attendingVolunteersCount} Volunteers
               </span>
             </div>
 
@@ -326,22 +326,24 @@ export const SessionView: React.FC<SessionViewProps> = ({
                 return (
                   <label
                     key={p.name}
-                    className={`flex items-center px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg cursor-pointer transition-all row-paddler ${
+                    className={`flex items-start sm:items-center px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg cursor-pointer transition-all row-paddler ${
                       isChecked
                         ? 'ring-2 ring-sky-500 dark:ring-sky-400'
                         : 'hover:brightness-95 dark:hover:brightness-110'
                     }`}
                   >
-                    <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full">
+                    <div className="flex items-start sm:items-center gap-2 sm:gap-2.5 min-w-0 w-full">
                       <input
                         type="checkbox"
                         checked={isChecked}
                         onChange={(e) => onAttendanceToggle(p.name, e.target.checked)}
-                        className="att-chk w-4 h-4 rounded accent-sky-500 shrink-0"
+                        className="att-chk w-4 h-4 mt-0.5 sm:mt-0 rounded accent-sky-500 shrink-0"
                       />
                       <div className="min-w-0 flex-1">
-                        <div className="truncate font-bold text-xs sm:text-sm">{p.name}</div>
-                        <div className="text-[11px] sm:text-xs font-semibold font-mono tabular-nums opacity-95">
+                        <div className="font-bold text-xs sm:text-sm break-words leading-snug">
+                          {p.name}
+                        </div>
+                        <div className="text-[11px] sm:text-xs font-semibold font-mono tabular-nums opacity-95 break-words mt-0.5">
                           {p.weight}kg · {p.side}
                         </div>
                       </div>
@@ -360,22 +362,24 @@ export const SessionView: React.FC<SessionViewProps> = ({
                 return (
                   <label
                     key={p.name}
-                    className={`flex items-center px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg cursor-pointer transition-all row-volunteer ${
+                    className={`flex items-start sm:items-center px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg cursor-pointer transition-all row-volunteer ${
                       isChecked
                         ? 'ring-2 ring-emerald-500 dark:ring-emerald-400'
                         : 'hover:brightness-95 dark:hover:brightness-110'
                     }`}
                   >
-                    <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full">
+                    <div className="flex items-start sm:items-center gap-2 sm:gap-2.5 min-w-0 w-full">
                       <input
                         type="checkbox"
                         checked={isChecked}
                         onChange={(e) => onAttendanceToggle(p.name, e.target.checked)}
-                        className="att-chk w-4 h-4 rounded accent-emerald-500 shrink-0"
+                        className="att-chk w-4 h-4 mt-0.5 sm:mt-0 rounded accent-emerald-500 shrink-0"
                       />
                       <div className="min-w-0 flex-1">
-                        <div className="truncate font-bold text-xs sm:text-sm">{p.name}</div>
-                        <div className="text-[11px] sm:text-xs font-semibold font-mono tabular-nums opacity-95">
+                        <div className="font-bold text-xs sm:text-sm break-words leading-snug">
+                          {p.name}
+                        </div>
+                        <div className="text-[11px] sm:text-xs font-semibold font-mono tabular-nums opacity-95 break-words mt-0.5">
                           {p.weight}kg · {p.side}
                         </div>
                       </div>

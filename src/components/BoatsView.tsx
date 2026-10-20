@@ -461,7 +461,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
         : member.type === 'Paddler'
         ? 'paddler'
         : 'drummer-helm';
-    const sideDisplay = member.side && member.side.length > 0 ? member.side.substring(0, 1) : '?';
+    const sideDisplay = member.side || 'Any';
     const weightDisplay = member.weight || 0;
     const isPoolSelected = !fromBoatId && !isSeatedInPool && selectedPoolMember === member.name;
 
@@ -490,13 +490,13 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
         } ${isPoolSelected ? 'ring-2 ring-sky-500 dark:ring-white scale-[1.02]' : ''}`}
       >
         <span
-          className={`font-bold text-xs sm:text-[13px] leading-tight ${
-            fromBoatId ? 'max-w-[calc(100%-22px)]' : ''
+          className={`font-bold text-xs sm:text-[13px] leading-snug break-words text-center ${
+            fromBoatId ? 'px-3.5' : 'px-1'
           }`}
         >
           {member.name}
         </span>
-        <span className="opacity-95 text-[11px] font-semibold font-mono tabular-nums weight-text">
+        <span className="opacity-95 text-[11px] font-semibold font-mono tabular-nums weight-text break-words text-center mt-0.5">
           {weightDisplay}kg · {sideDisplay}
         </span>
         {fromBoatId && seatRef && (
@@ -593,8 +593,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
               className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-white text-white dark:text-zinc-950 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span className="sm:hidden">Std (20)</span>
-              <span className="hidden sm:inline">Standard (20)</span>
+              <span>Standard (20)</span>
             </button>
             <button
               type="button"
@@ -644,7 +643,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
       {/* Quick Tap-to-Place Banner when a pool member is tapped on mobile/desktop */}
       {selectedPoolMember && (
         <div className="flex-none bg-sky-600 text-white px-3 py-1.5 text-xs font-bold flex items-center justify-between gap-2 z-20">
-          <span className="truncate">
+          <span className="break-words">
             Placing <b>{selectedPoolMember}</b> — tap any boat seat to assign
           </span>
           <button
@@ -679,8 +678,8 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                 className="w-full pl-8 pr-2 py-1 sm:py-1.5 text-xs font-medium rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] text-zinc-950 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:outline-none focus:border-sky-500"
               />
             </div>
-            <label className="flex items-center justify-between text-[11px] sm:text-xs font-semibold text-zinc-700 dark:text-zinc-200 px-0.5 cursor-pointer select-none">
-              <span className="truncate mr-1">Hide seated</span>
+            <label className="flex items-center justify-between gap-1 text-[11px] sm:text-xs font-semibold text-zinc-700 dark:text-zinc-200 px-0.5 cursor-pointer select-none">
+              <span className="break-words">Hide seated</span>
               <input
                 type="checkbox"
                 checked={hideSeatedInPool}
@@ -693,7 +692,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
           <div className="overflow-y-auto p-1.5 sm:p-2 flex-1 flex flex-col gap-1.5 droppable custom-scroll pb-24">
             {poolGroups.map(({ paddler, linkedVolunteers }) => (
               <div key={paddler.name} className="pool-group">
-                <div className="pool-group-label">
+                <div className="pool-group-label flex-wrap gap-1">
                   <span>{linkedVolunteers.length > 0 ? 'Linked Pair' : 'Paddler'}</span>
                   {linkedVolunteers.length > 0 && (
                     <span className="font-mono text-[10px]">1P+{linkedVolunteers.length}V</span>
@@ -708,8 +707,8 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
 
             {orphanVolunteers.length > 0 && (
               <div className="mt-1 pt-2 border-t border-zinc-300 dark:border-zinc-700 space-y-1">
-                <div className="text-[11px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-200 px-1 mb-1">
-                  Unlinked Vol ({orphanVolunteers.length})
+                <div className="text-[11px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-200 px-1 mb-1 break-words">
+                  Unlinked Volunteers ({orphanVolunteers.length})
                 </div>
                 {orphanVolunteers.map((vol) =>
                   renderSeatNode(vol, seatedNames.has(vol.name))
@@ -792,14 +791,14 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                     className="boat-wrapper bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800 rounded-xl p-2.5 sm:p-4 w-full"
                   >
                     {/* Boat Header */}
-                    <div className="flex justify-between items-start gap-1.5 mb-2.5 pb-2 border-b border-zinc-200 dark:border-zinc-800">
-                      <div className="min-w-0">
-                        <h4 className="font-display font-extrabold text-zinc-950 dark:text-white text-xs sm:text-base truncate boat-title">
+                    <div className="flex flex-wrap justify-between items-start gap-2 mb-2.5 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-display font-extrabold text-zinc-950 dark:text-white text-xs sm:text-base break-words leading-snug boat-title">
                           Boat {boatIndex + 1} ·{' '}
                           {boat.type === 'standard' ? 'Standard (20)' : 'Small (10)'}
                         </h4>
-                        <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-mono font-bold tabular-nums text-zinc-700 dark:text-zinc-200 mt-0.5 boat-date">
-                          <span className="truncate">{displayDateStr || 'Unsaved'}</span>
+                        <div className="flex flex-wrap items-center gap-1.5 text-[11px] sm:text-xs font-mono font-bold tabular-nums text-zinc-700 dark:text-zinc-200 mt-0.5 boat-date">
+                          <span className="break-words">{displayDateStr || 'Unsaved'}</span>
                           <span aria-hidden="true">·</span>
                           <span className="shrink-0">
                             {seatedInThisBoat}/{maxCapacity}
@@ -1029,7 +1028,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
             top: touchGhost.y - 28,
             transform: 'translate(-50%, -50%)',
           }}
-          className="fixed z-[100] pointer-events-none px-3 py-1.5 rounded-lg bg-sky-600 text-white font-bold text-xs shadow-xl border border-white/40 whitespace-nowrap"
+          className="fixed z-[100] pointer-events-none px-3 py-1.5 rounded-lg bg-sky-600 text-white font-bold text-xs shadow-xl border border-white/40 max-w-[260px] break-words text-center"
         >
           {touchGhost.name}
         </div>

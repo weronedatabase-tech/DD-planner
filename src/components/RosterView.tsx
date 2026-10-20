@@ -62,15 +62,15 @@ export const RosterView: React.FC<RosterViewProps> = ({
     return (
       <div
         key={`${p.name}-${p.rowIndex || ''}`}
-        className={`px-3 sm:px-3.5 py-2.5 rounded-lg flex justify-between items-center transition-colors ${
+        className={`px-3 sm:px-3.5 py-2.5 rounded-lg flex justify-between items-start sm:items-center gap-2 transition-colors ${
           p.type === 'Volunteer' ? 'row-volunteer' : 'row-paddler'
         }`}
       >
-        <div className="min-w-0 pr-2.5">
-          <div className="font-bold text-sm sm:text-base truncate" title={p.name}>
+        <div className="min-w-0 flex-1 pr-1">
+          <div className="font-bold text-sm sm:text-base break-words leading-snug">
             {p.name}
           </div>
-          <div className="flex flex-wrap items-center gap-1.5 text-xs sm:text-sm font-semibold opacity-95 font-mono tabular-nums mt-0.5">
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs sm:text-sm font-semibold opacity-95 font-mono tabular-nums mt-0.5">
             <span>{p.weight || 0} kg</span>
             <span aria-hidden="true">·</span>
             <span>{p.side || 'Any'} Side</span>
@@ -79,10 +79,7 @@ export const RosterView: React.FC<RosterViewProps> = ({
             {linkedList.length > 0 && (
               <>
                 <span aria-hidden="true">·</span>
-                <span
-                  className="font-sans font-bold truncate max-w-[160px] sm:max-w-[260px]"
-                  title={`Linked: ${linkedList.join(', ')}`}
-                >
+                <span className="font-sans font-bold break-words">
                   Linked: {linkedList.join(', ')}
                 </span>
               </>

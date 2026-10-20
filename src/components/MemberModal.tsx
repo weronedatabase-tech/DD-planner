@@ -265,22 +265,22 @@ export const MemberModal: React.FC<MemberModalProps> = ({
                   return (
                     <label
                       key={candidate.name}
-                      className={`flex items-center justify-between px-2.5 py-2 rounded-md text-xs sm:text-sm cursor-pointer select-none transition-colors ${
+                      className={`flex items-start sm:items-center justify-between gap-2 px-2.5 py-2 rounded-md text-xs sm:text-sm cursor-pointer select-none transition-colors ${
                         checked
                           ? 'bg-sky-500/20 text-sky-950 dark:text-sky-100 font-bold'
                           : 'hover:bg-zinc-200/70 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-semibold'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="flex items-start sm:items-center gap-2.5 min-w-0 flex-1">
                         <input
                           type="checkbox"
                           checked={checked}
                           onChange={() => handleLinkToggle(candidate.name)}
-                          className="w-4 h-4 rounded border-zinc-400 dark:border-zinc-600 accent-sky-500"
+                          className="w-4 h-4 mt-0.5 sm:mt-0 rounded border-zinc-400 dark:border-zinc-600 accent-sky-500 shrink-0"
                         />
-                        <span className="truncate">{candidate.name}</span>
+                        <span className="break-words leading-snug">{candidate.name}</span>
                       </div>
-                      <span className="text-xs font-mono font-bold tabular-nums text-zinc-700 dark:text-zinc-200 shrink-0 ml-2">
+                      <span className="text-xs font-mono font-bold tabular-nums text-zinc-700 dark:text-zinc-200 shrink-0">
                         {candidate.weight}kg · {candidate.side}
                       </span>
                     </label>

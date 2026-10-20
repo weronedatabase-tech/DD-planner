@@ -166,17 +166,19 @@ export const AssignModal: React.FC<AssignModalProps> = ({
                     onAssign(p.name);
                     onClose();
                   }}
-                  className={`w-full p-2.5 rounded-lg flex justify-between items-center text-left cursor-pointer transition-opacity hover:opacity-95 ${roleSurface} ${
+                  className={`w-full p-2.5 rounded-lg flex justify-between items-start sm:items-center gap-2 text-left cursor-pointer transition-opacity hover:opacity-95 ${roleSurface} ${
                     isSeated && !isCurrentOccupant ? 'opacity-75' : ''
                   }`}
                 >
-                  <div className="min-w-0">
-                    <div className="font-bold text-xs sm:text-sm truncate">{p.name}</div>
-                    <div className="text-xs font-semibold opacity-95 font-mono tabular-nums mt-0.5">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-bold text-xs sm:text-sm break-words leading-snug">
+                      {p.name}
+                    </div>
+                    <div className="text-xs font-semibold opacity-95 font-mono tabular-nums mt-0.5 break-words">
                       {p.type} · {p.weight}kg · {p.side} Side
                     </div>
                   </div>
-                  <span className="text-xs font-mono font-bold shrink-0 ml-2">{status}</span>
+                  <span className="text-xs font-mono font-bold shrink-0">{status}</span>
                 </button>
               );
             })
