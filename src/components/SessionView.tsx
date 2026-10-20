@@ -101,48 +101,48 @@ export const SessionView: React.FC<SessionViewProps> = ({
   return (
     <div
       id="view-session"
-      className="h-full flex flex-col max-w-4xl mx-auto w-full p-2.5 sm:p-5 gap-2.5 sm:gap-3 overflow-hidden"
+      className="h-full flex flex-col max-w-4xl mx-auto w-full p-1.5 sm:p-2.5 gap-1.5 overflow-hidden"
     >
-      {/* Top Session Control Card (New Session Date Picker / Load Saved Dropdown) */}
+      {/* Top Session Control Card (Compressed vertically to maximize checklist height) */}
       <div className="bg-white dark:bg-[#09090b] rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex-none">
         {/* Segmented Mode Tabs */}
-        <div className="flex p-1 sm:p-1.5 bg-zinc-100 dark:bg-[#0e0e13] border-b border-zinc-200 dark:border-zinc-800 gap-1 sm:gap-1.5">
+        <div className="flex p-1 bg-zinc-100 dark:bg-[#0e0e13] border-b border-zinc-200 dark:border-zinc-800 gap-1">
           <button
             type="button"
             id="tab-new"
             onClick={() => onSubTabChange('new')}
-            className={`flex-1 py-2 sm:py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap ${
+            className={`flex-1 py-1 sm:py-1.5 px-2.5 rounded-md text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap ${
               sessionSubTab === 'new'
                 ? 'bg-sky-600 dark:bg-sky-500 text-white dark:text-zinc-950 shadow-xs'
                 : 'text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
             }`}
           >
-            <Calendar className="w-4 h-4 shrink-0" />
+            <Calendar className="w-3.5 h-3.5 shrink-0" />
             <span>New Session</span>
           </button>
           <button
             type="button"
             id="tab-load"
             onClick={() => onSubTabChange('load')}
-            className={`flex-1 py-2 sm:py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap ${
+            className={`flex-1 py-1 sm:py-1.5 px-2.5 rounded-md text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap ${
               sessionSubTab === 'load'
                 ? 'bg-sky-600 dark:bg-sky-500 text-white dark:text-zinc-950 shadow-xs'
                 : 'text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60'
             }`}
           >
-            <FolderOpen className="w-4 h-4 shrink-0" />
+            <FolderOpen className="w-3.5 h-3.5 shrink-0" />
             <span>Load Saved</span>
           </button>
         </div>
 
-        <div className="p-3 sm:p-4">
+        <div className="px-2.5 py-1.5 sm:px-3 sm:py-2">
           {sessionSubTab === 'new' ? (
             <div id="panel-new">
-              <label className="block text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-100 mb-1.5">
-                Pick Date
-              </label>
-              <div className="flex gap-2 sm:gap-2.5 h-10 sm:h-11">
-                <div className="relative flex-1 h-full">
+              <div className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9">
+                <span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 whitespace-nowrap shrink-0">
+                  Pick Date:
+                </span>
+                <div className="relative flex-1 h-full min-w-0">
                   <div
                     id="new-session-display"
                     onClick={() => {
@@ -150,7 +150,7 @@ export const SessionView: React.FC<SessionViewProps> = ({
                         dateInputRef.current?.showPicker();
                       } catch {}
                     }}
-                    className="w-full h-full border border-zinc-300 dark:border-zinc-700 px-3 sm:px-3.5 rounded-lg bg-zinc-50 dark:bg-[#14141b] text-sm sm:text-base font-mono font-bold tabular-nums flex items-center justify-between text-zinc-950 dark:text-white cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors"
+                    className="w-full h-full border border-zinc-300 dark:border-zinc-700 px-2.5 sm:px-3 rounded-lg bg-zinc-50 dark:bg-[#14141b] text-xs sm:text-sm font-mono font-bold tabular-nums flex items-center justify-between text-zinc-950 dark:text-white cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-500 transition-colors"
                   >
                     <span>
                       {pickedDate ? (
@@ -161,7 +161,7 @@ export const SessionView: React.FC<SessionViewProps> = ({
                         </span>
                       )}
                     </span>
-                    <Calendar className="w-4 h-4 text-zinc-600 dark:text-zinc-300 shrink-0 ml-2" />
+                    <Calendar className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-300 shrink-0 ml-1.5" />
                   </div>
                   <input
                     ref={dateInputRef}
@@ -175,28 +175,28 @@ export const SessionView: React.FC<SessionViewProps> = ({
                 <button
                   type="button"
                   onClick={handleCreate}
-                  className="bg-sky-600 hover:bg-sky-500 text-white px-3.5 sm:px-5 rounded-lg text-xs sm:text-sm font-bold transition-colors h-full cursor-pointer whitespace-nowrap shrink-0"
+                  className="bg-sky-600 hover:bg-sky-500 text-white px-3 sm:px-4 rounded-lg text-xs font-bold transition-colors h-full cursor-pointer whitespace-nowrap shrink-0"
                 >
                   Create & Start
                 </button>
               </div>
               {dateWarning && (
-                <p className="text-xs sm:text-sm font-semibold text-red-500 mt-1.5">
+                <p className="text-xs font-semibold text-red-500 mt-1">
                   {dateWarning}
                 </p>
               )}
             </div>
           ) : (
             <div id="panel-load">
-              <label className="block text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-100 mb-1.5">
-                Select Saved Session
-              </label>
-              <div className="flex gap-2 sm:gap-2.5 h-10 sm:h-11">
+              <div className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9">
+                <span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 whitespace-nowrap shrink-0">
+                  Saved:
+                </span>
                 <select
                   id="load-select"
                   value={selectedLoadId}
                   onChange={(e) => setSelectedLoadId(e.target.value)}
-                  className="flex-1 h-full border border-zinc-300 dark:border-zinc-700 px-3 sm:px-3.5 rounded-lg bg-zinc-50 dark:bg-[#14141b] text-sm sm:text-base font-mono font-bold text-zinc-950 dark:text-white focus:outline-none focus:border-sky-500"
+                  className="flex-1 min-w-0 h-full border border-zinc-300 dark:border-zinc-700 px-2.5 sm:px-3 rounded-lg bg-zinc-50 dark:bg-[#14141b] text-xs sm:text-sm font-mono font-bold text-zinc-950 dark:text-white focus:outline-none focus:border-sky-500"
                 >
                   <option value="">
                     {savedSessions.length === 0 ? 'No saved sessions' : 'Select session...'}
@@ -211,7 +211,7 @@ export const SessionView: React.FC<SessionViewProps> = ({
                   type="button"
                   onClick={handleLoad}
                   disabled={!selectedLoadId}
-                  className="bg-sky-600 hover:bg-sky-500 disabled:opacity-40 text-white px-4 sm:px-5 rounded-lg text-xs sm:text-sm font-bold transition-colors h-full cursor-pointer whitespace-nowrap shrink-0"
+                  className="bg-sky-600 hover:bg-sky-500 disabled:opacity-40 text-white px-3.5 sm:px-4 rounded-lg text-xs font-bold transition-colors h-full cursor-pointer whitespace-nowrap shrink-0"
                 >
                   Load
                 </button>
@@ -222,25 +222,42 @@ export const SessionView: React.FC<SessionViewProps> = ({
 
         <div
           id="active-session-bar"
-          className="bg-zinc-100 dark:bg-[#111116] border-t border-zinc-200 dark:border-zinc-800 px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm"
+          className={`border-t px-2.5 sm:px-3.5 py-1.5 flex flex-wrap items-center justify-between gap-2 transition-colors ${
+            currentSessionDate
+              ? 'bg-sky-50/90 dark:bg-sky-950/45 border-sky-300 dark:border-sky-800/80'
+              : 'bg-zinc-100 dark:bg-[#111116] border-zinc-200 dark:border-zinc-800'
+          }`}
         >
-          <div className="flex flex-wrap items-center gap-2 min-w-0">
-            <span className="text-zinc-700 dark:text-zinc-200 font-bold">Active Session:</span>
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs uppercase tracking-wide font-extrabold text-zinc-800 dark:text-zinc-100">
+              <span
+                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0 ${
+                  currentSessionDate
+                    ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]'
+                    : 'bg-zinc-400 dark:bg-zinc-600'
+                }`}
+              />
+              Active Session:
+            </span>
             <span
               id="active-session-display"
-              className="font-mono font-bold text-sky-700 dark:text-sky-300 break-words"
+              className={`font-mono font-extrabold break-words ${
+                currentSessionDate
+                  ? 'text-xs sm:text-sm text-sky-900 dark:text-sky-200 bg-white dark:bg-[#09090b] px-2 py-0.5 rounded-md border border-sky-300 dark:border-sky-700 shadow-2xs'
+                  : 'text-xs text-zinc-500 dark:text-zinc-400'
+              }`}
             >
-              {currentSessionDate ? formatDisplayDate(currentSessionDate) : ''}
+              {currentSessionDate ? formatDisplayDate(currentSessionDate) : 'None selected'}
             </span>
           </div>
           {currentSessionDate && onGoToBoats && (
             <button
               type="button"
               onClick={onGoToBoats}
-              className="text-xs sm:text-sm font-bold text-sky-700 dark:text-sky-300 hover:underline flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
+              className="bg-sky-600 hover:bg-sky-500 active:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-400 text-white dark:text-zinc-950 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-lg text-xs font-extrabold shadow-sm ring-2 ring-sky-500/25 transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
             >
               <span>Plan Boats</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>
           )}
         </div>
@@ -252,64 +269,56 @@ export const SessionView: React.FC<SessionViewProps> = ({
           id="attendance-section"
           className="bg-white dark:bg-[#09090b] rounded-xl border border-zinc-200 dark:border-zinc-800 flex-1 flex flex-col min-h-0 overflow-hidden"
         >
-          {/* Attendance Header & Search */}
-          <div className="px-3 sm:px-3.5 py-2 border-b border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-zinc-50 dark:bg-[#0e0e13]">
-            <div className="flex items-center flex-wrap gap-1.5 sm:gap-2 text-xs sm:text-sm text-zinc-700 dark:text-zinc-200 font-mono font-bold tabular-nums">
+          {/* Attendance Header & Search — single compact row */}
+          <div className="px-2.5 sm:px-3 py-1.5 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-2 bg-zinc-50 dark:bg-[#0e0e13]">
+            <div className="flex items-center flex-wrap gap-1 sm:gap-1.5 text-xs text-zinc-700 dark:text-zinc-200 font-mono font-bold tabular-nums shrink-0">
               <span className="font-sans font-extrabold text-zinc-950 dark:text-white">
                 Attendance
               </span>
               <span aria-hidden="true">·</span>
               <span>{attendance.length} Present</span>
-              <span aria-hidden="true">·</span>
-              <span className="text-sky-700 dark:text-sky-300">
-                {attendingPaddlersCount} Paddlers
-              </span>
-              <span aria-hidden="true">·</span>
-              <span className="text-emerald-700 dark:text-emerald-300">
-                {attendingVolunteersCount} Volunteers
-              </span>
             </div>
 
-            <div className="relative w-full sm:w-64">
-              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500 dark:text-zinc-300 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <div className="relative flex-1 max-w-[220px] sm:max-w-xs">
+              <Search className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-300 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={attendanceSearch}
                 onChange={(e) => setAttendanceSearch(e.target.value)}
-                placeholder="Search Paddlers & Volunteers..."
-                className="w-full pl-8 sm:pl-9 pr-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-[#14141b] text-zinc-950 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:outline-none focus:border-sky-500"
+                placeholder="Search..."
+                className="w-full pl-7 pr-2.5 py-1 text-xs font-medium rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-[#14141b] text-zinc-950 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:outline-none focus:border-sky-500"
               />
             </div>
           </div>
 
           {/* Group Select Bar */}
-          <div className="grid grid-cols-2 text-xs sm:text-sm font-bold border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-[#111116]">
-            <label className="px-2.5 sm:px-3.5 py-2 sm:py-2.5 flex items-center justify-between cursor-pointer border-r border-zinc-200 dark:border-zinc-800 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 transition-colors">
-              <div className="flex items-center gap-2">
+          <div className="grid grid-cols-2 text-xs font-bold border-b border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-[#111116]">
+            <label className="px-2 sm:px-3 py-1.5 flex items-center justify-between cursor-pointer border-r border-zinc-200 dark:border-zinc-800 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 transition-colors">
+              <div className="flex items-center gap-1.5">
                 <input
                   type="checkbox"
                   checked={allPaddlersChecked}
                   onChange={(e) => onToggleGroup('Paddler', e.target.checked)}
-                  className="w-4 h-4 rounded accent-sky-500 cursor-pointer shrink-0"
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded accent-sky-500 cursor-pointer shrink-0"
                 />
                 <span className="text-sky-900 dark:text-sky-200">Paddlers</span>
               </div>
-              <span className="font-mono text-xs sm:text-sm text-zinc-700 dark:text-zinc-200 tabular-nums">
+              <span className="font-mono text-xs text-zinc-700 dark:text-zinc-200 tabular-nums">
                 {attendingPaddlersCount}/{allRosterPaddlers.length}
               </span>
             </label>
 
-            <label className="px-2.5 sm:px-3.5 py-2 sm:py-2.5 flex items-center justify-between cursor-pointer hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 transition-colors">
-              <div className="flex items-center gap-2">
+            <label className="px-2 sm:px-3 py-1.5 flex items-center justify-between cursor-pointer hover:bg-zinc-200/60 dark:hover:bg-zinc-800/60 transition-colors">
+              <div className="flex items-center gap-1.5">
                 <input
                   type="checkbox"
                   checked={allVolunteersChecked}
                   onChange={(e) => onToggleGroup('Volunteer', e.target.checked)}
-                  className="w-4 h-4 rounded accent-emerald-500 cursor-pointer shrink-0"
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded accent-emerald-500 cursor-pointer shrink-0"
                 />
                 <span className="text-emerald-900 dark:text-emerald-200">Volunteers</span>
               </div>
-              <span className="font-mono text-xs sm:text-sm text-zinc-700 dark:text-zinc-200 tabular-nums">
+              <span className="font-mono text-xs text-zinc-700 dark:text-zinc-200 tabular-nums">
                 {attendingVolunteersCount}/{allRosterVolunteers.length}
               </span>
             </label>
@@ -319,14 +328,14 @@ export const SessionView: React.FC<SessionViewProps> = ({
           <div className="flex-grow grid grid-cols-2 overflow-hidden min-h-0">
             <div
               id="list-paddlers"
-              className="overflow-y-auto p-1.5 sm:p-2 space-y-1.5 custom-scroll border-r border-zinc-200 dark:border-zinc-800 pb-20"
+              className="overflow-y-auto p-1 sm:p-1.5 space-y-1 custom-scroll border-r border-zinc-200 dark:border-zinc-800 pb-20"
             >
               {paddlers.map((p) => {
                 const isChecked = attendance.includes(p.name);
                 return (
                   <label
                     key={p.name}
-                    className={`flex items-start sm:items-center px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg cursor-pointer transition-all row-paddler ${
+                    className={`flex items-start sm:items-center px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-lg cursor-pointer transition-all row-paddler ${
                       isChecked
                         ? 'ring-2 ring-sky-500 dark:ring-sky-400'
                         : 'hover:brightness-95 dark:hover:brightness-110'
@@ -355,14 +364,14 @@ export const SessionView: React.FC<SessionViewProps> = ({
 
             <div
               id="list-volunteers"
-              className="overflow-y-auto p-1.5 sm:p-2 space-y-1.5 custom-scroll pb-20"
+              className="overflow-y-auto p-1 sm:p-1.5 space-y-1 custom-scroll pb-20"
             >
               {volunteers.map((p) => {
                 const isChecked = attendance.includes(p.name);
                 return (
                   <label
                     key={p.name}
-                    className={`flex items-start sm:items-center px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg cursor-pointer transition-all row-volunteer ${
+                    className={`flex items-start sm:items-center px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-lg cursor-pointer transition-all row-volunteer ${
                       isChecked
                         ? 'ring-2 ring-emerald-500 dark:ring-emerald-400'
                         : 'hover:brightness-95 dark:hover:brightness-110'

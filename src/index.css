@@ -31,7 +31,7 @@
 }
 
 .seat {
-  min-height: var(--seat-h);
+  min-height: 38px;
   height: auto;
   width: 100%;
   display: flex;
@@ -42,7 +42,7 @@
   border: 1px dashed #94a3b8;
   background-color: #f8fafc;
   color: #0f172a;
-  border-radius: 7px;
+  border-radius: 6px;
   cursor: grab;
   position: relative;
   overflow: visible;
@@ -50,9 +50,9 @@
   font-weight: 700;
   user-select: none;
   -webkit-user-select: none;
-  line-height: 1.25;
+  line-height: 1.2;
   flex-shrink: 0;
-  padding: 5px 6px;
+  padding: 3px 4px;
   touch-action: pan-y;
 }
 
@@ -144,20 +144,21 @@
 
 .remove-x {
   position: absolute;
-  top: 2px;
-  right: 3px;
-  width: 18px;
-  height: 18px;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  width: 16px;
+  height: 16px;
   background: transparent;
   color: #dc2626;
   border: none;
   padding: 0;
   cursor: pointer;
-  z-index: 20;
+  z-index: 25;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.88;
+  opacity: 0.95;
   transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.12s ease, color 0.12s ease;
 }
 
@@ -168,7 +169,7 @@
 .remove-x:hover,
 .remove-x:active {
   opacity: 1;
-  transform: scale(1.18);
+  transform: translate(50%, -50%) scale(1.2);
   color: #b91c1c;
 }
 
@@ -184,9 +185,9 @@
 .pool-group {
   border: 1px solid #cbd5e1;
   background-color: #ffffff;
-  padding: 7px;
-  border-radius: 8px;
-  margin-bottom: 7px;
+  padding: 3px;
+  border-radius: 6px;
+  margin-bottom: 2px;
 }
 
 .dark .pool-group {
@@ -195,10 +196,11 @@
 }
 
 .pool-group-label {
-  font-size: 11px;
+  font-size: 10px;
+  line-height: 1.15;
   color: #334155;
   font-weight: 700;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
   padding-left: 2px;
   display: flex;
   align-items: center;

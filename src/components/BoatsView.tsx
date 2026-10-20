@@ -461,7 +461,14 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
         : member.type === 'Paddler'
         ? 'paddler'
         : 'drummer-helm';
-    const sideDisplay = member.side || 'Any';
+    const rawSide = member.side || 'Any';
+    const sideDisplay = !fromBoatId
+      ? rawSide === 'Left'
+        ? 'L'
+        : rawSide === 'Right'
+        ? 'R'
+        : 'A'
+      : rawSide;
     const weightDisplay = member.weight || 0;
     const isPoolSelected = !fromBoatId && !isSeatedInPool && selectedPoolMember === member.name;
 
@@ -485,18 +492,14 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
         data-weight={weightDisplay}
         data-type={member.type}
         data-side={member.side || 'Any'}
-        className={`seat ${typeClass} z-10 w-full mb-1 flex-shrink-0 ${
+        className={`seat ${typeClass} z-10 w-full ${fromBoatId ? 'mb-0' : 'mb-1'} flex-shrink-0 ${
           isSeatedInPool ? 'seated-in-pool' : ''
         } ${isPoolSelected ? 'ring-2 ring-sky-500 dark:ring-white scale-[1.02]' : ''}`}
       >
-        <span
-          className={`font-bold text-xs sm:text-[13px] leading-snug break-words text-center ${
-            fromBoatId ? 'px-3.5' : 'px-1'
-          }`}
-        >
+        <span className="font-bold text-xs sm:text-[13px] leading-tight break-words text-center px-1">
           {member.name}
         </span>
-        <span className="opacity-95 text-[11px] font-semibold font-mono tabular-nums weight-text break-words text-center mt-0.5">
+        <span className="opacity-95 text-[10px] sm:text-[11px] font-semibold font-mono tabular-nums weight-text break-words text-center mt-0.5 leading-tight">
           {weightDisplay}kg · {sideDisplay}
         </span>
         {fromBoatId && seatRef && (
@@ -524,13 +527,12 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
 
   return (
     <div id="view-planning" className="h-full flex flex-col w-full max-w-[1440px] mx-auto">
-      {/* Top Action & Telemetry Bar */}
-      <div className="flex-none z-20 bg-white dark:bg-[#09090b] border-b border-zinc-200 dark:border-zinc-800 px-2.5 sm:px-3 py-2 flex flex-col lg:flex-row lg:items-center justify-between gap-2">
-        {/* Left: Pool & Total Metrics + Undo/Redo + Add Boats */}
-        <div className="flex flex-wrap items-center justify-between sm:justify-start gap-1.5 sm:gap-2">
-          {/* Pool vs Total Telemetry */}
-          <div className="flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-zinc-100 dark:bg-[#14141b] border border-zinc-300 dark:border-zinc-700 text-xs sm:text-sm font-mono font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
-            <div className="flex items-center gap-1 sm:gap-1.5">
+      {/* Top Action & Telemetry Bar — maximized horizontal space across 2 tight rows on mobile, 1 row on desktop */}
+      <div className="flex-none z-20 bg-white dark:bg-[#09090b] border-b border-zinc-200 dark:border-zinc-800 px-1.5 sm:px-2.5 py-1 flex flex-col xl:flex-row xl:items-center justify-between gap-1">
+        {/* Row 1: Pool & Total Metrics + Add Boat Controls */}
+        <div className="flex items-center justify-between gap-1 w-full xl:w-auto">
+          <div className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-[#14141b] border border-zinc-300 dark:border-zinc-700 text-[11px] sm:text-xs font-mono font-bold tabular-nums text-zinc-900 dark:text-zinc-100 shrink-0">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <span className="text-zinc-700 dark:text-zinc-200">Pool:</span>
               <span>
                 P:<b id="pool-paddlers" className="text-sky-700 dark:text-sky-300 ml-0.5">{poolPaddlersCount}</b>
@@ -540,7 +542,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
               </span>
             </div>
             <span className="text-zinc-400 dark:text-zinc-600">|</span>
-            <div className="flex items-center gap-1 sm:gap-1.5">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <span className="text-zinc-700 dark:text-zinc-200">Total:</span>
               <span>
                 P:<b id="total-paddlers" className="text-sky-700 dark:text-sky-300 ml-0.5">{totalPaddlers}</b>
@@ -551,98 +553,98 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            {/* Undo / Redo */}
-            <div className="flex items-center rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] p-0.5">
-              <button
-                type="button"
-                id="undo-btn"
-                onClick={onUndo}
-                disabled={!canUndo}
-                className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer ${
-                  canUndo
-                    ? 'text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800'
-                    : 'opacity-40 pointer-events-none text-zinc-500 dark:text-zinc-400'
-                }`}
-                title="Undo (Ctrl+Z)"
-              >
-                <Undo2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Undo</span>
-              </button>
-              <button
-                type="button"
-                id="redo-btn"
-                onClick={onRedo}
-                disabled={!canRedo}
-                className={`px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer ${
-                  canRedo
-                    ? 'text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800'
-                    : 'opacity-40 pointer-events-none text-zinc-500 dark:text-zinc-400'
-                }`}
-                title="Redo (Ctrl+Y)"
-              >
-                <Redo2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Redo</span>
-              </button>
-            </div>
-
-            {/* Add Boat Controls */}
+          <div className="flex items-center gap-1 flex-1 sm:flex-initial justify-end">
             <button
               type="button"
               onClick={() => onAddBoat('standard')}
-              className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-white text-white dark:text-zinc-950 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
+              className="flex-1 sm:flex-initial justify-center bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-white text-white dark:text-zinc-950 px-2 sm:px-2.5 py-1 rounded-md text-[11px] sm:text-xs font-bold transition-colors cursor-pointer flex items-center gap-0.5 sm:gap-1 whitespace-nowrap shrink-0"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
               <span>Standard (20)</span>
             </button>
             <button
               type="button"
               onClick={() => onAddBoat('small')}
-              className="bg-zinc-100 dark:bg-[#181820] hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-950 dark:text-white border border-zinc-300 dark:border-zinc-700 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
+              className="flex-1 sm:flex-initial justify-center bg-zinc-100 dark:bg-[#181820] hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-950 dark:text-white border border-zinc-300 dark:border-zinc-700 px-2 sm:px-2.5 py-1 rounded-md text-[11px] sm:text-xs font-bold transition-colors cursor-pointer flex items-center gap-0.5 sm:gap-1 whitespace-nowrap shrink-0"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
               <span>Small (10)</span>
             </button>
           </div>
         </div>
 
-        {/* Right: Auto-Balancing Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2 bg-zinc-100 dark:bg-[#14141b] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700">
-          <span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 whitespace-nowrap">
-            Auto-Balance:
-          </span>
-          <select
-            id="balance-mode"
-            value={balanceMode}
-            onChange={(e) => setBalanceMode(e.target.value as BalanceMode)}
-            className="flex-1 sm:flex-initial text-xs px-2 sm:px-2.5 py-1 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-[#09090b] font-bold text-zinc-950 dark:text-white focus:outline-none focus:border-sky-500"
-          >
-            <option value="stability">Stability (L/R)</option>
-            <option value="rocket">Rocket (Engine)</option>
-          </select>
-          <button
-            type="button"
-            onClick={onShowAlgoInfo}
-            className="p-1 sm:p-1.5 rounded-md text-zinc-700 hover:text-zinc-950 dark:text-zinc-200 dark:hover:text-white hover:bg-zinc-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-            title="Balancing Algorithm Info"
-          >
-            <Info className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => onRunAutoBalance(balanceMode)}
-            disabled={boats.length === 0}
-            className="bg-sky-600 hover:bg-sky-500 disabled:opacity-40 text-white px-3 sm:px-3.5 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Balance</span>
-          </button>
+        {/* Row 2: Undo/Redo + Auto-Balancing Controls */}
+        <div className="flex items-center justify-between gap-1 w-full xl:w-auto">
+          <div className="flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] p-0.5 shrink-0">
+            <button
+              type="button"
+              id="undo-btn"
+              onClick={onUndo}
+              disabled={!canUndo}
+              className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer ${
+                canUndo
+                  ? 'text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800'
+                  : 'opacity-40 pointer-events-none text-zinc-500 dark:text-zinc-400'
+              }`}
+              title="Undo (Ctrl+Z)"
+            >
+              <Undo2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Undo</span>
+            </button>
+            <button
+              type="button"
+              id="redo-btn"
+              onClick={onRedo}
+              disabled={!canRedo}
+              className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer ${
+                canRedo
+                  ? 'text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800'
+                  : 'opacity-40 pointer-events-none text-zinc-500 dark:text-zinc-400'
+              }`}
+              title="Redo (Ctrl+Y)"
+            >
+              <Redo2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Redo</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1 flex-1 bg-zinc-100 dark:bg-[#14141b] px-1.5 sm:px-2 py-0.5 rounded-md border border-zinc-300 dark:border-zinc-700 min-w-0">
+            <span className="text-[11px] sm:text-xs font-bold text-zinc-800 dark:text-zinc-100 whitespace-nowrap shrink-0">
+              Auto-Balance:
+            </span>
+            <select
+              id="balance-mode"
+              value={balanceMode}
+              onChange={(e) => setBalanceMode(e.target.value as BalanceMode)}
+              className="flex-1 min-w-0 text-[11px] sm:text-xs px-1.5 py-0.5 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-[#09090b] font-bold text-zinc-950 dark:text-white focus:outline-none focus:border-sky-500"
+            >
+              <option value="stability">Stability (L/R)</option>
+              <option value="rocket">Rocket (Engine)</option>
+            </select>
+            <button
+              type="button"
+              onClick={onShowAlgoInfo}
+              className="p-0.5 sm:p-1 rounded text-zinc-700 hover:text-zinc-950 dark:text-zinc-200 dark:hover:text-white hover:bg-zinc-200/70 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
+              title="Balancing Algorithm Info"
+            >
+              <Info className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onRunAutoBalance(balanceMode)}
+              disabled={boats.length === 0}
+              className="bg-sky-600 hover:bg-sky-500 disabled:opacity-40 text-white px-2 sm:px-2.5 py-0.5 sm:py-1 rounded text-[11px] sm:text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
+            >
+              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span>Balance</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Quick Tap-to-Place Banner when a pool member is tapped on mobile/desktop */}
       {selectedPoolMember && (
-        <div className="flex-none bg-sky-600 text-white px-3 py-1.5 text-xs font-bold flex items-center justify-between gap-2 z-20">
+        <div className="flex-none bg-sky-600 text-white px-2.5 py-1 text-xs font-bold flex items-center justify-between gap-2 z-20">
           <span className="break-words">
             Placing <b>{selectedPoolMember}</b> — tap any boat seat to assign
           </span>
@@ -659,26 +661,26 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
 
       {/* Main Split Workspace: Pool (Left) + Boats Grid (Right) */}
       <div className="flex-grow flex overflow-hidden min-h-0">
-        {/* Attendee Pool Sidebar */}
+        {/* Attendee Pool Sidebar — compact width to maximize space for Boat column */}
         <div
           id="pool-container"
           onDragOver={handleDragOver}
           onDrop={handleDropOnPool}
-          className="w-[35%] sm:w-[240px] lg:w-[270px] flex-none bg-zinc-100 dark:bg-[#07070a] border-r border-zinc-200 dark:border-zinc-800 flex flex-col min-h-0"
+          className="w-[26%] min-w-[92px] max-w-[126px] sm:w-[168px] sm:max-w-none lg:w-[192px] flex-none bg-zinc-100 dark:bg-[#07070a] border-r border-zinc-200 dark:border-zinc-800 flex flex-col min-h-0"
         >
           {/* Pool Filter Header */}
-          <div className="p-2 sm:p-2.5 border-b border-zinc-200 dark:border-zinc-800 space-y-1.5 sm:space-y-2 bg-white dark:bg-[#0c0c10]">
+          <div className="p-1 sm:p-1.5 border-b border-zinc-200 dark:border-zinc-800 space-y-1 bg-white dark:bg-[#0c0c10]">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-zinc-500 dark:text-zinc-300 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-3 h-3 text-zinc-500 dark:text-zinc-300 absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={poolSearch}
                 onChange={(e) => setPoolSearch(e.target.value)}
-                placeholder="Search pool..."
-                className="w-full pl-8 pr-2 py-1 sm:py-1.5 text-xs font-medium rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] text-zinc-950 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:outline-none focus:border-sky-500"
+                placeholder="Search..."
+                className="w-full pl-6 pr-1.5 py-1 text-[11px] sm:text-xs font-medium rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] text-zinc-950 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400 focus:outline-none focus:border-sky-500"
               />
             </div>
-            <label className="flex items-center justify-between gap-1 text-[11px] sm:text-xs font-semibold text-zinc-700 dark:text-zinc-200 px-0.5 cursor-pointer select-none">
+            <label className="flex items-center justify-between gap-1 text-[10px] sm:text-xs font-semibold text-zinc-700 dark:text-zinc-200 px-0.5 cursor-pointer select-none">
               <span className="break-words">Hide seated</span>
               <input
                 type="checkbox"
@@ -689,27 +691,27 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
             </label>
           </div>
 
-          <div className="overflow-y-auto p-1.5 sm:p-2 flex-1 flex flex-col gap-1.5 droppable custom-scroll pb-24">
-            {poolGroups.map(({ paddler, linkedVolunteers }) => (
-              <div key={paddler.name} className="pool-group">
-                <div className="pool-group-label flex-wrap gap-1">
-                  <span>{linkedVolunteers.length > 0 ? 'Linked Pair' : 'Paddler'}</span>
-                  {linkedVolunteers.length > 0 && (
-                    <span className="font-mono text-[10px]">1P+{linkedVolunteers.length}V</span>
+          <div className="overflow-y-auto p-1 sm:p-1.5 flex-1 flex flex-col gap-0.5 droppable custom-scroll pb-24">
+            {poolGroups.map(({ paddler, linkedVolunteers }) =>
+              linkedVolunteers.length > 0 ? (
+                <div key={paddler.name} className="pool-group">
+                  <div className="pool-group-label">
+                    <span>Linked</span>
+                  </div>
+                  {renderSeatNode(paddler, seatedNames.has(paddler.name))}
+                  {linkedVolunteers.map((vol) =>
+                    renderSeatNode(vol, seatedNames.has(vol.name))
                   )}
                 </div>
-                {renderSeatNode(paddler, seatedNames.has(paddler.name))}
-                {linkedVolunteers.map((vol) =>
-                  renderSeatNode(vol, seatedNames.has(vol.name))
-                )}
-              </div>
-            ))}
+              ) : (
+                <React.Fragment key={paddler.name}>
+                  {renderSeatNode(paddler, seatedNames.has(paddler.name))}
+                </React.Fragment>
+              )
+            )}
 
             {orphanVolunteers.length > 0 && (
-              <div className="mt-1 pt-2 border-t border-zinc-300 dark:border-zinc-700 space-y-1">
-                <div className="text-[11px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-200 px-1 mb-1 break-words">
-                  Unlinked Volunteers ({orphanVolunteers.length})
-                </div>
+              <div className="mt-0.5 pt-1 border-t border-zinc-300 dark:border-zinc-700 flex flex-col gap-0.5">
                 {orphanVolunteers.map((vol) =>
                   renderSeatNode(vol, seatedNames.has(vol.name))
                 )}
@@ -717,7 +719,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
             )}
 
             {attendeeMembers.length === 0 && (
-              <div className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-300 text-center py-8 px-1.5">
+              <div className="text-[11px] sm:text-xs font-medium text-zinc-600 dark:text-zinc-300 text-center py-6 px-1">
                 No attendees marked yet. Use Session tab to check in members.
               </div>
             )}
@@ -727,10 +729,10 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
         {/* Boats Canvas Area */}
         <div
           id="boats-area"
-          className="flex-1 bg-zinc-50 dark:bg-black overflow-y-auto p-2 sm:p-5 custom-scroll pb-24"
+          className="flex-1 bg-zinc-50 dark:bg-black overflow-y-auto p-1 sm:p-2 custom-scroll pb-24"
         >
           {boats.length === 0 ? (
-            <div className="h-full min-h-[280px] flex flex-col items-center justify-center p-5 sm:p-8 text-center border border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-[#09090b]">
+            <div className="h-full min-h-[280px] flex flex-col items-center justify-center p-4 sm:p-8 text-center border border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-[#09090b]">
               <p className="font-display text-sm sm:text-lg font-bold text-zinc-950 dark:text-white mb-1">
                 No Boats in This Session Yet
               </p>
@@ -756,7 +758,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 items-start">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-1.5 sm:gap-2.5 items-start">
               {boats.map((boat, boatIndex) => {
                 const numRows = boat.type === 'standard' ? 10 : 5;
                 const weights = calculateBoatWeight(boat, memberMap);
@@ -782,22 +784,28 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
 
                 const drummerCollab = getSeatCollaborator(boat.id, 'drummer');
                 const helmCollab = getSeatCollaborator(boat.id, 'helm');
+                const drummerMember = drummerSeat.occupant
+                  ? memberMap.get(drummerSeat.occupant)
+                  : undefined;
+                const helmMember = helmSeat.occupant
+                  ? memberMap.get(helmSeat.occupant)
+                  : undefined;
 
                 return (
                   <div
                     key={boat.id}
                     id={boat.id}
                     data-type={boat.type}
-                    className="boat-wrapper bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800 rounded-xl p-2.5 sm:p-4 w-full"
+                    className="boat-wrapper bg-white dark:bg-[#09090b] border border-zinc-200 dark:border-zinc-800 rounded-xl px-1 py-1.5 sm:p-2.5 w-full"
                   >
                     {/* Boat Header */}
-                    <div className="flex flex-wrap justify-between items-start gap-2 mb-2.5 pb-2 border-b border-zinc-200 dark:border-zinc-800">
+                    <div className="flex flex-wrap justify-between items-start gap-1 mb-1 pb-1 border-b border-zinc-200 dark:border-zinc-800 px-0.5">
                       <div className="min-w-0 flex-1">
                         <h4 className="font-display font-extrabold text-zinc-950 dark:text-white text-xs sm:text-base break-words leading-snug boat-title">
                           Boat {boatIndex + 1} ·{' '}
                           {boat.type === 'standard' ? 'Standard (20)' : 'Small (10)'}
                         </h4>
-                        <div className="flex flex-wrap items-center gap-1.5 text-[11px] sm:text-xs font-mono font-bold tabular-nums text-zinc-700 dark:text-zinc-200 mt-0.5 boat-date">
+                        <div className="flex flex-wrap items-center gap-1 text-[11px] sm:text-xs font-mono font-bold tabular-nums text-zinc-700 dark:text-zinc-200 mt-0.5 boat-date">
                           <span className="break-words">{displayDateStr || 'Unsaved'}</span>
                           <span aria-hidden="true">·</span>
                           <span className="shrink-0">
@@ -806,12 +814,12 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                      <div className="flex items-center gap-1 shrink-0">
                         {onClearBoatSeats && seatedInThisBoat > 0 && (
                           <button
                             type="button"
                             onClick={() => onClearBoatSeats(boat.id)}
-                            className="text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                            className="text-zinc-800 dark:text-zinc-200 border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] p-1 sm:px-2 sm:py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
                             title="Clear Paddler Rows"
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
@@ -821,7 +829,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                         <button
                           type="button"
                           onClick={() => onSaveBoatCanvas(boat.id)}
-                          className="text-sky-700 dark:text-sky-300 border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                          className="text-sky-700 dark:text-sky-300 border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] p-1 sm:px-2 sm:py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
                           title="Share Lineup Image"
                         >
                           <Share2 className="w-3.5 h-3.5" />
@@ -830,7 +838,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                         <button
                           type="button"
                           onClick={() => onRemoveBoat(boat.id)}
-                          className="text-red-600 dark:text-red-400 border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] p-1.5 rounded-lg hover:bg-red-500/15 transition-colors cursor-pointer"
+                          className="text-red-600 dark:text-red-400 border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] p-1 rounded-lg hover:bg-red-500/15 transition-colors cursor-pointer"
                           title="Remove Boat"
                         >
                           <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -839,8 +847,8 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                     </div>
 
                     {/* Column Labels */}
-                    <div className="grid grid-cols-[28px_1fr_1fr] sm:grid-cols-[44px_1fr_1fr] gap-1 sm:gap-1.5 mb-1.5 text-[11px] sm:text-xs font-mono font-bold text-zinc-700 dark:text-zinc-200 text-center">
-                      <div>ROW</div>
+                    <div className="grid grid-cols-[12px_1fr_1fr] sm:grid-cols-[16px_1fr_1fr] gap-x-1 mb-1 text-[10px] sm:text-xs font-mono font-bold text-zinc-700 dark:text-zinc-200 text-center">
+                      <div aria-hidden="true" />
                       <div>
                         <span className="sm:hidden">LEFT</span>
                         <span className="hidden sm:inline">PORT (LEFT)</span>
@@ -851,28 +859,21 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-[28px_1fr_1fr] sm:grid-cols-[44px_1fr_1fr] gap-1 sm:gap-1.5">
-                      {/* Coach / Drum */}
-                      <div className="flex items-center justify-center text-[11px] sm:text-xs font-bold text-zinc-800 dark:text-zinc-200 leading-tight text-center">
-                        Drum
-                      </div>
+                    <div className="grid grid-cols-[12px_1fr_1fr] sm:grid-cols-[16px_1fr_1fr] gap-x-1 gap-y-1.5">
+                      {/* Coach / Drum — no word in the row number column */}
+                      <div aria-hidden="true" />
                       <div
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDropOnSeat(e, boat.id, 'drummer')}
                         onClick={() => handleBenchSeatInteraction(boat.id, drummerSeat)}
                         data-boat-id={boat.id}
                         data-role="drummer"
-                        className={`col-span-2 seat drummer-helm droppable ${
-                          drummerCollab ? 'ring-2 ring-sky-400' : ''
-                        }`}
+                        className={`col-span-2 droppable ${
+                          drummerMember ? 'w-full' : 'seat drummer-helm'
+                        } ${drummerCollab ? 'ring-2 ring-sky-400 rounded-md' : ''}`}
                       >
-                        {drummerSeat.occupant && memberMap.get(drummerSeat.occupant) ? (
-                          renderSeatNode(
-                            memberMap.get(drummerSeat.occupant)!,
-                            false,
-                            boat.id,
-                            drummerSeat
-                          )
+                        {drummerMember ? (
+                          renderSeatNode(drummerMember, false, boat.id, drummerSeat)
                         ) : (
                           <span className="text-xs font-bold opacity-90">
                             <span className="sm:hidden">Coach / Drum</span>
@@ -881,7 +882,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                         )}
                       </div>
 
-                      {/* Numbered Paddler Benches */}
+                      {/* Numbered Paddler Benches — plain compact row numbers without backing */}
                       {Array.from({ length: numRows }, (_, idx) => {
                         const rowNum = idx + 1;
                         const leftSeat = boat.seats.find(
@@ -906,10 +907,16 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                           rowNum,
                           'Right'
                         );
+                        const leftMember = leftSeat.occupant
+                          ? memberMap.get(leftSeat.occupant)
+                          : undefined;
+                        const rightMember = rightSeat.occupant
+                          ? memberMap.get(rightSeat.occupant)
+                          : undefined;
 
                         return (
                           <React.Fragment key={rowNum}>
-                            <div className="flex items-center justify-center font-mono font-bold text-zinc-900 dark:text-zinc-100 text-xs sm:text-sm tabular-nums bg-zinc-100 dark:bg-[#14141b] rounded-md border border-zinc-200 dark:border-zinc-800">
+                            <div className="flex items-center justify-center font-mono font-bold text-zinc-500 dark:text-zinc-400 text-[10px] sm:text-xs tabular-nums leading-none select-none">
                               {rowNum}
                             </div>
                             <div
@@ -921,17 +928,12 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                               data-boat-id={boat.id}
                               data-row={rowNum}
                               data-side="Left"
-                              className={`seat droppable ${
-                                leftCollab ? 'ring-2 ring-sky-400' : ''
+                              className={`droppable ${leftMember ? 'w-full' : 'seat'} ${
+                                leftCollab ? 'ring-2 ring-sky-400 rounded-md' : ''
                               }`}
                             >
-                              {leftSeat.occupant && memberMap.get(leftSeat.occupant) ? (
-                                renderSeatNode(
-                                  memberMap.get(leftSeat.occupant)!,
-                                  false,
-                                  boat.id,
-                                  leftSeat
-                                )
+                              {leftMember ? (
+                                renderSeatNode(leftMember, false, boat.id, leftSeat)
                               ) : (
                                 <span className="text-xs font-bold text-zinc-500 dark:text-zinc-300">
                                   {rowNum}L
@@ -947,17 +949,12 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                               data-boat-id={boat.id}
                               data-row={rowNum}
                               data-side="Right"
-                              className={`seat droppable ${
-                                rightCollab ? 'ring-2 ring-sky-400' : ''
+                              className={`droppable ${rightMember ? 'w-full' : 'seat'} ${
+                                rightCollab ? 'ring-2 ring-sky-400 rounded-md' : ''
                               }`}
                             >
-                              {rightSeat.occupant && memberMap.get(rightSeat.occupant) ? (
-                                renderSeatNode(
-                                  memberMap.get(rightSeat.occupant)!,
-                                  false,
-                                  boat.id,
-                                  rightSeat
-                                )
+                              {rightMember ? (
+                                renderSeatNode(rightMember, false, boat.id, rightSeat)
                               ) : (
                                 <span className="text-xs font-bold text-zinc-500 dark:text-zinc-300">
                                   {rowNum}R
@@ -968,27 +965,20 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                         );
                       })}
 
-                      {/* Steer */}
-                      <div className="flex items-center justify-center text-[11px] sm:text-xs font-bold text-zinc-800 dark:text-zinc-200">
-                        Steer
-                      </div>
+                      {/* Steer — no word in the row number column */}
+                      <div aria-hidden="true" />
                       <div
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDropOnSeat(e, boat.id, 'helm')}
                         onClick={() => handleBenchSeatInteraction(boat.id, helmSeat)}
                         data-boat-id={boat.id}
                         data-role="helm"
-                        className={`col-span-2 seat drummer-helm droppable ${
-                          helmCollab ? 'ring-2 ring-sky-400' : ''
-                        }`}
+                        className={`col-span-2 droppable ${
+                          helmMember ? 'w-full' : 'seat drummer-helm'
+                        } ${helmCollab ? 'ring-2 ring-sky-400 rounded-md' : ''}`}
                       >
-                        {helmSeat.occupant && memberMap.get(helmSeat.occupant) ? (
-                          renderSeatNode(
-                            memberMap.get(helmSeat.occupant)!,
-                            false,
-                            boat.id,
-                            helmSeat
-                          )
+                        {helmMember ? (
+                          renderSeatNode(helmMember, false, boat.id, helmSeat)
                         ) : (
                           <span className="text-xs font-bold opacity-90">
                             <span className="sm:hidden">Steer / Helm</span>
@@ -998,7 +988,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                       </div>
 
                       {/* Lateral Weight Telemetry Bar */}
-                      <div className="col-start-2 col-span-2 mt-1.5 sm:mt-2 text-[11px] sm:text-sm flex items-center justify-between font-mono font-bold tabular-nums px-2 sm:px-3 py-1.5 sm:py-2 bg-zinc-100 dark:bg-[#14141b] rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-950 dark:text-white boat-stats-bar">
+                      <div className="col-start-2 col-span-2 mt-0.5 text-[11px] sm:text-sm flex items-center justify-between font-mono font-bold tabular-nums px-2 sm:px-3 py-1 bg-zinc-100 dark:bg-[#14141b] rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-950 dark:text-white boat-stats-bar">
                         <span>L:{roundedL}kg</span>
                         <span
                           className={`font-extrabold ${
