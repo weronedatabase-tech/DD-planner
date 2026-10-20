@@ -7,15 +7,46 @@
   <meta name="description" content="Dragon boat seating planner with roster management, Google Sheets session tracking, live multi-user collaboration, auto-balancing, and visual boat assignment.">
   <meta property="og:title" content="Different Dragons Planner">
   <meta property="og:description" content="Dragon boat seating planner with roster management, Google Sheets session tracking, live multi-user collaboration, auto-balancing, and visual boat assignment.">
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icon-192.png">
   <meta name="theme-color" content="#000000">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 antialiased select-none flex flex-col h-dvh overflow-hidden">
+<body style="background-color:#000000;margin:0;" class="bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 antialiased select-none flex flex-col h-dvh overflow-hidden">
   <div id="root" class="h-full w-full flex flex-col overflow-hidden"></div>
-  <script type="module" src="/src/main.tsx"></script>
+  <script type="module" src="./src/main.tsx"></script>
+  <script>
+    (function () {
+      function bootStaticBundle() {
+        if (window.__DD_BOOTED__ || window.__DD_STATIC_LOADING__) return;
+        window.__DD_STATIC_LOADING__ = true;
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = './app.bundle.css';
+        document.head.appendChild(link);
+
+        var s = document.createElement('script');
+        s.type = 'module';
+        s.src = './app.bundle.js';
+        document.body.appendChild(s);
+      }
+
+      if (location.hostname.endsWith('github.io') || location.protocol === 'file:') {
+        bootStaticBundle();
+      } else {
+        window.addEventListener('load', function () {
+          setTimeout(bootStaticBundle, 500);
+        });
+      }
+
+      if ('serviceWorker' in navigator && location.hostname.endsWith('github.io')) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('./sw.js').catch(function () {});
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

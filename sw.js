@@ -1,18 +1,19 @@
-const CACHE_NAME = 'dd-planner-v2'; // Increment version to force update
+const CACHE_NAME = 'dd-planner-v5';
 const STATIC_ASSETS = [
   './',
   './index.html',
+  './app.bundle.css',
+  './app.bundle.js',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png',
-  'https://cdn.tailwindcss.com'
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
   );
-  self.skipWaiting(); // Force new SW to take control immediately
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
@@ -23,19 +24,19 @@ self.addEventListener('activate', (e) => {
       );
     })
   );
-  self.clients.claim(); // Take control of open clients
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', (e) => {
-  // Strategy: Network First for HTML (to get updates), Cache First for images/styles
-  if (e.request.mode === 'navigate') {
-    e.respondWith(
-      fetch(e.request)
-        .catch(() => caches.match(e.request))
-    );
-  } else {
-    e.respondWith(
-      caches.match(e.request).then((response) => response || fetch(e.request))
-    );
-  }
+  if (e.request.method !== 'GET') return;
+  // Network-first strategy so code updates are always reflected immediately when online
+  e.respondWith(
+    fetch(e.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(e.request, copy)).catch(() => {});
+        return res;
+      })
+      .catch(() => caches.match(e.request))
+  );
 });
