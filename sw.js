@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dd-planner-v5';
+const CACHE_NAME = 'dd-planner-v6';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -28,8 +28,8 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
-  // Network-first strategy so code updates are always reflected immediately when online
+  if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
+  // Network-first strategy for same-origin static assets so updates are reflected immediately when online
   e.respondWith(
     fetch(e.request)
       .then((res) => {

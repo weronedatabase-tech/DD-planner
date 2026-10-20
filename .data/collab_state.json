@@ -1,0 +1,7489 @@
+{
+  "roster": [
+    {
+      "rowIndex": 2,
+      "name": "Clement",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 70,
+      "side": "Left",
+      "active": true,
+      "volunteers": "Ellen Hong Har"
+    },
+    {
+      "rowIndex": 3,
+      "name": "Daniel",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 78.3,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 4,
+      "name": "David Loh",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 76,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 5,
+      "name": "David Rudolph",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 58,
+      "side": "Right",
+      "active": true,
+      "volunteers": "Clara"
+    },
+    {
+      "rowIndex": 6,
+      "name": "Dylan",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 65,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 7,
+      "name": "Jarran",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 65,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 8,
+      "name": "Jia Xuan",
+      "type": "Paddler",
+      "gender": "F",
+      "weight": 50,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 9,
+      "name": "Jimmy",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 82,
+      "side": "Left",
+      "active": true,
+      "volunteers": "Hui Quan"
+    },
+    {
+      "rowIndex": 10,
+      "name": "Reena",
+      "type": "Paddler",
+      "gender": "F",
+      "weight": 65,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 11,
+      "name": "Richard",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 60,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 12,
+      "name": "Wei Keong",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 133,
+      "side": "Left",
+      "active": true,
+      "volunteers": "Ignatius"
+    },
+    {
+      "rowIndex": 13,
+      "name": "Yi Rui",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 40,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 14,
+      "name": "Zhenyu",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 67,
+      "side": "Right",
+      "active": true,
+      "volunteers": "Wei Yan"
+    },
+    {
+      "rowIndex": 15,
+      "name": "Abel",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 60,
+      "side": "Right",
+      "active": true,
+      "volunteers": "Li Li"
+    },
+    {
+      "rowIndex": 16,
+      "name": "Cher Xuan",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 75,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 17,
+      "name": "Hui Tong",
+      "type": "Paddler",
+      "gender": "F",
+      "weight": 60,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 18,
+      "name": "Cheng Hwee",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 80,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 19,
+      "name": "Johnson",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 80,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 20,
+      "name": "Moh Chye",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 65,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 21,
+      "name": "Peter",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 61,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 22,
+      "name": "Martin",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 88,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 23,
+      "name": "Yat Ming",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 45,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 24,
+      "name": "Adrian",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 0,
+      "side": "Right",
+      "active": true,
+      "volunteers": "Jarita"
+    },
+    {
+      "rowIndex": 25,
+      "name": "Jennifer",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 62,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 26,
+      "name": "Olivia",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 50,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 27,
+      "name": "Choon Lan",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 0,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 28,
+      "name": "Wei Yan",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 57,
+      "side": "Left",
+      "active": true,
+      "volunteers": "Zhenyu"
+    },
+    {
+      "rowIndex": 29,
+      "name": "Li Li",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 57,
+      "side": "Left",
+      "active": true,
+      "volunteers": "Abel"
+    },
+    {
+      "rowIndex": 30,
+      "name": "Ellen Hong Har",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 53,
+      "side": "Any",
+      "active": true,
+      "volunteers": "Clement"
+    },
+    {
+      "rowIndex": 31,
+      "name": "Hamza",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 70,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 32,
+      "name": "Rayson",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 60,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 33,
+      "name": "Shu Hui",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 52,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 34,
+      "name": "Yan Quan",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 61,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 35,
+      "name": "Julia",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 55,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 36,
+      "name": "Yen Qin",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 53,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 37,
+      "name": "Heng Yong",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 55,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 38,
+      "name": "Dion Yee Kin",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 70,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 39,
+      "name": "Cher Hui",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 66,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 40,
+      "name": "Alyson",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 54,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 41,
+      "name": "Joreen",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 54,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 42,
+      "name": "Han Tong",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 67,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 43,
+      "name": "Audrey",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 57,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 44,
+      "name": "Guan Wee",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 65,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 45,
+      "name": "Hui Quan",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 60,
+      "side": "Right",
+      "active": true,
+      "volunteers": "Jimmy"
+    },
+    {
+      "rowIndex": 46,
+      "name": "Joel",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 57,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 47,
+      "name": "Seng Tat",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 62,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 48,
+      "name": "Nayli",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 52,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 49,
+      "name": "Bowie",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 63,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 50,
+      "name": "Lily",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 62,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 51,
+      "name": "Serene",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 54,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 52,
+      "name": "Zhao Qun",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 42,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 53,
+      "name": "Jerlyn",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 52,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 54,
+      "name": "Sadil",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 80,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 55,
+      "name": "Marq",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 63,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 56,
+      "name": "Ignatius",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 95,
+      "side": "Right",
+      "active": true,
+      "volunteers": "Wei Keong"
+    },
+    {
+      "rowIndex": 57,
+      "name": "Joey",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 48,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 58,
+      "name": "Cheng Yi",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 60,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 59,
+      "name": "David Joseph",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 78,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 60,
+      "name": "Pearl",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 56,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 61,
+      "name": "Xian Wei",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 90,
+      "side": "Right",
+      "active": true,
+      "volunteers": "Alice"
+    },
+    {
+      "rowIndex": 62,
+      "name": "Linus",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 71,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 63,
+      "name": "May Wan",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 58,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 64,
+      "name": "Sofiah",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 62,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 65,
+      "name": "Desean",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 63,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 66,
+      "name": "Alicia",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 51,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 67,
+      "name": "Lena",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 67,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 68,
+      "name": "Aldan",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 55,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 69,
+      "name": "Harish",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 90,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 70,
+      "name": "Vel",
+      "type": "Paddler",
+      "gender": "F",
+      "weight": 60,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 71,
+      "name": "Der Shiun",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 60,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 72,
+      "name": "Enjin",
+      "type": "Paddler",
+      "gender": "F",
+      "weight": 78,
+      "side": "Left",
+      "active": true,
+      "volunteers": "Xing Jun"
+    },
+    {
+      "rowIndex": 73,
+      "name": "Xing Jun",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 60,
+      "side": "Right",
+      "active": true,
+      "volunteers": "Enjin"
+    },
+    {
+      "rowIndex": 74,
+      "name": "Sook Mei",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 44,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 75,
+      "name": "Samantha",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 43,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 76,
+      "name": "Charan",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 70,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 77,
+      "name": "Si Ying",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 44,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 78,
+      "name": "Ariqah",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 58,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 79,
+      "name": "D",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 50,
+      "side": "Left",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 80,
+      "name": "Alice",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 83,
+      "side": "Left",
+      "active": true,
+      "volunteers": "Xian Wei"
+    },
+    {
+      "rowIndex": 81,
+      "name": "Clara",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 60,
+      "side": "Left",
+      "active": true,
+      "volunteers": "David Rudolph"
+    },
+    {
+      "rowIndex": 82,
+      "name": "Xin Zhi",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 70,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 83,
+      "name": "Xiang Ting",
+      "type": "Paddler",
+      "gender": "F",
+      "weight": 0,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 84,
+      "name": "Wendy",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 0,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 85,
+      "name": "Halimi",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 60,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 86,
+      "name": "Xavier Lai",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 60,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 87,
+      "name": "Vivienne",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 50,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 88,
+      "name": "Jozen",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 61,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 89,
+      "name": "Maya",
+      "type": "Paddler",
+      "gender": "F",
+      "weight": 76,
+      "side": "Left",
+      "active": true,
+      "volunteers": "Melvin"
+    },
+    {
+      "rowIndex": 90,
+      "name": "Melvin",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 52,
+      "side": "Right",
+      "active": true,
+      "volunteers": "Maya"
+    },
+    {
+      "rowIndex": 91,
+      "name": "Ian",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 0,
+      "side": "Any",
+      "active": true,
+      "volunteers": "Elaine"
+    },
+    {
+      "rowIndex": 92,
+      "name": "Elaine",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 0,
+      "side": "Any",
+      "active": true,
+      "volunteers": "Ian"
+    },
+    {
+      "rowIndex": 93,
+      "name": "Jarita",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 0,
+      "side": "Any",
+      "active": true,
+      "volunteers": "Adrian"
+    },
+    {
+      "rowIndex": 94,
+      "name": "Allison",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 0,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 95,
+      "name": "Joshua",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 0,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 96,
+      "name": "Amy",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 0,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 97,
+      "name": "kenny",
+      "type": "Paddler",
+      "gender": "M",
+      "weight": 66,
+      "side": "Any",
+      "active": true,
+      "volunteers": "Steven"
+    },
+    {
+      "rowIndex": 98,
+      "name": "Steven",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 67,
+      "side": "Any",
+      "active": true,
+      "volunteers": "kenny"
+    },
+    {
+      "rowIndex": 99,
+      "name": "Kathleen",
+      "type": "Volunteer",
+      "gender": "F",
+      "weight": 65,
+      "side": "Any",
+      "active": true,
+      "volunteers": ""
+    },
+    {
+      "rowIndex": 100,
+      "name": "Serene's friend",
+      "type": "Volunteer",
+      "gender": "M",
+      "weight": 70,
+      "side": "Right",
+      "active": true,
+      "volunteers": ""
+    }
+  ],
+  "rosterVersion": 17,
+  "sessions": {
+    "2026-10-20": {
+      "date": "2026-10-20",
+      "attendance": [
+        "Alex Wong",
+        "Sam Chen",
+        "Marcus Taylor",
+        "Sarah Jenkins",
+        "David Kim",
+        "Emily Watson",
+        "Jason Lee",
+        "Michael Tan",
+        "Chris Evans",
+        "Jessica Alba",
+        "Oliver Twist",
+        "Hannah Abbott",
+        "Ryan Gosling",
+        "Emma Stone",
+        "Alice",
+        "Alicia",
+        "Allison"
+      ],
+      "boats": [
+        {
+          "id": "boat-initial-1",
+          "type": "small",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": 1,
+              "side": "Left",
+              "occupant": "Alice"
+            },
+            {
+              "row": 1,
+              "side": "Right",
+              "occupant": "Alicia"
+            },
+            {
+              "row": 2,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 2,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 3,
+              "side": "Left",
+              "occupant": "Allison"
+            },
+            {
+              "row": 3,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 4,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 4,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 5,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 5,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": null
+            }
+          ]
+        },
+        {
+          "id": "boat-1792503050549-745",
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": 1,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 1,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 2,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 2,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 3,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 3,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 4,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 4,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 5,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 5,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 6,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 6,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 7,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 7,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 8,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 8,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 9,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 9,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": 10,
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": 10,
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": null
+            }
+          ]
+        }
+      ],
+      "version": 83,
+      "updatedAt": "2026-10-20T14:16:54.730Z",
+      "updatedBy": "Coach #44"
+    },
+    "2026-10-04": {
+      "date": "2026-10-04",
+      "attendance": [
+        "2",
+        "15",
+        "18",
+        "24",
+        "35",
+        "42",
+        "55",
+        "59",
+        "63",
+        "71",
+        "85",
+        "88",
+        "89",
+        "6",
+        "9",
+        "31",
+        "33",
+        "43",
+        "54",
+        "60",
+        "64",
+        "70",
+        "73",
+        "78",
+        "79",
+        "82",
+        "93",
+        "95"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Alyson"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Kathleen"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Marq"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Yen Qin"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Si Ying"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yan Quan"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Jennifer"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Steven"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "kenny"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Maya"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Melvin"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Shu Hui"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Hamza"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-10-04T02:52:12.012Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-09-27": {
+      "date": "2026-09-27",
+      "attendance": [
+        "0",
+        "2",
+        "18",
+        "42",
+        "59",
+        "63",
+        "69",
+        "3",
+        "6",
+        "9",
+        "31",
+        "54",
+        "57",
+        "58",
+        "64",
+        "73",
+        "78",
+        "95"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": null
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-09-27T02:51:55.330Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-09-26": {
+      "date": "2026-09-26",
+      "attendance": [],
+      "boats": [],
+      "version": 1,
+      "updatedAt": "2026-09-27T02:47:05.219Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-09-20": {
+      "date": "2026-09-20",
+      "attendance": [
+        "2",
+        "18",
+        "35",
+        "42",
+        "55",
+        "59",
+        "63",
+        "71",
+        "89",
+        "9",
+        "31",
+        "58",
+        "64",
+        "68",
+        "70",
+        "78",
+        "81",
+        "82",
+        "93"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Lily"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Shu Hui"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Steven"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "kenny"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Sook Mei"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Maya"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Melvin"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Pearl"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yan Quan"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-09-20T04:49:00.473Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-09-13": {
+      "date": "2026-09-13",
+      "attendance": [
+        "2",
+        "12",
+        "18",
+        "35",
+        "42",
+        "59",
+        "63",
+        "69",
+        "72",
+        "88",
+        "94",
+        "98",
+        "9",
+        "13",
+        "14",
+        "19",
+        "31",
+        "58",
+        "60",
+        "62",
+        "64",
+        "70",
+        "73",
+        "78",
+        "81",
+        "86"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Peter"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Richard"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Maya"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Melvin"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Sook Mei"
+            },
+            {
+              "role": "helm",
+              "occupant": "D"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Wei Yan"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Zhenyu"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Cheng Hwee"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Marq"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Shu Hui"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-09-13T00:39:07.640Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-08-30": {
+      "date": "2026-08-30",
+      "attendance": [
+        "2",
+        "15",
+        "18",
+        "24",
+        "30",
+        "35",
+        "55",
+        "59",
+        "63",
+        "69",
+        "88",
+        "98",
+        "9",
+        "13",
+        "14",
+        "21",
+        "31",
+        "54",
+        "64",
+        "73",
+        "76",
+        "77",
+        "78",
+        "79",
+        "82",
+        "86",
+        "92",
+        "93"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Peter"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Steven"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "kenny"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yan Quan"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Kathleen"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Maya"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Melvin"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Wei Yan"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Zhenyu"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Serene"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Serene's friend"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Enjin"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Xing Jun"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Si Ying"
+            },
+            {
+              "role": "helm",
+              "occupant": "Shu Hui"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-08-30T01:26:01.313Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-08-16": {
+      "date": "2026-08-16",
+      "attendance": [
+        "2",
+        "12",
+        "18",
+        "24",
+        "30",
+        "38",
+        "39",
+        "42",
+        "54",
+        "58",
+        "62",
+        "70",
+        "86",
+        "87",
+        "96",
+        "5",
+        "7",
+        "9",
+        "10",
+        "28",
+        "31",
+        "43",
+        "51",
+        "57",
+        "59",
+        "61",
+        "63",
+        "65",
+        "69",
+        "75",
+        "80",
+        "84",
+        "90",
+        "91"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Steven"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "kenny"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Enjin"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Xing Jun"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Ian"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Elaine"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Joshua"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Allison"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Yan Quan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Maya"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Melvin"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Guan Wee"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Hui Tong"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Wei Yan"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Zhenyu"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Jennifer"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Nayli"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Serene"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Bowie"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": null
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-08-16T02:12:30.187Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-08-02": {
+      "date": "2026-08-02",
+      "attendance": [
+        "1",
+        "2",
+        "24",
+        "30",
+        "35",
+        "39",
+        "42",
+        "45",
+        "58",
+        "60",
+        "62",
+        "83",
+        "86",
+        "87",
+        "92",
+        "96",
+        "5",
+        "7",
+        "9",
+        "13",
+        "14",
+        "19",
+        "21",
+        "28",
+        "31",
+        "33",
+        "41",
+        "44",
+        "47",
+        "51",
+        "57",
+        "59",
+        "61",
+        "63",
+        "65",
+        "67",
+        "69",
+        "72",
+        "77",
+        "79",
+        "84",
+        "90",
+        "93"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Nayli"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Pearl"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Enjin"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Xing Jun"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Ian"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Elaine"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Guan Wee"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Yen Qin"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Jerlyn"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Amy"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Si Ying"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Sook Mei"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Joel"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Maya"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Melvin"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Wei Yan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Zhenyu"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Hamza"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-08-02T02:12:02.126Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-07-26": {
+      "date": "2026-07-26",
+      "attendance": [
+        "1",
+        "2",
+        "18",
+        "20",
+        "35",
+        "42",
+        "54",
+        "62",
+        "68",
+        "71",
+        "86",
+        "87",
+        "96",
+        "14",
+        "19",
+        "31",
+        "41",
+        "44",
+        "57",
+        "61",
+        "63",
+        "69",
+        "72",
+        "76",
+        "77",
+        "79",
+        "80",
+        "84"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Daniel"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "kenny"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Steven"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Maya"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Melvin"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Si Ying"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Peter"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Jarita"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Adrian"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Shu Hui"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Sook Mei"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Jerlyn"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Richard"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Wei Yan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Zhenyu"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "D"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-07-26T01:51:33.244Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-07-18": {
+      "date": "2026-07-18",
+      "attendance": [
+        "13",
+        "16",
+        "18",
+        "32",
+        "40",
+        "41",
+        "44",
+        "51",
+        "53",
+        "61",
+        "62",
+        "73",
+        "77",
+        "82",
+        "7",
+        "8",
+        "11",
+        "12",
+        "19",
+        "30",
+        "42",
+        "50",
+        "52",
+        "60",
+        "66",
+        "67",
+        "70"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Bowie"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Richard"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Joel"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Daniel"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Shu Hui"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Sook Mei"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Serene"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Hamza"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-07-17T12:19:12.987Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-07-12": {
+      "date": "2026-07-12",
+      "attendance": [
+        "0",
+        "2",
+        "13",
+        "16",
+        "18",
+        "32",
+        "37",
+        "51",
+        "61",
+        "62",
+        "73",
+        "76",
+        "77",
+        "82",
+        "7",
+        "11",
+        "12",
+        "19",
+        "28",
+        "30",
+        "42",
+        "49",
+        "52",
+        "54",
+        "60",
+        "63",
+        "67",
+        "68"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Daniel"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Richard"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Joel"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Marq"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Shu Hui"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "role": "helm",
+              "occupant": "Guan Wee"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Li Li"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Abel"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Si Ying"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Hamza"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-07-12T01:34:24.284Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-07-05": {
+      "date": "2026-07-05",
+      "attendance": [
+        "13",
+        "16",
+        "22",
+        "32",
+        "37",
+        "40",
+        "41",
+        "51",
+        "53",
+        "59",
+        "73",
+        "77",
+        "82",
+        "84",
+        "7",
+        "8",
+        "11",
+        "12",
+        "19",
+        "28",
+        "42",
+        "50",
+        "54",
+        "60",
+        "66"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Serene"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Bowie"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Jia Xuan"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Jimmy"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Peter"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Joel"
+            },
+            {
+              "role": "helm",
+              "occupant": "Yi Rui"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-07-05T02:49:51.556Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-06-28": {
+      "date": "2026-06-28",
+      "attendance": [
+        "2",
+        "13",
+        "16",
+        "18",
+        "32",
+        "37",
+        "40",
+        "53",
+        "59",
+        "62",
+        "73",
+        "76",
+        "77",
+        "82",
+        "84",
+        "7",
+        "12",
+        "34",
+        "47",
+        "50",
+        "54",
+        "70"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Hui Quan"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Daniel"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Julia"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Peter"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Richard"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Sook Mei"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Jia Xuan"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": "Lily"
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "role": "helm",
+              "occupant": "Yi Rui"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-06-28T02:10:53.459Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-06-21": {
+      "date": "2026-06-21",
+      "attendance": [
+        "13",
+        "16",
+        "18",
+        "22",
+        "32",
+        "35",
+        "37",
+        "40",
+        "41",
+        "46",
+        "51",
+        "53",
+        "59",
+        "73",
+        "76",
+        "77",
+        "82",
+        "7",
+        "8",
+        "12",
+        "17",
+        "28",
+        "42",
+        "50",
+        "54",
+        "58",
+        "60",
+        "66",
+        "67",
+        "70"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Hui Tong"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Jia Xuan"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Serene"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "role": "helm",
+              "occupant": "Guan Wee"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Pearl"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Jozen"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Shu Hui"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Joel"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Peter"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Sook Mei"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "D"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-06-24T15:06:17.248Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-06-14": {
+      "date": "2026-06-14",
+      "attendance": [
+        "2",
+        "10",
+        "13",
+        "16",
+        "18",
+        "22",
+        "32",
+        "35",
+        "37",
+        "40",
+        "44",
+        "50",
+        "52",
+        "72",
+        "75",
+        "76",
+        "83",
+        "7",
+        "8",
+        "11",
+        "12",
+        "17",
+        "19",
+        "23",
+        "28",
+        "30",
+        "36",
+        "42",
+        "49",
+        "51",
+        "53",
+        "55",
+        "59",
+        "62",
+        "66",
+        "67",
+        "69"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Jia Xuan"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Marq"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Sook Mei"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Joel"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yi Rui"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Hui Tong"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Johnson"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Nayli"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Shu Hui"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Hamza"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-06-14T01:54:12.796Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-06-07": {
+      "date": "2026-06-07",
+      "attendance": [
+        "0",
+        "2",
+        "13",
+        "16",
+        "18",
+        "22",
+        "32",
+        "35",
+        "37",
+        "40",
+        "41",
+        "50",
+        "52",
+        "60",
+        "72",
+        "75",
+        "76",
+        "81",
+        "83",
+        "4",
+        "8",
+        "12",
+        "17",
+        "23",
+        "28",
+        "30",
+        "38",
+        "42",
+        "48",
+        "49",
+        "53",
+        "55",
+        "57",
+        "59",
+        "62",
+        "66",
+        "67",
+        "69"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Bowie"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Sook Mei"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Desean"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Jimmy"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yi Rui"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Hamza"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Si Ying"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Hui Tong"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Shu Hui"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Pearl"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Jennifer"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Abel"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Li Li"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Alicia"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "D"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-06-12T04:54:13.031Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-05-17": {
+      "date": "2026-05-17",
+      "attendance": [
+        "2",
+        "16",
+        "22",
+        "32",
+        "37",
+        "40",
+        "60",
+        "75",
+        "76",
+        "81",
+        "83",
+        "7",
+        "17",
+        "23",
+        "28",
+        "30",
+        "38",
+        "39",
+        "42",
+        "49",
+        "53",
+        "57",
+        "59",
+        "62",
+        "66"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Rayson"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Joel"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Lily"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Jia Xuan"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": "Desean"
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Jerlyn"
+            },
+            {
+              "role": "helm",
+              "occupant": "Yi Rui"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Hamza"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Jennifer"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Pearl"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": "D"
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "role": "helm",
+              "occupant": "Shu Hui"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-05-17T01:49:59.012Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-05-03": {
+      "date": "2026-05-03",
+      "attendance": [
+        "2",
+        "16",
+        "27",
+        "32",
+        "35",
+        "41",
+        "50",
+        "52",
+        "60",
+        "72",
+        "75",
+        "76",
+        "81",
+        "83",
+        "5",
+        "7",
+        "17",
+        "28",
+        "30",
+        "34",
+        "38",
+        "42",
+        "51",
+        "53",
+        "62",
+        "67",
+        "78",
+        "79",
+        "80"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Hui Tong"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Alyson"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Jimmy"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Joel"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Jennifer"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Marq"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Xin Zhi"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yan Quan"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Hamza"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "D"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Si Ying"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Enjin"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Xing Jun"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yi Rui"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-05-03T02:05:29.417Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-04-19": {
+      "date": "2026-04-19",
+      "attendance": [
+        "0",
+        "2",
+        "13",
+        "16",
+        "22",
+        "27",
+        "32",
+        "37",
+        "50",
+        "60",
+        "72",
+        "75",
+        "76",
+        "81",
+        "7",
+        "9",
+        "11",
+        "12",
+        "19",
+        "23",
+        "28",
+        "30",
+        "38",
+        "39",
+        "43",
+        "46",
+        "48",
+        "49",
+        "53",
+        "57",
+        "62",
+        "65",
+        "78",
+        "79"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Serene"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Jerlyn"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Joey"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Enjin"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Xing Jun"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Pearl"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Hamza"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Desean"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Julia"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Li Li"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Abel"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Charan"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Jennifer"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Xin Zhi"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "David Joseph"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-04-19T02:13:49.223Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-04-05": {
+      "date": "2026-04-05",
+      "attendance": [
+        "2",
+        "13",
+        "16",
+        "22",
+        "27",
+        "32",
+        "35",
+        "50",
+        "52",
+        "75",
+        "76",
+        "81",
+        "83",
+        "7",
+        "11",
+        "12",
+        "17",
+        "19",
+        "28",
+        "30",
+        "36",
+        "39",
+        "51",
+        "53",
+        "62",
+        "65",
+        "66",
+        "67",
+        "79",
+        "80"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Hamza"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Hui Tong"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Shu Hui"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Ignatius"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Serene"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Marq"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "D"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yan Quan"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Jerlyn"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Xavier Lai"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Enjin"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Xing Jun"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Si Ying"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yi Rui"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-04-05T02:10:12.174Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-03-07": {
+      "date": "2026-03-07",
+      "attendance": [
+        "2",
+        "13",
+        "16",
+        "32",
+        "41",
+        "50",
+        "52",
+        "58",
+        "61",
+        "71",
+        "74",
+        "79",
+        "81",
+        "7",
+        "8",
+        "11",
+        "19",
+        "30",
+        "42",
+        "51",
+        "55",
+        "62",
+        "65",
+        "66",
+        "69"
+      ],
+      "boats": [
+        {
+          "type": "small",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Shu Hui"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Bowie"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Jimmy"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Peter"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Serene"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Hamza"
+            }
+          ]
+        },
+        {
+          "type": "small",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Sook Mei"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Joel"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Marq"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Richard"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Nayli"
+            },
+            {
+              "role": "helm",
+              "occupant": "Yi Rui"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-03-07T02:03:45.034Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-03-01": {
+      "date": "2026-03-01",
+      "attendance": [
+        "2",
+        "13",
+        "16",
+        "27",
+        "29",
+        "32",
+        "35",
+        "50",
+        "52",
+        "58",
+        "60",
+        "61",
+        "74",
+        "79",
+        "81",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "11",
+        "12",
+        "19",
+        "28",
+        "30",
+        "31",
+        "42",
+        "43",
+        "51",
+        "53",
+        "55",
+        "62",
+        "66",
+        "67",
+        "68",
+        "76",
+        "77",
+        "78"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Yat Ming"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Joel"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Han Tong"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Xin Zhi"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Enjin"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Xing Jun"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Ariqah"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Sofiah"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Alicia"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Nayli"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Si Ying"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": "Marq"
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yi Rui"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Bowie"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Joey"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Richard"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Hui Tong"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Peter"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Yan Quan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Halimi"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": "Alyson"
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Shu Hui"
+            },
+            {
+              "role": "helm",
+              "occupant": "Hamza"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-03-01T01:58:54.554Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-02-22": {
+      "date": "2026-02-22",
+      "attendance": [
+        "2",
+        "16",
+        "31",
+        "34",
+        "40",
+        "49",
+        "51",
+        "57",
+        "59",
+        "73",
+        "74",
+        "78",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "11",
+        "17",
+        "19",
+        "23",
+        "28",
+        "29",
+        "35",
+        "37",
+        "38",
+        "41",
+        "42",
+        "48",
+        "50",
+        "52",
+        "54",
+        "61",
+        "66",
+        "67",
+        "68",
+        "72",
+        "75",
+        "77"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Bowie"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Jimmy"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Marq"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Joel"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Peter"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Alyson"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Nayli"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Sook Mei"
+            },
+            {
+              "role": "helm",
+              "occupant": "D"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Joey"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Jerlyn"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Ariqah"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Hui Tong"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Sofiah"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Xin Zhi"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Ignatius"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Desean"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Yan Quan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Alicia"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Si Ying"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Hamza"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-02-22T01:59:26.939Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-02-08": {
+      "date": "2026-02-08",
+      "attendance": [
+        "0",
+        "2",
+        "16",
+        "22",
+        "27",
+        "31",
+        "34",
+        "36",
+        "40",
+        "49",
+        "59",
+        "69",
+        "70",
+        "72",
+        "77",
+        "4",
+        "6",
+        "7",
+        "9",
+        "11",
+        "12",
+        "17",
+        "19",
+        "28",
+        "29",
+        "33",
+        "35",
+        "37",
+        "38",
+        "41",
+        "44",
+        "46",
+        "48",
+        "50",
+        "52",
+        "54",
+        "56",
+        "61",
+        "62",
+        "64",
+        "65",
+        "66",
+        "67",
+        "68",
+        "73"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Lena"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Samantha"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Ignatius"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Jennifer"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Clement"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "May Wan"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Si Ying"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Sook Mei"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "Yi Rui"
+            }
+          ]
+        },
+        {
+          "type": "small",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Joel"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Jerlyn"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Serene"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Shu Hui"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Nayli"
+            },
+            {
+              "role": "helm",
+              "occupant": "Hamza"
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Charan"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Marq"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Hui Tong"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Pearl"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Joreen"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Der Shiun"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Jimmy"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Hui Quan"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Alicia"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Enjin"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Xing Jun"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Ariqah"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Abel"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Sofiah"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": "D"
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-02-09T14:05:35.887Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-01-30": {
+      "date": "2026-01-30",
+      "attendance": [
+        "0",
+        "1",
+        "2",
+        "10",
+        "13",
+        "16",
+        "18",
+        "20",
+        "21",
+        "22",
+        "25",
+        "27",
+        "31",
+        "34",
+        "36",
+        "39",
+        "40",
+        "43",
+        "49",
+        "51",
+        "53",
+        "57",
+        "59",
+        "60",
+        "69",
+        "70",
+        "72",
+        "75",
+        "77",
+        "79",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "11",
+        "12",
+        "14",
+        "15",
+        "17",
+        "19",
+        "23",
+        "24",
+        "26",
+        "28",
+        "29",
+        "30",
+        "32",
+        "33",
+        "35",
+        "37",
+        "38",
+        "41",
+        "42",
+        "44",
+        "45",
+        "46",
+        "47",
+        "48",
+        "50",
+        "52",
+        "54",
+        "55",
+        "56",
+        "58",
+        "61",
+        "62",
+        "63",
+        "64",
+        "65",
+        "66",
+        "67",
+        "68",
+        "71",
+        "73",
+        "74",
+        "76",
+        "78"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Ignatius"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Johnson"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Dion Yee Kin"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Daniel"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Han Tong"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Enjin"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Xing Jun"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Lena"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Moh Chye"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Linus"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Reena"
+            },
+            {
+              "role": "helm",
+              "occupant": null
+            }
+          ]
+        },
+        {
+          "type": "small",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Charan"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Alice"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Jimmy"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Hui Quan"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Hamza"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Dylan"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "David Loh"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Marq"
+            },
+            {
+              "role": "helm",
+              "occupant": null
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-02-14T19:04:17.759Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-01-25": {
+      "date": "2026-01-25",
+      "attendance": [
+        "2",
+        "13",
+        "20",
+        "21",
+        "27",
+        "31",
+        "36",
+        "40",
+        "43",
+        "51",
+        "53",
+        "60",
+        "69",
+        "72",
+        "75",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "11",
+        "12",
+        "15",
+        "17",
+        "24",
+        "26",
+        "28",
+        "30",
+        "32",
+        "33",
+        "35",
+        "37",
+        "41",
+        "47",
+        "48",
+        "50",
+        "55",
+        "58",
+        "63",
+        "66",
+        "67",
+        "71",
+        "73"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": "Guan Wee"
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Hui Quan"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Ariqah"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Sofiah"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Enjin"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Xing Jun"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "Jennifer"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Cher Xuan"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Cher Hui"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Alicia"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": "Aldan"
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": null
+            }
+          ]
+        },
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Audrey"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Heng Yong"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Lily"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": "Bowie"
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Cheng Yi"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Joel"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Alyson"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": null
+            },
+            {
+              "role": "helm",
+              "occupant": null
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-01-30T13:43:25.150Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-01-12": {
+      "date": "2026-01-12",
+      "attendance": [],
+      "boats": [],
+      "version": 1,
+      "updatedAt": "2026-01-12T11:20:52.611Z",
+      "updatedBy": "Migrated from Drive"
+    },
+    "2026-01-01": {
+      "date": "2026-01-01",
+      "attendance": [
+        "0",
+        "1",
+        "2",
+        "10",
+        "13",
+        "16",
+        "18",
+        "20",
+        "21",
+        "22",
+        "25",
+        "27",
+        "29",
+        "32",
+        "35",
+        "37",
+        "40",
+        "41",
+        "44",
+        "50",
+        "52",
+        "54",
+        "58",
+        "60",
+        "61",
+        "70",
+        "71",
+        "74",
+        "75",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "11",
+        "12",
+        "14",
+        "15",
+        "17",
+        "19",
+        "23",
+        "24",
+        "26",
+        "28",
+        "30",
+        "31",
+        "33",
+        "34",
+        "36",
+        "38",
+        "39",
+        "42",
+        "43",
+        "45",
+        "46",
+        "47",
+        "48",
+        "49",
+        "51",
+        "53",
+        "55",
+        "56",
+        "57",
+        "59",
+        "62",
+        "63",
+        "64",
+        "65",
+        "66",
+        "67",
+        "68",
+        "69",
+        "72",
+        "73",
+        "76",
+        "77",
+        "78"
+      ],
+      "boats": [
+        {
+          "type": "standard",
+          "seats": [
+            {
+              "role": "drummer",
+              "occupant": null
+            },
+            {
+              "row": "1",
+              "side": "Left",
+              "occupant": "Wei Keong"
+            },
+            {
+              "row": "1",
+              "side": "Right",
+              "occupant": "Ignatius"
+            },
+            {
+              "row": "2",
+              "side": "Left",
+              "occupant": "Sadil"
+            },
+            {
+              "row": "2",
+              "side": "Right",
+              "occupant": "Harish"
+            },
+            {
+              "row": "3",
+              "side": "Left",
+              "occupant": "Martin"
+            },
+            {
+              "row": "3",
+              "side": "Right",
+              "occupant": "Charan"
+            },
+            {
+              "row": "4",
+              "side": "Left",
+              "occupant": null
+            },
+            {
+              "row": "4",
+              "side": "Right",
+              "occupant": "Xian Wei"
+            },
+            {
+              "row": "5",
+              "side": "Left",
+              "occupant": "David Joseph"
+            },
+            {
+              "row": "5",
+              "side": "Right",
+              "occupant": "Johnson"
+            },
+            {
+              "row": "6",
+              "side": "Left",
+              "occupant": "Dion Yee Kin"
+            },
+            {
+              "row": "6",
+              "side": "Right",
+              "occupant": "Daniel"
+            },
+            {
+              "row": "7",
+              "side": "Left",
+              "occupant": "David Loh"
+            },
+            {
+              "row": "7",
+              "side": "Right",
+              "occupant": "Xin Zhi"
+            },
+            {
+              "row": "8",
+              "side": "Left",
+              "occupant": "Hamza"
+            },
+            {
+              "row": "8",
+              "side": "Right",
+              "occupant": "Dylan"
+            },
+            {
+              "row": "9",
+              "side": "Left",
+              "occupant": "Jimmy"
+            },
+            {
+              "row": "9",
+              "side": "Right",
+              "occupant": "Hui Quan"
+            },
+            {
+              "row": "10",
+              "side": "Left",
+              "occupant": "Han Tong"
+            },
+            {
+              "row": "10",
+              "side": "Right",
+              "occupant": "Jarran"
+            },
+            {
+              "role": "helm",
+              "occupant": null
+            }
+          ]
+        }
+      ],
+      "version": 1,
+      "updatedAt": "2026-03-07T12:41:56.392Z",
+      "updatedBy": "Migrated from Drive"
+    }
+  },
+  "activeSessionDate": "2026-10-04"
+}

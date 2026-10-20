@@ -1,5 +1,6 @@
 import {
   Member,
+  Boat,
   SessionData,
   SavedSessionSummary,
   CollaboratorPresence,
@@ -82,21 +83,179 @@ export function setCollaboratorName(newName: string): string {
   return clean;
 }
 
-// Local Google Sheet 'Sessions' table mirror for offline resilience & instant reads
+// Normalize legacy numeric attendance indices (from Drive migration) into actual member names
+export function normalizeSessionAttendance(
+  rawAttendance: (string | number)[],
+  boats: Boat[] = [],
+  roster: Member[] = []
+): string[] {
+  const sortedRoster =
+    roster.length > 0 ? [...roster].sort((a, b) => a.name.localeCompare(b.name)) : [];
+  const nameSet = new Set(roster.map((m) => m.name));
+  const resolved: string[] = [];
+
+  for (const item of rawAttendance || []) {
+    const str = String(item ?? '').trim();
+    if (!str) continue;
+    if (nameSet.has(str)) {
+      resolved.push(str);
+    } else if (/^\d+$/.test(str) && sortedRoster.length > 0) {
+      const idx = Number(str);
+      if (idx >= 0 && idx < sortedRoster.length && sortedRoster[idx]?.name) {
+        resolved.push(sortedRoster[idx].name);
+      } else {
+        resolved.push(str);
+      }
+    } else {
+      resolved.push(str);
+    }
+  }
+
+  // Ensure any member seated in a boat is also included in attendance
+  for (const boat of boats || []) {
+    for (const seat of boat.seats || []) {
+      if (seat.occupant && typeof seat.occupant === 'string' && seat.occupant.trim()) {
+        resolved.push(seat.occupant.trim());
+      }
+    }
+  }
+
+  return Array.from(new Set(resolved));
+}
+
+// In-memory + localStorage mirror for instant session reads
+const memorySessionsTable: Record<string, SessionData> = {};
+
 function getLocalSessionsSheetTable(): Record<string, SessionData> {
   try {
     const raw = localStorage.getItem('dd_sheets_sessions_table');
     if (raw) {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return { ...parsed, ...memorySessionsTable };
     }
   } catch {}
-  return {};
+  return { ...memorySessionsTable };
 }
 
 function saveLocalSessionsSheetTable(table: Record<string, SessionData>) {
+  Object.assign(memorySessionsTable, table);
   try {
     localStorage.setItem('dd_sheets_sessions_table', JSON.stringify(table));
   } catch {}
+}
+
+// Direct high-speed read from Google Sheet Visualization JSON endpoint (CORS-enabled, ~200ms, no GAS rate limit)
+async function fetchSheetGvizTable(sheetName: string): Promise<any[] | null> {
+  const sheetId = FRONTEND_CONFIG[ENV].SHEET_ID;
+  if (!sheetId) return null;
+  try {
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 8000);
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(
+      sheetName
+    )}&_=${Date.now()}`;
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(tid);
+    if (!res.ok) return null;
+    const txt = await res.text();
+    const start = txt.indexOf('{');
+    const end = txt.lastIndexOf('}');
+    if (start === -1 || end === -1) return null;
+    const parsed = JSON.parse(txt.substring(start, end + 1));
+    return parsed?.table?.rows || null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchRosterFromSheetDirect(): Promise<Member[] | null> {
+  const rows = await fetchSheetGvizTable('Roster');
+  if (!rows || rows.length === 0) return null;
+  const roster: Member[] = [];
+  rows.forEach((r: any, idx: number) => {
+    const c = r?.c || [];
+    const name = c[0]?.v ? String(c[0].v).trim() : '';
+    if (!name || name.toLowerCase() === 'name') return;
+    const rawType = c[1]?.v ? String(c[1].v).trim() : 'Paddler';
+    const rawGender = c[2]?.v ? String(c[2].v).trim() : 'M';
+    const rawWeight = Number(c[3]?.v) || 0;
+    const rawSide = c[4]?.v ? String(c[4].v).trim() : 'Any';
+    const rawActive = c[5]?.v !== false && String(c[5]?.v).toLowerCase() !== 'false';
+    const rawVol = c[6]?.v ? String(c[6].v).trim() : '';
+    roster.push({
+      rowIndex: idx + 2,
+      name,
+      type: rawType === 'Volunteer' ? 'Volunteer' : 'Paddler',
+      gender: rawGender === 'F' ? 'F' : 'M',
+      weight: rawWeight,
+      side: rawSide === 'Left' || rawSide === 'Right' ? rawSide : 'Any',
+      active: rawActive,
+      volunteers: rawVol,
+    });
+  });
+  if (roster.length > 0) {
+    try {
+      localStorage.setItem('dd_roster_cache', JSON.stringify(roster));
+    } catch {}
+    return roster;
+  }
+  return null;
+}
+
+async function fetchSessionsFromSheetDirect(): Promise<{
+  list: SavedSessionSummary[];
+  table: Record<string, SessionData>;
+} | null> {
+  const rows = await fetchSheetGvizTable('Sessions');
+  if (!rows) return null;
+  const list: SavedSessionSummary[] = [];
+  const table = getLocalSessionsSheetTable();
+  const seenIds = new Set<string>();
+
+  for (const r of rows) {
+    const c = r?.c || [];
+    let rawDate = c[0]?.v ? String(c[0].v).trim().replace(/^'/, '') : '';
+    if (!rawDate || rawDate.toLowerCase() === 'session date') continue;
+    const displayDate = c[1]?.v ? String(c[1].v) : formatDisplayDate(rawDate);
+    const updatedAt = c[2]?.v ? String(c[2].v) : '';
+    const version = Number(c[3]?.v) || 1;
+    const updatedBy = c[4]?.v ? String(c[4].v) : '';
+    const attendanceCount = Number(c[5]?.v) || 0;
+    const boatsSummary = c[6]?.v ? String(c[6].v) : '';
+    const jsonCell = c[8]?.v ? String(c[8].v) : '';
+
+    if (jsonCell) {
+      try {
+        const parsed: SessionData = JSON.parse(jsonCell);
+        const key = parsed.date || rawDate;
+        table[key] = {
+          ...parsed,
+          date: key,
+          version: Number(parsed.version) || version,
+          updatedAt: parsed.updatedAt || updatedAt,
+          updatedBy: parsed.updatedBy || updatedBy,
+        };
+      } catch {}
+    }
+
+    if (!seenIds.has(rawDate)) {
+      seenIds.add(rawDate);
+      list.push({
+        id: rawDate,
+        name: displayDate,
+        rawDate,
+        updatedAt,
+        version,
+        updatedBy,
+        attendanceCount,
+        boatsSummary,
+      });
+    }
+  }
+
+  saveLocalSessionsSheetTable(table);
+  list.sort((a, b) => (b.rawDate || b.id).localeCompare(a.rawDate || a.id));
+  return { list, table };
 }
 
 export function applyLocalDelta(session: SessionData, ops: SessionDeltaOp[], author: string): SessionData {
@@ -203,62 +362,123 @@ export function applyLocalDelta(session: SessionData, ops: SessionDeltaOp[], aut
   };
 }
 
-let localServerAvailable: boolean | null = null;
+let localServerAvailable: boolean | null =
+  typeof window !== 'undefined' &&
+  (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:')
+    ? false
+    : null;
+
+let activeForegroundCalls = 0;
 
 export async function apiCall<T = any>(action: string, data: any = {}): Promise<T> {
-  // 1. Try local full-stack Express + Google Sheet sync endpoint first if available
-  if (localServerAvailable !== false) {
-    try {
-      const controller = new AbortController();
-      const t = setTimeout(() => controller.abort(), 5000);
-      const localRes = await fetch('/api/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, data }),
-        signal: controller.signal,
-      });
-      clearTimeout(t);
-      if (localRes.ok) {
-        localServerAvailable = true;
-        const json = await localRes.json();
-        if (json.status === 'success') {
-          mirrorToLocalStorage(action, data, json.data);
-          return json.data as T;
-        }
-      } else if (localRes.status === 404 && action !== 'loadSessionFile' && action !== 'loadSession') {
-        localServerAvailable = false;
-      }
-    } catch {
-      if (localServerAvailable === null) {
-        localServerAvailable = false;
-      }
-    }
+  const isBackgroundSync = action === 'syncState';
+  if (!isBackgroundSync) {
+    activeForegroundCalls++;
   }
 
-  // 2. Call Google Apps Script Web App directly (used when deployed on GitHub Pages)
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
-
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      redirect: 'follow',
-      body: JSON.stringify({ action, data }),
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-
-    const result = await response.json();
-    if (result.status === 'success') {
-      mirrorToLocalStorage(action, data, result.data);
-      return result.data as T;
-    } else {
-      throw new Error(result.message || 'API returned failure status');
+    // 1. Try local full-stack Express + Google Sheet sync endpoint first if available (AI Studio preview)
+    if (localServerAvailable !== false) {
+      try {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), 5000);
+        const localRes = await fetch('/api/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, data }),
+          signal: controller.signal,
+        });
+        clearTimeout(t);
+        if (localRes.ok) {
+          localServerAvailable = true;
+          const json = await localRes.json();
+          if (json.status === 'success') {
+            mirrorToLocalStorage(action, data, json.data);
+            return json.data as T;
+          }
+        } else if (localServerAvailable === null || localRes.status === 405 || localRes.status === 404) {
+          if (localServerAvailable === null) {
+            localServerAvailable = false;
+          }
+        }
+      } catch {
+        if (localServerAvailable === null) {
+          localServerAvailable = false;
+        }
+      }
     }
-  } catch (error: any) {
-    // 3. Offline / Google Sheet fallback mirror
-    return handleOfflineSheetFallback<T>(action, data, error);
+
+    // 2. Fast-path for read operations on GitHub Pages / static hosting:
+    // Use direct Google Sheets gviz read in parallel or ahead of GAS to avoid GAS cold-start / rate-limiting
+    if (action === 'listSessions') {
+      const direct = await fetchSessionsFromSheetDirect();
+      if (direct && direct.list.length > 0) {
+        return direct.list as unknown as T;
+      }
+    }
+
+    if (action === 'loadSessionFile' || action === 'loadSession') {
+      const cleanDate = String(data || '').replace('.json', '').trim();
+      const cachedTable = getLocalSessionsSheetTable();
+      if (
+        cachedTable[cleanDate] &&
+        ((cachedTable[cleanDate].attendance && cachedTable[cleanDate].attendance.length > 0) ||
+          (cachedTable[cleanDate].boats && cachedTable[cleanDate].boats.length > 0))
+      ) {
+        return JSON.stringify(cachedTable[cleanDate]) as unknown as T;
+      }
+      const direct = await fetchSessionsFromSheetDirect();
+      if (direct && direct.table[cleanDate]) {
+        return JSON.stringify(direct.table[cleanDate]) as unknown as T;
+      }
+    }
+
+    if (action === 'getRosterData') {
+      const directRoster = await fetchRosterFromSheetDirect();
+      if (directRoster && directRoster.length > 0) {
+        return directRoster as unknown as T;
+      }
+    }
+
+    // 3. Call Google Apps Script Web App directly (with retry for transient GAS concurrency limits)
+    const maxAttempts = isBackgroundSync ? 1 : 2;
+    let lastError: any = null;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        if (attempt > 0) {
+          await new Promise((r) => setTimeout(r, 700 * attempt));
+        }
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 14000);
+
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          body: JSON.stringify({ action, data }),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        const result = await response.json();
+        if (result.status === 'success') {
+          mirrorToLocalStorage(action, data, result.data);
+          return result.data as T;
+        } else {
+          throw new Error(result.message || 'API returned failure status');
+        }
+      } catch (err: any) {
+        lastError = err;
+      }
+    }
+
+    // 4. Offline / Google Sheet fallback mirror
+    return await handleOfflineSheetFallback<T>(action, data, lastError);
+  } finally {
+    if (!isBackgroundSync) {
+      activeForegroundCalls = Math.max(0, activeForegroundCalls - 1);
+    }
   }
 }
 
@@ -266,6 +486,24 @@ function mirrorToLocalStorage(action: string, reqData: any, resData: any) {
   try {
     if (action === 'getRosterData' && Array.isArray(resData)) {
       localStorage.setItem('dd_roster_cache', JSON.stringify(resData));
+    } else if (action === 'listSessions' && Array.isArray(resData)) {
+      const table = getLocalSessionsSheetTable();
+      let updated = false;
+      for (const item of resData) {
+        if (item?.sessionJson && typeof item.sessionJson === 'string') {
+          try {
+            const parsed = JSON.parse(item.sessionJson);
+            const key = parsed.date || item.rawDate || item.id;
+            if (key) {
+              table[key] = parsed;
+              updated = true;
+            }
+          } catch {}
+        }
+      }
+      if (updated) {
+        saveLocalSessionsSheetTable(table);
+      }
     } else if (
       (action === 'saveSessionToSheet' || action === 'saveSessionToDrive') &&
       reqData?.dateStr
@@ -286,8 +524,8 @@ function mirrorToLocalStorage(action: string, reqData: any, resData: any) {
       const table = getLocalSessionsSheetTable();
       table[resData.session.date] = resData.session;
       saveLocalSessionsSheetTable(table);
-    } else if ((action === 'loadSessionFile' || action === 'loadSession') && typeof resData === 'string') {
-      const parsed = JSON.parse(resData);
+    } else if ((action === 'loadSessionFile' || action === 'loadSession') && resData) {
+      const parsed = typeof resData === 'string' ? JSON.parse(resData) : resData;
       if (parsed?.date) {
         const table = getLocalSessionsSheetTable();
         table[parsed.date] = parsed;
@@ -297,8 +535,12 @@ function mirrorToLocalStorage(action: string, reqData: any, resData: any) {
   } catch {}
 }
 
-function handleOfflineSheetFallback<T>(action: string, data: any, error: any): T {
+async function handleOfflineSheetFallback<T>(action: string, data: any, error: any): Promise<T> {
   if (action === 'getRosterData') {
+    const directRoster = await fetchRosterFromSheetDirect();
+    if (directRoster && directRoster.length > 0) {
+      return directRoster as unknown as T;
+    }
     const cached = localStorage.getItem('dd_roster_cache');
     if (cached) {
       try {
@@ -333,6 +575,10 @@ function handleOfflineSheetFallback<T>(action: string, data: any, error: any): T
   }
 
   if (action === 'listSessions') {
+    const direct = await fetchSessionsFromSheetDirect();
+    if (direct && direct.list.length > 0) {
+      return direct.list as unknown as T;
+    }
     const table = getLocalSessionsSheetTable();
     const list: SavedSessionSummary[] = Object.values(table)
       .sort((a, b) => b.date.localeCompare(a.date))
@@ -352,7 +598,9 @@ function handleOfflineSheetFallback<T>(action: string, data: any, error: any): T
   if (action === 'checkSessionExists') {
     const dateStr = String(data || '').replace('.json', '').trim();
     const table = getLocalSessionsSheetTable();
-    return Boolean(table[dateStr]) as T;
+    if (table[dateStr]) return true as T;
+    const direct = await fetchSessionsFromSheetDirect();
+    return Boolean(direct?.table[dateStr]) as T;
   }
 
   if (action === 'saveSessionToDrive' || action === 'saveSessionToSheet') {
@@ -391,6 +639,10 @@ function handleOfflineSheetFallback<T>(action: string, data: any, error: any): T
 
   if (action === 'loadSessionFile' || action === 'loadSession') {
     const cleanDate = String(data || '').replace('.json', '').trim();
+    const direct = await fetchSessionsFromSheetDirect();
+    if (direct && direct.table[cleanDate]) {
+      return JSON.stringify(direct.table[cleanDate]) as T;
+    }
     const table = getLocalSessionsSheetTable();
     if (table[cleanDate]) {
       return JSON.stringify(table[cleanDate]) as T;
@@ -404,6 +656,7 @@ function handleOfflineSheetFallback<T>(action: string, data: any, error: any): T
     const cleanDate = String(data || '').replace('.json', '').trim();
     const table = getLocalSessionsSheetTable();
     delete table[cleanDate];
+    delete memorySessionsTable[cleanDate];
     saveLocalSessionsSheetTable(table);
     return { deleted: true, date: cleanDate } as T;
   }
@@ -451,12 +704,13 @@ export class CollaborationManager {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private callbacks: CollabCallbacks;
   private identity = getClientIdentity();
-  private currentTab: ActiveTab = 'planning';
+  private currentTab: ActiveTab = 'session';
   private currentSessionDate: string | null = null;
   private currentSessionVersion = 0;
   private currentRosterVersion = '';
   private selectedSeat: CollaboratorPresence['selectedSeat'] = null;
   private isDestroyed = false;
+  private isPolling = false;
 
   constructor(callbacks: CollabCallbacks) {
     this.callbacks = callbacks;
@@ -526,8 +780,7 @@ export class CollaborationManager {
 
   private connectWebSocket() {
     if (this.isDestroyed || typeof window === 'undefined') return;
-    // Skip WS connection attempt on github.io static hosting
-    if (window.location.hostname.endsWith('github.io')) {
+    if (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:') {
       this.callbacks.onConnectionStateChange?.(true);
       return;
     }
@@ -653,7 +906,6 @@ export class CollaborationManager {
   public async dispatchDelta(date: string, ops: SessionDeltaOp[]): Promise<SessionData | null> {
     if (!date || ops.length === 0) return null;
 
-    // If WebSocket is open, send immediately via WS for sub-10ms broadcast
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(
         JSON.stringify({
@@ -695,10 +947,16 @@ export class CollaborationManager {
   }
 
   private startAdaptivePolling() {
+    const isStaticHost =
+      typeof window !== 'undefined' &&
+      (window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:');
+    const intervalMs = isStaticHost ? 12000 : 4000;
+
     const poll = async () => {
-      if (this.isDestroyed) return;
+      if (this.isDestroyed || this.isPolling || activeForegroundCalls > 0) return;
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
 
+      this.isPolling = true;
       try {
         const res = await apiCall<{
           activeUsers?: CollaboratorPresence[];
@@ -733,10 +991,12 @@ export class CollaborationManager {
         }
       } catch {
         this.callbacks.onConnectionStateChange?.(false);
+      } finally {
+        this.isPolling = false;
       }
     };
 
-    this.pollTimer = setInterval(poll, 3500);
+    this.pollTimer = setInterval(poll, intervalMs);
     if (typeof window !== 'undefined') {
       window.addEventListener('focus', poll);
     }

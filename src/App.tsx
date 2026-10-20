@@ -17,6 +17,7 @@ import {
   ENV,
   FRONTEND_CONFIG,
   CollaborationManager,
+  normalizeSessionAttendance,
 } from './services/api';
 import { RosterView } from './components/RosterView';
 import { SessionView } from './components/SessionView';
@@ -114,10 +115,24 @@ export const App: React.FC = () => {
   const isDraggingRef = useRef<boolean>(false);
   const collabRef = useRef<CollaborationManager | null>(null);
   const currentSessionDateRef = useRef<string | null>(null);
+  const rosterRef = useRef<Member[]>([]);
 
   useEffect(() => {
     currentSessionDateRef.current = currentSessionDate;
   }, [currentSessionDate]);
+
+  useEffect(() => {
+    rosterRef.current = roster;
+    // If a legacy session was loaded before roster arrived, resolve any numeric attendance indices now
+    if (roster.length > 0) {
+      setAttendance((prev) => {
+        if (prev.some((item) => /^\d+$/.test(item))) {
+          return normalizeSessionAttendance(prev, boats, roster);
+        }
+        return prev;
+      });
+    }
+  }, [roster, boats]);
 
   const showToast = useCallback((msg: string) => {
     setToastMessage(msg);
@@ -145,8 +160,6 @@ export const App: React.FC = () => {
     if (data.version) {
       setSessionVersion(Number(data.version));
     }
-    const restoredAttendance = (data.attendance || []).map(String);
-    setAttendance(restoredAttendance);
 
     const restoredBoats: Boat[] = (data.boats || []).map((b, idx) => {
       const numRows = b.type === 'standard' ? 10 : 5;
@@ -177,6 +190,12 @@ export const App: React.FC = () => {
       };
     });
 
+    const restoredAttendance = normalizeSessionAttendance(
+      data.attendance || [],
+      restoredBoats,
+      rosterRef.current
+    );
+    setAttendance(restoredAttendance);
     setBoats(restoredBoats);
     isRestoringRef.current = false;
   }, []);
@@ -264,11 +283,8 @@ export const App: React.FC = () => {
     const ident = manager.getIdentity();
     setClientId(ident.clientId);
 
-    // Fetch Roster & Google Sheet Sessions list (do not auto-activate a session until Create & Start or Load is pressed)
-    (async () => {
-      await loadRoster();
-      await loadSessionList();
-    })();
+    // Fetch Roster & Google Sheet Sessions list in parallel (do not auto-activate a session until Create & Start or Load is pressed)
+    Promise.all([loadRoster(), loadSessionList()]).catch(() => {});
 
     return () => {
       mounted = false;
@@ -520,17 +536,22 @@ export const App: React.FC = () => {
   const handleLoadSession = async (sessionId: string) => {
     if (!sessionId) return;
     setIsLoading(true);
-    setLoadingText('Loading Session from Google Sheet...');
+    setLoadingText('Loading Session from Sheet...');
     try {
-      const json = await apiCall<string>('loadSessionFile', sessionId);
-      if (json && json.trim()) {
-        const data: SessionData = JSON.parse(json);
+      const raw = await apiCall<string | SessionData>('loadSessionFile', sessionId);
+      if (raw) {
+        const data: SessionData = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (!data.date) {
+          data.date = String(sessionId).replace('.json', '').trim();
+        }
         restoreState(data);
         setUndoStack([]);
         setRedoStack([]);
         setSaveStatus('idle');
         collabRef.current?.broadcastSessionSwitch(data.date, data);
         showToast(`Loaded session ${formatDisplayDate(data.date)}`);
+      } else {
+        throw new Error('Empty session response');
       }
     } catch (err: any) {
       console.error('Load session failed:', err);
@@ -973,17 +994,17 @@ export const App: React.FC = () => {
   // Non-disruptive live data refresh from Google Sheet
   const handleRefreshAppData = async () => {
     setIsLoading(true);
-    setLoadingText('Syncing Latest Data from Google Sheet...');
+    setLoadingText('Syncing Latest Data from Sheet...');
     try {
-      await loadRoster();
-      await loadSessionList();
+      await Promise.all([loadRoster(), loadSessionList()]);
       if (currentSessionDate) {
-        const json = await apiCall<string>('loadSessionFile', currentSessionDate);
-        if (json && json.trim()) {
-          restoreState(JSON.parse(json));
+        const raw = await apiCall<string | SessionData>('loadSessionFile', currentSessionDate);
+        if (raw) {
+          const parsed: SessionData = typeof raw === 'string' ? JSON.parse(raw) : raw;
+          restoreState(parsed);
         }
       }
-      showToast('Synced latest Roster & Sessions from Google Sheet');
+      showToast('Synced latest Roster & Sessions from Sheet');
     } catch (err) {
       console.error('Refresh error:', err);
     } finally {

@@ -184,6 +184,64 @@ async function callGoogleAppsScript(action: string, data: any): Promise<any | nu
   return null;
 }
 
+const PROD_SHEET_ID = '1JKHOx-53BbL3XfP1RqYQ7QLmb2vg1q_rlvnXda5ervw';
+
+async function syncSessionsFromSheetDirect(): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    const url = `https://docs.google.com/spreadsheets/d/${PROD_SHEET_ID}/gviz/tq?tqx=out:json&sheet=Sessions&_=${Date.now()}`;
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+    if (!res.ok) return false;
+    const txt = await res.text();
+    const start = txt.indexOf('{');
+    const end = txt.lastIndexOf('}');
+    if (start === -1 || end === -1) return false;
+    const parsed = JSON.parse(txt.substring(start, end + 1));
+    const rows = parsed?.table?.rows || [];
+    let updated = false;
+
+    for (const r of rows) {
+      const c = r?.c || [];
+      const rawDate = c[0]?.v ? String(c[0].v).trim().replace(/^'/, '') : '';
+      if (!rawDate || rawDate.toLowerCase() === 'session date') continue;
+      const updatedAt = c[2]?.v ? String(c[2].v) : '';
+      const version = Number(c[3]?.v) || 1;
+      const updatedBy = c[4]?.v ? String(c[4].v) : 'Google Sheet';
+      const jsonCell = c[8]?.v ? String(c[8].v) : '';
+
+      if (jsonCell) {
+        try {
+          const sessObj = JSON.parse(jsonCell);
+          const dKey = sessObj.date || rawDate;
+          const existing = state.sessions[dKey];
+          const isPlaceholder =
+            existing && existing.attendance.length === 0 && existing.boats.length === 0;
+          if (!existing || isPlaceholder || (Number(sessObj.version) || 1) >= existing.version) {
+            state.sessions[dKey] = {
+              date: dKey,
+              attendance: Array.isArray(sessObj.attendance) ? sessObj.attendance.map(String) : [],
+              boats: Array.isArray(sessObj.boats) ? sessObj.boats : [],
+              version: Number(sessObj.version) || version,
+              updatedAt: sessObj.updatedAt || updatedAt,
+              updatedBy: sessObj.updatedBy || updatedBy,
+            };
+            updated = true;
+          }
+        } catch {}
+      }
+    }
+
+    if (updated) {
+      persistState();
+    }
+    return updated;
+  } catch {
+    return false;
+  }
+}
+
 function getActiveCollaborators(): CollaboratorPresence[] {
   const now = Date.now();
   const list: CollaboratorPresence[] = [];
@@ -324,34 +382,11 @@ async function startServer() {
 
   // Initial background sync from Google Sheet on server startup
   (async () => {
+    await syncSessionsFromSheetDirect();
     const remoteRoster = await callGoogleAppsScript('getRosterData', {});
     if (Array.isArray(remoteRoster) && remoteRoster.length > 0) {
       state.roster = remoteRoster;
       state.rosterVersion++;
-      persistState();
-    }
-    const remoteSessions = await callGoogleAppsScript('listSessions', {});
-    if (Array.isArray(remoteSessions) && remoteSessions.length > 0) {
-      for (const item of remoteSessions.slice(0, 8)) {
-        const rawId = item.rawDate || item.id;
-        if (rawId && !state.sessions[rawId]) {
-          const loaded = await callGoogleAppsScript('loadSessionFile', rawId);
-          if (loaded) {
-            try {
-              const parsed = typeof loaded === 'string' ? JSON.parse(loaded) : loaded;
-              const dateKey = parsed.date || item.rawDate || String(rawId).replace('.json', '');
-              state.sessions[dateKey] = {
-                date: dateKey,
-                attendance: Array.isArray(parsed.attendance) ? parsed.attendance.map(String) : [],
-                boats: Array.isArray(parsed.boats) ? parsed.boats : [],
-                version: Number(parsed.version) || 1,
-                updatedAt: parsed.updatedAt || new Date().toISOString(),
-                updatedBy: parsed.updatedBy || 'Google Sheet',
-              };
-            } catch {}
-          }
-        }
-      }
       persistState();
     }
   })();
@@ -568,23 +603,7 @@ async function startServer() {
       }
 
       if (action === 'listSessions') {
-        const remote = await callGoogleAppsScript('listSessions', {});
-        if (Array.isArray(remote)) {
-          remote.forEach((item: any) => {
-            const dKey = item.rawDate || String(item.id || '').replace('.json', '');
-            if (dKey && !state.sessions[dKey]) {
-              state.sessions[dKey] = {
-                date: dKey,
-                attendance: [],
-                boats: [],
-                version: Number(item.version) || 1,
-                updatedAt: item.updatedAt || '',
-                updatedBy: item.updatedBy || 'Google Sheet',
-              };
-            }
-          });
-          persistState();
-        }
+        await syncSessionsFromSheetDirect();
         const list = Object.values(state.sessions)
           .sort((a, b) => b.date.localeCompare(a.date))
           .map((s) => ({
@@ -596,6 +615,7 @@ async function startServer() {
             updatedBy: s.updatedBy,
             attendanceCount: s.attendance.length,
             boatsCount: s.boats.length,
+            sessionJson: JSON.stringify(s),
           }));
         return res.json({ status: 'success', data: list });
       }
@@ -610,7 +630,19 @@ async function startServer() {
 
       if (action === 'loadSessionFile' || action === 'loadSession') {
         const dateStr = String(data || '').replace('.json', '').trim();
-        if (state.sessions[dateStr] && (state.sessions[dateStr].attendance.length > 0 || state.sessions[dateStr].boats.length > 0)) {
+        if (
+          state.sessions[dateStr] &&
+          (state.sessions[dateStr].attendance.length > 0 || state.sessions[dateStr].boats.length > 0)
+        ) {
+          state.activeSessionDate = dateStr;
+          persistState();
+          return res.json({ status: 'success', data: JSON.stringify(state.sessions[dateStr]) });
+        }
+        await syncSessionsFromSheetDirect();
+        if (
+          state.sessions[dateStr] &&
+          (state.sessions[dateStr].attendance.length > 0 || state.sessions[dateStr].boats.length > 0)
+        ) {
           state.activeSessionDate = dateStr;
           persistState();
           return res.json({ status: 'success', data: JSON.stringify(state.sessions[dateStr]) });

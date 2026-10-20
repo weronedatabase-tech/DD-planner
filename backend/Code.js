@@ -396,19 +396,30 @@ function listSessions() {
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return [];
 
-  const values = sheet.getRange(2, 1, lastRow - 1, 8).getValues();
+  const values = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
   const sessionList = [];
+  const seenDates = {};
+  const cache = CacheService.getScriptCache();
 
   for (let i = 0; i < values.length; i++) {
     const row = values[i];
     const rawDate = normalizeDateCell(row[0]);
-    if (!rawDate) continue;
+    if (!rawDate || seenDates[rawDate]) continue;
+    seenDates[rawDate] = true;
+
     const displayDate = row[1] ? String(row[1]) : formatDateDisplay(rawDate);
     const updatedAt = row[2] ? String(row[2]) : "";
     const version = Number(row[3]) || 1;
     const updatedBy = row[4] ? String(row[4]) : "";
     const attendanceCount = Number(row[5]) || 0;
     const boatsSummary = row[6] ? String(row[6]) : "";
+    const sessionJson = row[8] ? String(row[8]) : "";
+
+    if (sessionJson) {
+      try {
+        cache.put("dd_session_" + rawDate, sessionJson, 21600);
+      } catch (e) {}
+    }
 
     sessionList.push({
       id: rawDate,
@@ -418,7 +429,8 @@ function listSessions() {
       version: version,
       updatedBy: updatedBy,
       attendanceCount: attendanceCount,
-      boatsSummary: boatsSummary
+      boatsSummary: boatsSummary,
+      sessionJson: sessionJson
     });
   }
 
