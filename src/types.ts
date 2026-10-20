@@ -24,12 +24,62 @@ export interface Boat {
 
 export interface SessionData {
   date: string;
-  attendance: (number | string)[]; // Member indexes or identifiers
+  attendance: string[];
   boats: {
+    id?: string;
     type: 'standard' | 'small';
     seats: BoatSeat[];
   }[];
+  version?: number;
+  updatedAt?: string;
+  updatedBy?: string;
 }
+
+export interface SavedSessionSummary {
+  id: string;
+  name: string;
+  rawDate?: string;
+  version?: number;
+  updatedAt?: string;
+  updatedBy?: string;
+  attendanceCount?: number;
+  boatsSummary?: string;
+  boatsCount?: number;
+}
+
+export interface CollaboratorPresence {
+  clientId: string;
+  name: string;
+  color: string;
+  activeTab: ActiveTab;
+  sessionDate: string | null;
+  selectedSeat?: {
+    boatId: string;
+    role?: string;
+    row?: number;
+    side?: string;
+  } | null;
+  lastSeen: number;
+}
+
+export type SessionDeltaOp =
+  | { type: 'TOGGLE_ATTENDANCE'; memberName: string; isChecked: boolean }
+  | { type: 'TOGGLE_GROUP'; memberNames: string[]; isChecked: boolean }
+  | { type: 'ADD_BOAT'; boat: Boat }
+  | { type: 'REMOVE_BOAT'; boatId: string; boatIndex?: number }
+  | {
+      type: 'ASSIGN_SEAT';
+      memberName: string;
+      targetBoatId: string;
+      targetBoatIndex?: number;
+      targetRole?: 'drummer' | 'helm';
+      targetRow?: number;
+      targetSide?: 'Left' | 'Right';
+      swapWithOccupant?: boolean;
+    }
+  | { type: 'RETURN_TO_POOL'; memberName: string }
+  | { type: 'SET_BOATS'; boats: Boat[] }
+  | { type: 'SET_FULL_STATE'; state: SessionData };
 
 export type ActiveTab = 'roster' | 'session' | 'planning';
 export type SessionSubTab = 'new' | 'load';

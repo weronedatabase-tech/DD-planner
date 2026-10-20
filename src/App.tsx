@@ -8,8 +8,16 @@ import {
   SaveStatus,
   BalanceMode,
   SessionData,
+  SavedSessionSummary,
+  CollaboratorPresence,
+  SessionDeltaOp,
 } from './types';
-import { apiCall, ENV, FRONTEND_CONFIG } from './services/api';
+import {
+  apiCall,
+  ENV,
+  FRONTEND_CONFIG,
+  CollaborationManager,
+} from './services/api';
 import { RosterView } from './components/RosterView';
 import { SessionView } from './components/SessionView';
 import { BoatsView } from './components/BoatsView';
@@ -18,23 +26,49 @@ import { DeleteModal } from './components/DeleteModal';
 import { AssignModal } from './components/AssignModal';
 import { InfoModal } from './components/InfoModal';
 import { LinkModal } from './components/LinkModal';
+import { ConfirmModal } from './components/ConfirmModal';
 import { LoadingOverlay } from './components/LoadingOverlay';
 import { runAutoBalanceBoats } from './utils/balancer';
 import { generateBoatCanvasDataUrl } from './utils/canvas';
 import { formatDisplayDate } from './utils/date';
+import {
+  RefreshCw,
+  ExternalLink,
+  Users,
+  Check,
+  CloudUpload,
+} from 'lucide-react';
+import logo192 from '../icon-192.png';
+import logo512 from '../icon-512.png';
+
+interface ConfirmDialogState {
+  isOpen: boolean;
+  title: string;
+  description: string;
+  confirmLabel?: string;
+  variant?: 'danger' | 'primary';
+  onConfirm: () => void;
+}
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('session');
   const [sessionSubTab, setSessionSubTab] = useState<SessionSubTab>('new');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    return localStorage.getItem('theme') === 'dark';
+    const saved = localStorage.getItem('theme');
+    return saved ? saved === 'dark' : true; // Default to black-based dark theme
   });
 
   const [roster, setRoster] = useState<Member[]>([]);
   const [currentSessionDate, setCurrentSessionDate] = useState<string | null>(null);
+  const [sessionVersion, setSessionVersion] = useState<number>(1);
   const [attendance, setAttendance] = useState<string[]>([]);
   const [boats, setBoats] = useState<Boat[]>([]);
-  const [savedSessions, setSavedSessions] = useState<{ id: string; name: string }[]>([]);
+  const [savedSessions, setSavedSessions] = useState<SavedSessionSummary[]>([]);
+
+  // Collaborative Presence
+  const [activeUsers, setActiveUsers] = useState<CollaboratorPresence[]>([]);
+  const [clientId, setClientId] = useState<string>('');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Undo / Redo
   const [undoStack, setUndoStack] = useState<string[]>([]);
@@ -61,10 +95,37 @@ export const App: React.FC = () => {
   const [isInfoModalOpen, setIsInfoModalOpen] = useState<boolean>(false);
   const [isLinkModalOpen, setIsLinkModalOpen] = useState<boolean>(false);
   const [driveUrl, setDriveUrl] = useState<string>('#');
+  const [exportedDataUrl, setExportedDataUrl] = useState<string>('');
+  const [exportedFilename, setExportedFilename] = useState<string>('boat_lineup.jpg');
 
-  // Timer ref for debounced autosave
-  const autosaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
+    isOpen: false,
+    title: '',
+    description: '',
+    onConfirm: () => {},
+  });
+
+  // Refs for real-time reconciliation & delta batching
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const deltaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingOpsRef = useRef<SessionDeltaOp[]>([]);
   const isRestoringRef = useRef<boolean>(false);
+  const isDraggingRef = useRef<boolean>(false);
+  const collabRef = useRef<CollaborationManager | null>(null);
+  const currentSessionDateRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    currentSessionDateRef.current = currentSessionDate;
+  }, [currentSessionDate]);
+
+  const showToast = useCallback((msg: string) => {
+    setToastMessage(msg);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => {
+      setToastMessage(null);
+    }, 3200);
+  }, []);
 
   // Sync theme
   useEffect(() => {
@@ -77,140 +138,25 @@ export const App: React.FC = () => {
     }
   }, [isDarkMode]);
 
-  // Handle window unload check
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (autosaveTimerRef.current || saveStatus === 'saving' || saveStatus === 'waiting') {
-        e.preventDefault();
-        e.returnValue = 'Changes are not yet saved. Are you sure you want to leave?';
-        return e.returnValue;
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [saveStatus]);
-
-  // Load roster
-  const loadRoster = useCallback(async () => {
-    try {
-      const data = await apiCall<Member[]>('getRosterData');
-      const sorted = [...data].sort((a, b) => a.name.localeCompare(b.name));
-      setRoster(sorted);
-    } catch (err: any) {
-      console.error('Error loading roster:', err);
-    }
-  }, []);
-
-  // Load sessions list
-  const loadSessionList = useCallback(async () => {
-    try {
-      const files = await apiCall<{ id: string; name: string }[]>('listSessions');
-      setSavedSessions(files || []);
-    } catch (err: any) {
-      console.warn('Error loading sessions:', err);
-    }
-  }, []);
-
-  // Initial load
-  useEffect(() => {
-    loadRoster();
-    loadSessionList();
-  }, [loadRoster, loadSessionList]);
-
-  // Helper map
-  const memberMap = new Map<string, Member>();
-  roster.forEach((m) => memberMap.set(m.name, m));
-
-  // Serialize current state
-  const serializeState = useCallback((): SessionData => {
-    return {
-      date: currentSessionDate || '',
-      attendance: attendance,
-      boats: boats.map((b) => ({
-        type: b.type,
-        seats: b.seats.map((s) => ({
-          role: s.role,
-          row: s.row,
-          side: s.side,
-          occupant: s.occupant,
-        })),
-      })),
-    };
-  }, [currentSessionDate, attendance, boats]);
-
-  // Execute Save
-  const executeSave = useCallback(
-    async (overrideData?: SessionData) => {
-      const data = overrideData || serializeState();
-      if (!data.date) return;
-
-      if (autosaveTimerRef.current) {
-        clearTimeout(autosaveTimerRef.current);
-        autosaveTimerRef.current = null;
-      }
-
-      setSaveStatus('saving');
-      try {
-        await apiCall('saveSessionToDrive', {
-          dateStr: data.date,
-          jsonContent: JSON.stringify(data),
-        });
-        setSaveStatus('saved');
-        setTimeout(() => {
-          setSaveStatus((prev) => (prev === 'saved' ? 'idle' : prev));
-        }, 2000);
-      } catch (err) {
-        console.error('Save failed:', err);
-        setSaveStatus('error');
-      }
-    },
-    [serializeState]
-  );
-
-  // Trigger Autosave
-  const triggerAutosave = useCallback(
-    (customData?: SessionData) => {
-      if (!currentSessionDate) return;
-      setSaveStatus('waiting');
-      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
-      autosaveTimerRef.current = setTimeout(() => {
-        executeSave(customData);
-      }, 2000);
-    },
-    [currentSessionDate, executeSave]
-  );
-
-  // Push to Undo
-  const pushUndo = useCallback(() => {
-    if (isRestoringRef.current) return;
-    const current = JSON.stringify(serializeState());
-    setUndoStack((prev) => {
-      const next = [...prev, current];
-      if (next.length > 20) next.shift();
-      return next;
-    });
-    setRedoStack([]);
-  }, [serializeState]);
-
-  // Restore State
+  // Restore State helper
   const restoreState = useCallback((data: SessionData) => {
     isRestoringRef.current = true;
     setCurrentSessionDate(data.date);
+    if (data.version) {
+      setSessionVersion(Number(data.version));
+    }
     const restoredAttendance = (data.attendance || []).map(String);
     setAttendance(restoredAttendance);
 
     const restoredBoats: Boat[] = (data.boats || []).map((b, idx) => {
       const numRows = b.type === 'standard' ? 10 : 5;
-      const initialSeats: BoatSeat[] = [
-        { role: 'drummer', occupant: null },
-      ];
+      const initialSeats: BoatSeat[] = [{ role: 'drummer', occupant: null }];
       for (let r = 1; r <= numRows; r++) {
         initialSeats.push({ row: r, side: 'Left', occupant: null });
         initialSeats.push({ row: r, side: 'Right', occupant: null });
       }
       initialSeats.push({ role: 'helm', occupant: null });
 
-      // Merge saved seats
       (b.seats || []).forEach((savedSeat) => {
         if (!savedSeat.occupant) return;
         if (savedSeat.role) {
@@ -225,7 +171,7 @@ export const App: React.FC = () => {
       });
 
       return {
-        id: `boat-${Date.now()}-${idx}-${Math.floor(Math.random() * 1000)}`,
+        id: b.id || `boat-${data.date || 'sess'}-${idx}`,
         type: b.type,
         seats: initialSeats,
       };
@@ -235,13 +181,225 @@ export const App: React.FC = () => {
     isRestoringRef.current = false;
   }, []);
 
+  // Load roster from Google Sheet
+  const loadRoster = useCallback(async () => {
+    try {
+      const data = await apiCall<Member[]>('getRosterData');
+      const sorted = [...data].sort((a, b) => a.name.localeCompare(b.name));
+      setRoster(sorted);
+    } catch (err: any) {
+      console.error('Error loading roster:', err);
+    }
+  }, []);
+
+  // Load sessions list from Google Sheet ('Sessions' tab)
+  const loadSessionList = useCallback(async () => {
+    try {
+      const files = await apiCall<SavedSessionSummary[]>('listSessions');
+      setSavedSessions(files || []);
+      return files || [];
+    } catch (err: any) {
+      console.warn('Error loading sessions:', err);
+      return [];
+    }
+  }, []);
+
+  // Initialize Real-Time Collaboration Manager & Initial Data
+  useEffect(() => {
+    let mounted = true;
+    const manager = new CollaborationManager({
+      onInit: (payload) => {
+        if (!mounted) return;
+        if (Array.isArray(payload.roster) && payload.roster.length > 0) {
+          setRoster([...payload.roster].sort((a, b) => a.name.localeCompare(b.name)));
+        }
+        if (Array.isArray(payload.sessionsList)) {
+          setSavedSessions(payload.sessionsList);
+        }
+        if (Array.isArray(payload.activeUsers)) {
+          setActiveUsers(payload.activeUsers);
+        }
+      },
+      onSessionUpdated: (incomingSession, senderId) => {
+        if (!mounted) return;
+        const myId = manager.getIdentity().clientId;
+        if (senderId === myId) {
+          if (incomingSession.version) {
+            setSessionVersion(Number(incomingSession.version));
+          }
+          return;
+        }
+        // Only apply if for the currently active session
+        if (
+          currentSessionDateRef.current &&
+          incomingSession.date === currentSessionDateRef.current
+        ) {
+          if (!isDraggingRef.current && pendingOpsRef.current.length === 0) {
+            restoreState(incomingSession);
+          }
+        }
+      },
+      onSessionSwitched: (date, session) => {
+        if (!mounted) return;
+        if (
+          session &&
+          currentSessionDateRef.current &&
+          currentSessionDateRef.current !== date
+        ) {
+          restoreState(session);
+          showToast(`Session switched to ${formatDisplayDate(date)}`);
+        }
+      },
+      onRosterUpdated: (updatedRoster) => {
+        if (!mounted) return;
+        setRoster([...updatedRoster].sort((a, b) => a.name.localeCompare(b.name)));
+      },
+      onPresenceUpdated: (users) => {
+        if (!mounted) return;
+        setActiveUsers(users);
+      },
+    });
+
+    collabRef.current = manager;
+    const ident = manager.getIdentity();
+    setClientId(ident.clientId);
+
+    // Fetch Roster & Google Sheet Sessions list (do not auto-activate a session until Create & Start or Load is pressed)
+    (async () => {
+      await loadRoster();
+      await loadSessionList();
+    })();
+
+    return () => {
+      mounted = false;
+      manager.destroy();
+    };
+  }, [loadRoster, loadSessionList, restoreState, showToast]);
+
+  // Keep CollaborationManager context in sync
+  useEffect(() => {
+    collabRef.current?.setContext({
+      activeTab,
+      sessionDate: currentSessionDate,
+      sessionVersion,
+      selectedSeat: selectedSeatContext
+        ? {
+            boatId: selectedSeatContext.boatId,
+            role: selectedSeatContext.seat.role,
+            row: selectedSeatContext.seat.row,
+            side: selectedSeatContext.seat.side,
+          }
+        : null,
+    });
+  }, [activeTab, currentSessionDate, sessionVersion, selectedSeatContext]);
+
+  // Helper map
+  const memberMap = new Map<string, Member>();
+  roster.forEach((m) => memberMap.set(m.name, m));
+
+  // Serialize current state
+  const serializeState = useCallback((): SessionData => {
+    return {
+      date: currentSessionDate || '',
+      attendance: attendance,
+      boats: boats.map((b) => ({
+        id: b.id,
+        type: b.type,
+        seats: b.seats.map((s) => ({
+          role: s.role,
+          row: s.row,
+          side: s.side,
+          occupant: s.occupant,
+        })),
+      })),
+      version: sessionVersion,
+    };
+  }, [currentSessionDate, attendance, boats, sessionVersion]);
+
+  // Execute Full Save to Google Sheet ('Sessions' tab)
+  const executeSave = useCallback(
+    async (overrideData?: SessionData) => {
+      const data = overrideData || serializeState();
+      if (!data.date) return;
+
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+        autosaveTimerRef.current = null;
+      }
+
+      setSaveStatus('saving');
+      try {
+        const saved = await apiCall<SessionData>('saveSessionToSheet', {
+          dateStr: data.date,
+          jsonContent: JSON.stringify(data),
+        });
+        if (saved?.version) {
+          setSessionVersion(Number(saved.version));
+        }
+        collabRef.current?.broadcastSessionUpdate(saved || data);
+        setSaveStatus('saved');
+        loadSessionList();
+        setTimeout(() => {
+          setSaveStatus((prev) => (prev === 'saved' ? 'idle' : prev));
+        }, 2000);
+      } catch (err) {
+        console.error('Save failed:', err);
+        setSaveStatus('error');
+      }
+    },
+    [serializeState, loadSessionList]
+  );
+
+  // Queue atomic collaborative delta operation for instant multi-user sync
+  const queueDelta = useCallback(
+    (op: SessionDeltaOp, fallbackFullState?: SessionData) => {
+      const targetDate = fallbackFullState?.date || currentSessionDate;
+      if (!targetDate) return;
+
+      pendingOpsRef.current.push(op);
+      setSaveStatus('waiting');
+
+      if (deltaTimerRef.current) clearTimeout(deltaTimerRef.current);
+      deltaTimerRef.current = setTimeout(async () => {
+        const opsToSend = [...pendingOpsRef.current];
+        pendingOpsRef.current = [];
+        if (opsToSend.length === 0) return;
+
+        setSaveStatus('saving');
+        try {
+          const updatedSession = await collabRef.current?.dispatchDelta(targetDate, opsToSend);
+          if (updatedSession?.version) {
+            setSessionVersion(Number(updatedSession.version));
+          }
+          setSaveStatus('saved');
+          loadSessionList();
+          setTimeout(() => {
+            setSaveStatus((prev) => (prev === 'saved' ? 'idle' : prev));
+          }, 1800);
+        } catch (err) {
+          console.error('Delta sync failed, falling back to full save:', err);
+          await executeSave(fallbackFullState);
+        }
+      }, 180);
+    },
+    [currentSessionDate, executeSave, loadSessionList]
+  );
+
+  // Push to Undo
+  const pushUndo = useCallback(() => {
+    if (isRestoringRef.current) return;
+    const current = JSON.stringify(serializeState());
+    setUndoStack((prev) => {
+      const next = [...prev, current];
+      if (next.length > 30) next.shift();
+      return next;
+    });
+    setRedoStack([]);
+  }, [serializeState]);
+
   // Undo / Redo
   const handleUndo = useCallback(() => {
     if (undoStack.length === 0) return;
-    if (autosaveTimerRef.current) {
-      clearTimeout(autosaveTimerRef.current);
-      autosaveTimerRef.current = null;
-    }
     const currentSnapshot = JSON.stringify(serializeState());
     const nextUndo = [...undoStack];
     const prevSnapshotStr = nextUndo.pop()!;
@@ -249,20 +407,16 @@ export const App: React.FC = () => {
     setRedoStack((prev) => [...prev, currentSnapshot]);
 
     try {
-      const parsed = JSON.parse(prevSnapshotStr);
+      const parsed: SessionData = JSON.parse(prevSnapshotStr);
       restoreState(parsed);
-      triggerAutosave(parsed);
+      queueDelta({ type: 'SET_FULL_STATE', state: parsed }, parsed);
     } catch (e) {
       console.error('Undo parse error', e);
     }
-  }, [undoStack, serializeState, restoreState, triggerAutosave]);
+  }, [undoStack, serializeState, restoreState, queueDelta]);
 
   const handleRedo = useCallback(() => {
     if (redoStack.length === 0) return;
-    if (autosaveTimerRef.current) {
-      clearTimeout(autosaveTimerRef.current);
-      autosaveTimerRef.current = null;
-    }
     const currentSnapshot = JSON.stringify(serializeState());
     const nextRedo = [...redoStack];
     const nextSnapshotStr = nextRedo.pop()!;
@@ -270,79 +424,150 @@ export const App: React.FC = () => {
     setUndoStack((prev) => [...prev, currentSnapshot]);
 
     try {
-      const parsed = JSON.parse(nextSnapshotStr);
+      const parsed: SessionData = JSON.parse(nextSnapshotStr);
       restoreState(parsed);
-      triggerAutosave(parsed);
+      queueDelta({ type: 'SET_FULL_STATE', state: parsed }, parsed);
     } catch (e) {
       console.error('Redo parse error', e);
     }
-  }, [redoStack, serializeState, restoreState, triggerAutosave]);
+  }, [redoStack, serializeState, restoreState, queueDelta]);
 
-  // Session management: create
-  const handleCreateNewSession = async (dateVal: string) => {
+  // Keyboard shortcuts for Undo/Redo
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (
+        document.activeElement?.tagName === 'INPUT' ||
+        document.activeElement?.tagName === 'SELECT'
+      ) {
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) handleRedo();
+        else handleUndo();
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [handleUndo, handleRedo]);
+
+  // Session management: create in Google Sheet
+  const executeCreateSession = async (dateVal: string) => {
     setIsLoading(true);
-    setLoadingText('Checking date...');
+    setLoadingText('Creating Session in Google Sheet...');
     try {
-      const exists = await apiCall<boolean>('checkSessionExists', dateVal);
-      if (exists) {
-        setIsLoading(false);
-        if (!confirm(`A session for ${dateVal} already exists. Overwrite?`)) {
-          return;
-        }
-        setIsLoading(true);
-        setLoadingText('Creating Session...');
-      }
-
-      if (autosaveTimerRef.current) {
-        clearTimeout(autosaveTimerRef.current);
-        autosaveTimerRef.current = null;
-      }
-
       setCurrentSessionDate(dateVal);
+      setSessionVersion(1);
       setAttendance([]);
       setBoats([]);
       setUndoStack([]);
       setRedoStack([]);
-      setSaveStatus('idle');
+      setSaveStatus('saving');
 
-      const emptyState: SessionData = { date: dateVal, attendance: [], boats: [] };
-      await apiCall('saveSessionToDrive', {
+      const emptyState: SessionData = {
+        date: dateVal,
+        attendance: [],
+        boats: [],
+        version: 1,
+      };
+      await apiCall('saveSessionToSheet', {
         dateStr: dateVal,
         jsonContent: JSON.stringify(emptyState),
       });
-      loadSessionList();
+      collabRef.current?.broadcastSessionSwitch(dateVal, emptyState);
+      await loadSessionList();
+      setSaveStatus('saved');
+      showToast(`Created session ${formatDisplayDate(dateVal)}`);
     } catch (err: any) {
       console.error('Session create failed:', err);
-      alert('Session check/create failed: ' + err.message);
+      showToast('Failed to create session in Sheet');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Session management: load
+  const handleCreateNewSession = async (dateVal: string) => {
+    setIsLoading(true);
+    setLoadingText('Checking Google Sheet...');
+    try {
+      const exists = await apiCall<boolean>('checkSessionExists', dateVal);
+      setIsLoading(false);
+      if (exists) {
+        setConfirmDialog({
+          isOpen: true,
+          title: 'Session Date Already Exists',
+          description: `A session for ${formatDisplayDate(dateVal)} is already saved in the Google Sheet. Do you want to reset and overwrite it, or cancel and load the existing session?`,
+          confirmLabel: 'Overwrite Session',
+          variant: 'danger',
+          onConfirm: () => {
+            setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+            executeCreateSession(dateVal);
+          },
+        });
+        return;
+      }
+      await executeCreateSession(dateVal);
+    } catch (err: any) {
+      setIsLoading(false);
+      console.error('Session check failed:', err);
+    }
+  };
+
+  // Session management: load from Google Sheet
   const handleLoadSession = async (sessionId: string) => {
     if (!sessionId) return;
-    if (autosaveTimerRef.current) {
-      clearTimeout(autosaveTimerRef.current);
-      autosaveTimerRef.current = null;
-    }
     setIsLoading(true);
-    setLoadingText('Loading Data...');
+    setLoadingText('Loading Session from Google Sheet...');
     try {
       const json = await apiCall<string>('loadSessionFile', sessionId);
       if (json && json.trim()) {
-        const data = JSON.parse(json);
+        const data: SessionData = JSON.parse(json);
         restoreState(data);
         setUndoStack([]);
         setRedoStack([]);
         setSaveStatus('idle');
+        collabRef.current?.broadcastSessionSwitch(data.date, data);
+        showToast(`Loaded session ${formatDisplayDate(data.date)}`);
       }
     } catch (err: any) {
       console.error('Load session failed:', err);
-      alert('Failed to load session: ' + err.message);
+      showToast('Could not load session from Sheet');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Session management: delete from Google Sheet
+  const handleDeleteSession = (sessionId: string) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Saved Session',
+      description: `Remove session ${formatDisplayDate(sessionId)} from the Google Sheet? This cannot be undone.`,
+      confirmLabel: 'Delete Session',
+      variant: 'danger',
+      onConfirm: async () => {
+        setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+        setIsLoading(true);
+        setLoadingText('Removing from Google Sheet...');
+        try {
+          await apiCall('deleteSession', sessionId);
+          if (currentSessionDate === sessionId) {
+            setCurrentSessionDate(null);
+            setAttendance([]);
+            setBoats([]);
+          }
+          await loadSessionList();
+          showToast(`Deleted session ${formatDisplayDate(sessionId)}`);
+        } catch (err) {
+          console.error('Delete session error:', err);
+        } finally {
+          setIsLoading(false);
+        }
+      },
+    });
   };
 
   // Attendance toggling
@@ -351,7 +576,6 @@ export const App: React.FC = () => {
     if (isChecked) {
       setAttendance((prev) => (prev.includes(memberName) ? prev : [...prev, memberName]));
     } else {
-      // Uncheck attendee: remove from attendance AND remove from any boat seats!
       setAttendance((prev) => prev.filter((n) => n !== memberName));
       setBoats((prev) =>
         prev.map((boat) => ({
@@ -362,7 +586,7 @@ export const App: React.FC = () => {
         }))
       );
     }
-    triggerAutosave();
+    queueDelta({ type: 'TOGGLE_ATTENDANCE', memberName, isChecked });
   };
 
   const handleToggleGroup = (type: 'Paddler' | 'Volunteer', isChecked: boolean) => {
@@ -383,7 +607,7 @@ export const App: React.FC = () => {
         }))
       );
     }
-    triggerAutosave();
+    queueDelta({ type: 'TOGGLE_GROUP', memberNames: groupMembers, isChecked });
   };
 
   // Boat management
@@ -404,13 +628,42 @@ export const App: React.FC = () => {
     };
 
     setBoats((prev) => [...prev, newBoat]);
-    triggerAutosave();
+    queueDelta({ type: 'ADD_BOAT', boat: newBoat });
   };
 
   const handleRemoveBoat = (boatId: string) => {
+    const boatIdx = boats.findIndex((b) => b.id === boatId);
+    setConfirmDialog({
+      isOpen: true,
+      title: `Remove Boat ${boatIdx + 1}?`,
+      description:
+        'All members currently seated in this boat will be returned to the session pool.',
+      confirmLabel: 'Remove Boat',
+      variant: 'danger',
+      onConfirm: () => {
+        setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+        pushUndo();
+        setBoats((prev) => prev.filter((b) => b.id !== boatId));
+        queueDelta({ type: 'REMOVE_BOAT', boatId, boatIndex: boatIdx });
+      },
+    });
+  };
+
+  const handleClearBoatSeats = (boatId: string) => {
     pushUndo();
-    setBoats((prev) => prev.filter((b) => b.id !== boatId));
-    triggerAutosave();
+    setBoats((prev) => {
+      const next = prev.map((b) => {
+        if (b.id !== boatId) return b;
+        return {
+          ...b,
+          seats: b.seats.map((s) =>
+            s.row !== undefined ? { ...s, occupant: null } : s
+          ),
+        };
+      });
+      queueDelta({ type: 'SET_BOATS', boats: next });
+      return next;
+    });
   };
 
   // Auto-Balancing
@@ -423,45 +676,82 @@ export const App: React.FC = () => {
 
     const balancedBoats = runAutoBalanceBoats(boats, attendeeMembers, mode, memberMap);
     setBoats(balancedBoats);
-    triggerAutosave();
+    queueDelta({ type: 'SET_BOATS', boats: balancedBoats });
+    showToast(
+      `Auto-balanced ${balancedBoats.length} boat${balancedBoats.length > 1 ? 's' : ''} (${
+        mode === 'rocket' ? 'Rocket Engine' : 'Lateral Stability'
+      })`
+    );
   };
 
-  // Drag and drop assignment
+  // Drag and drop assignment (with seat-to-seat swap support!)
   const handleDropMemberToSeat = (
     memberName: string,
     targetBoatId: string,
     targetRole?: 'drummer' | 'helm',
     targetRow?: number,
-    targetSide?: 'Left' | 'Right'
+    targetSide?: 'Left' | 'Right',
+    fromBoatId?: string | null
   ) => {
     pushUndo();
+    const targetBoatIndex = boats.findIndex((b) => b.id === targetBoatId);
+    const shouldSwap = Boolean(fromBoatId);
+
     setBoats((prevBoats) => {
-      return prevBoats.map((b) => {
-        // If this boat contains the previous seat of memberName, clear that seat
-        let nextSeats = b.seats.map((s) => {
+      const nextBoats = prevBoats.map((b) => ({
+        ...b,
+        seats: b.seats.map((s) => ({ ...s })),
+      }));
+
+      // Find previous seat of memberName in case we swap
+      let prevBoatIdx = -1;
+      let prevSeatIdx = -1;
+      nextBoats.forEach((b, bIdx) => {
+        b.seats.forEach((s, sIdx) => {
           if (s.occupant === memberName) {
-            return { ...s, occupant: null };
+            prevBoatIdx = bIdx;
+            prevSeatIdx = sIdx;
           }
-          return s;
         });
-
-        // If this is the target boat, assign memberName to target seat
-        if (b.id === targetBoatId) {
-          nextSeats = nextSeats.map((s) => {
-            const isTarget = targetRole
-              ? s.role === targetRole
-              : s.row === targetRow && s.side === targetSide;
-            if (isTarget) {
-              return { ...s, occupant: memberName };
-            }
-            return s;
-          });
-        }
-
-        return { ...b, seats: nextSeats };
       });
+
+      // Clear memberName from previous seat
+      nextBoats.forEach((b) => {
+        b.seats.forEach((s) => {
+          if (s.occupant === memberName) s.occupant = null;
+        });
+      });
+
+      // Assign to target seat (and swap if occupied and dragged from another seat)
+      nextBoats.forEach((b) => {
+        if (b.id !== targetBoatId) return;
+        b.seats.forEach((s) => {
+          const isTarget = targetRole
+            ? s.role === targetRole
+            : s.row === targetRow && s.side === targetSide;
+          if (isTarget) {
+            const displaced = s.occupant;
+            s.occupant = memberName;
+            if (displaced && shouldSwap && prevBoatIdx !== -1 && prevSeatIdx !== -1) {
+              nextBoats[prevBoatIdx].seats[prevSeatIdx].occupant = displaced;
+            }
+          }
+        });
+      });
+
+      return nextBoats;
     });
-    triggerAutosave();
+
+    queueDelta({
+      type: 'ASSIGN_SEAT',
+      memberName,
+      targetBoatId,
+      targetBoatIndex,
+      targetRole,
+      targetRow,
+      targetSide,
+      swapWithOccupant: shouldSwap,
+    });
   };
 
   const handleDropMemberToPool = (memberName: string) => {
@@ -472,10 +762,12 @@ export const App: React.FC = () => {
         seats: b.seats.map((s) => (s.occupant === memberName ? { ...s, occupant: null } : s)),
       }))
     );
-    triggerAutosave();
+    queueDelta({ type: 'RETURN_TO_POOL', memberName });
   };
 
   const handleReturnToPool = (boatId: string, seat: BoatSeat) => {
+    if (!seat.occupant) return;
+    const occName = seat.occupant;
     pushUndo();
     setBoats((prevBoats) =>
       prevBoats.map((b) => {
@@ -483,13 +775,15 @@ export const App: React.FC = () => {
         return {
           ...b,
           seats: b.seats.map((s) => {
-            const isMatch = s.role ? s.role === seat.role : s.row === seat.row && s.side === seat.side;
+            const isMatch = s.role
+              ? s.role === seat.role
+              : s.row === seat.row && s.side === seat.side;
             return isMatch ? { ...s, occupant: null } : s;
           }),
         };
       })
     );
-    triggerAutosave();
+    queueDelta({ type: 'RETURN_TO_POOL', memberName: occName });
   };
 
   // Seat click / Assign modal
@@ -519,9 +813,13 @@ export const App: React.FC = () => {
     const boatTitle = `Boat ${boatIndex + 1} (${boat.type})`;
     const displayDate = formatDisplayDate(currentSessionDate);
 
+    setIsLoading(true);
+    setLoadingText('Generating High-Res Boat Lineup...');
     try {
       const dataUrl = generateBoatCanvasDataUrl(boat, boatTitle, displayDate, memberMap);
       const filename = `${currentSessionDate || 'boat'}_${boatTitle.replace(/\s+/g, '_')}.jpg`;
+      setExportedDataUrl(dataUrl);
+      setExportedFilename(filename);
 
       const result = await apiCall<{ id: string }>('saveBoatImageToDrive', {
         base64Data: dataUrl,
@@ -531,13 +829,14 @@ export const App: React.FC = () => {
       if (result.id && !result.id.startsWith('local_preview')) {
         setDriveUrl(`https://drive.google.com/uc?export=view&id=${result.id}`);
       } else {
-        // Fallback local download / preview
         setDriveUrl(dataUrl);
       }
       setIsLinkModalOpen(true);
     } catch (err: any) {
       console.error('Error generating boat image:', err);
-      alert('Canvas error: ' + err.message);
+      showToast('Failed to export boat image');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -599,6 +898,7 @@ export const App: React.FC = () => {
 
     updatedRoster.sort((a, b) => a.name.localeCompare(b.name));
     setRoster(updatedRoster);
+    collabRef.current?.broadcastRosterUpdate(updatedRoster);
 
     // If member renamed, update attendance and boats
     if (oldName && oldName !== memberToSave.name) {
@@ -615,12 +915,10 @@ export const App: React.FC = () => {
       );
     }
 
-    // Trigger save
     if (currentSessionDate) {
       executeSave();
     }
 
-    // Persist to server
     const memberForServer = { ...memberToSave };
     if (String(memberForServer.rowIndex).startsWith('TEMP_')) {
       memberForServer.rowIndex = null;
@@ -628,7 +926,8 @@ export const App: React.FC = () => {
 
     try {
       await apiCall('saveMember', memberForServer);
-      loadRoster();
+      await loadRoster();
+      showToast(`Saved ${memberToSave.name} to Google Sheet Roster`);
     } catch (err: any) {
       console.error('Save member error:', err);
     }
@@ -644,7 +943,6 @@ export const App: React.FC = () => {
     const p = memberToDelete;
     setIsDeleteModalOpen(false);
 
-    // Remove from attendance and boats
     setAttendance((prev) => prev.filter((n) => n !== p.name));
     setBoats((prev) =>
       prev.map((boat) => ({
@@ -655,7 +953,9 @@ export const App: React.FC = () => {
       }))
     );
 
-    setRoster((prev) => prev.filter((m) => m.name !== p.name));
+    const nextRoster = roster.filter((m) => m.name !== p.name);
+    setRoster(nextRoster);
+    collabRef.current?.broadcastRosterUpdate(nextRoster);
 
     if (currentSessionDate) {
       executeSave();
@@ -663,20 +963,32 @@ export const App: React.FC = () => {
 
     try {
       await apiCall('deleteMember', p.rowIndex);
-      loadRoster();
+      await loadRoster();
+      showToast(`Removed ${p.name} from Roster`);
     } catch (err: any) {
       console.error('Delete member error:', err);
     }
   };
 
-  // Refresh app data button
-  const handleRefreshAppData = () => {
-    if (saveStatus === 'saving' || saveStatus === 'waiting') {
-      if (!confirm('Saving is in progress. Reloading now might lose unsaved changes. Continue?')) {
-        return;
+  // Non-disruptive live data refresh from Google Sheet
+  const handleRefreshAppData = async () => {
+    setIsLoading(true);
+    setLoadingText('Syncing Latest Data from Google Sheet...');
+    try {
+      await loadRoster();
+      await loadSessionList();
+      if (currentSessionDate) {
+        const json = await apiCall<string>('loadSessionFile', currentSessionDate);
+        if (json && json.trim()) {
+          restoreState(JSON.parse(json));
+        }
       }
+      showToast('Synced latest Roster & Sessions from Google Sheet');
+    } catch (err) {
+      console.error('Refresh error:', err);
+    } finally {
+      setIsLoading(false);
     }
-    window.location.reload();
   };
 
   const activeConfig = FRONTEND_CONFIG[ENV as keyof typeof FRONTEND_CONFIG];
@@ -684,175 +996,191 @@ export const App: React.FC = () => {
     ? `https://docs.google.com/spreadsheets/d/${activeConfig.SHEET_ID}`
     : '#';
 
-  // Save button styling based on status
   const getSaveBtnProps = () => {
     switch (saveStatus) {
       case 'waiting':
         return {
-          text: 'Waiting...',
-          className: 'bg-amber-100 text-amber-700 border-amber-200',
+          text: 'Sync...',
+          className:
+            'bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-500/30',
           disabled: false,
         };
       case 'saving':
         return {
-          text: 'Saving...',
-          className: 'bg-blue-100 text-blue-700 border-blue-200',
+          text: 'Save...',
+          className: 'bg-sky-500/15 text-sky-600 dark:text-sky-300 border-sky-500/30',
           disabled: true,
         };
       case 'saved':
         return {
           text: 'Saved',
-          className: 'bg-green-100 text-green-700 border-green-200',
+          className:
+            'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30',
           disabled: false,
         };
       case 'error':
         return {
-          text: 'Retry Save',
-          className: 'bg-red-100 text-red-700 border-red-200',
+          text: 'Retry',
+          className: 'bg-red-500/15 text-red-600 dark:text-red-300 border-red-500/30',
           disabled: false,
         };
       case 'idle':
       default:
         return {
-          text: 'Save Now',
+          text: 'Save',
           className:
-            'bg-slate-200 text-slate-800 border-slate-300 dark:bg-slate-700 dark:text-white dark:border-gray-600',
+            'bg-zinc-900 text-white border-zinc-800 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:border-zinc-200 dark:hover:bg-white',
           disabled: false,
         };
     }
   };
 
   const saveBtnProps = getSaveBtnProps();
+  const onlineCount = Math.max(1, activeUsers.length);
 
   return (
-    <div className="bg-bg-light dark:bg-bg-dark text-gray-900 dark:text-gray-100 select-none flex flex-col h-full w-full">
-      {/* Dev Mode Banner */}
-      {ENV === 'DEV' && (
-        <div className="flex-none bg-red-600 text-white text-center text-xs font-bold py-1 z-50">
-          DEV MODE
-        </div>
-      )}
+    <div className="bg-zinc-50 dark:bg-black text-zinc-950 dark:text-zinc-50 select-none flex flex-col h-full w-full">
+      {/* Main Top Bar (Strict 3-Zone Contract) */}
+      <header className="flex-none z-30 grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-4 px-2.5 sm:px-6 py-1.5 sm:py-2 bg-white dark:bg-black border-b border-zinc-200 dark:border-zinc-800">
+        {/* Zone 1: Brand Logo */}
+        <a
+          href="#top"
+          onClick={(e) => {
+            e.preventDefault();
+            setActiveTab('session');
+          }}
+          className="justify-self-start flex items-center h-8 sm:h-10 overflow-hidden shrink-0 no-underline"
+          title="Different Dragons"
+        >
+          <img
+            src={logo192}
+            srcSet={`${logo192} 192w, ${logo512} 512w`}
+            sizes="(max-width: 640px) 96px, 140px"
+            alt="Different Dragons"
+            className="h-14 sm:h-18 w-auto max-w-[105px] sm:max-w-[160px] object-cover object-center dark:invert select-none pointer-events-none"
+          />
+        </a>
 
-      {/* Main Top Header */}
-      <div className="flex-none shadow z-30 flex text-sm items-center justify-between p-2 relative gap-2 bg-surface-light dark:bg-surface-dark bg-white dark:bg-gray-800">
-        <img
-          src="https://drive.google.com/thumbnail?id=1zWXle0f60eKYSKMrlyUbfU8OyKJ_9oju&sz=h100"
-          referrerPolicy="no-referrer"
-          alt="Logo"
-          className="h-10 w-auto rounded object-contain"
-        />
-        <div className="flex w-full gap-1">
+        {/* Zone 2: Primary Navigation Links */}
+        <nav className="justify-self-center flex items-center gap-0.5 sm:gap-2 shrink-0">
           <div
             id="nav-roster"
             onClick={() => setActiveTab('roster')}
-            className={`nav-btn ${activeTab === 'roster' ? 'active' : ''}`}
+            className={`nav-btn ${
+              activeTab === 'roster'
+                ? 'active'
+                : 'text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'
+            }`}
           >
             Roster
           </div>
           <div
             id="nav-session"
             onClick={() => setActiveTab('session')}
-            className={`nav-btn ${activeTab === 'session' ? 'active' : ''}`}
+            className={`nav-btn ${
+              activeTab === 'session'
+                ? 'active'
+                : 'text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'
+            }`}
           >
             Session
           </div>
           <div
             id="nav-planning"
             onClick={() => setActiveTab('planning')}
-            className={`nav-btn ${activeTab === 'planning' ? 'active' : ''}`}
+            className={`nav-btn ${
+              activeTab === 'planning'
+                ? 'active'
+                : 'text-zinc-700 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900'
+            }`}
           >
             Boats
           </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsDarkMode(!isDarkMode)}
-          className="ml-2 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
-          title="Toggle Theme"
-        >
-          🌗
-        </button>
-      </div>
+        </nav>
 
-      {/* Sub Header */}
-      <div className="flex-none bg-white dark:bg-gray-900 border-b dark:border-gray-700 py-1 px-3 relative shadow-sm z-20 flex items-center justify-end h-10 gap-3">
-        {sheetUrl !== '#' && (
-          <a
-            id="sheet-link"
-            href={sheetUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="flex-none text-[10px] font-bold px-3 py-1 rounded border transition-colors bg-white text-blue-600 border-blue-200 hover:bg-blue-50 dark:bg-gray-700 dark:text-blue-300 dark:border-gray-600 z-10 no-underline"
+        {/* Zone 3: 1 Primary Action */}
+        <div className="justify-self-end flex items-center shrink-0">
+          <button
+            type="button"
+            id="save-btn"
+            disabled={saveBtnProps.disabled}
+            onClick={() => executeSave()}
+            className={`justify-center text-xs sm:text-sm font-bold px-2.5 sm:px-3 py-1.5 rounded-lg border transition-colors cursor-pointer flex items-center gap-1 sm:gap-1.5 whitespace-nowrap shrink-0 ${saveBtnProps.className}`}
           >
-            Open Sheet
-          </a>
-        )}
+            {saveStatus === 'saved' ? (
+              <Check className="w-3.5 h-3.5 shrink-0" />
+            ) : (
+              <CloudUpload className="w-3.5 h-3.5 shrink-0" />
+            )}
+            <span>{saveBtnProps.text}</span>
+          </button>
+        </div>
+      </header>
 
-        <div className="flex-grow flex justify-center gap-6 text-[10px] font-bold uppercase tracking-wider">
-          <div className="flex items-center gap-1.5 text-[#1e3a8a] dark:text-[#bfdbfe]">
-            <div className="w-3 h-3 rounded-sm bg-[#bfdbfe] border border-[#60a5fa] dark:bg-[#1e3a8a] dark:border-[#1d4ed8]" />
-            Paddler
-          </div>
-          <div className="flex items-center gap-1.5 text-[#14532d] dark:text-[#bbf7d0]">
-            <div className="w-3 h-3 rounded-sm bg-[#bbf7d0] border border-[#4ade80] dark:bg-[#14532d] dark:border-[#15803d]" />
-            Volunteer
+      {/* Secondary Workspace Toolbar (Legend, Live Count, Sheet Link, Theme Toggle) */}
+      <div className="flex-none bg-zinc-100 dark:bg-[#09090b] border-b border-zinc-200 dark:border-zinc-800 py-1.5 px-2.5 sm:px-6 z-20 flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between gap-2 sm:gap-3 text-xs sm:text-sm">
+        {/* Left: Sheet Link & Live Count */}
+        <div className="justify-self-start flex items-center gap-2 sm:gap-3 shrink-0">
+          {sheetUrl !== '#' && (
+            <a
+              id="sheet-link"
+              href={sheetUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] sm:text-xs font-bold px-2.5 sm:px-3 py-1 rounded-md border transition-colors bg-white dark:bg-[#14141b] text-sky-700 dark:text-sky-300 border-zinc-300 dark:border-zinc-700 hover:border-sky-400 dark:hover:border-sky-500 flex items-center gap-1 sm:gap-1.5 no-underline whitespace-nowrap shrink-0"
+            >
+              <span>Sheet</span>
+              <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+            </a>
+          )}
+
+          {/* Live Count */}
+          <div
+            className="flex items-center gap-1 text-xs font-bold text-zinc-800 dark:text-zinc-100"
+            title="Active users"
+          >
+            <Users className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+            <span className="font-mono tabular-nums">{onlineCount}</span>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleRefreshAppData}
-          className="cursor-pointer hover:opacity-80 transition-opacity z-10 p-0 bg-transparent border-0"
-          title="Update App & Refresh Data"
-        >
-          <svg
-            className="w-6 h-6"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 1 }} />
-                <stop offset="100%" style={{ stopColor: '#22c55e', stopOpacity: 1 }} />
-              </linearGradient>
-            </defs>
-            <path
-              d="M4 12C4 16.4183 7.58172 20 12 20C14.5656 20 16.8481 18.7877 18.2868 16.9038M19.918 13C19.9729 12.6738 20 12.3397 20 12C20 7.58172 16.4183 4 12 4C9.56557 4 7.3779 5.09758 5.88235 6.82353"
-              stroke="url(#grad1)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-            <path
-              d="M16 16.5L18.5 16.5L18.5 19"
-              stroke="url(#grad1)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M8 7.5L5.5 7.5L5.5 5"
-              stroke="url(#grad1)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+        {/* Center: Role Color Key */}
+        <div className="justify-self-center flex items-center gap-2.5 sm:gap-5 text-[11px] sm:text-xs font-bold text-zinc-800 dark:text-zinc-100 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-xs bg-[#e0f2fe] dark:bg-[#0a2540] border border-sky-500 shrink-0" />
+            <span>Paddler</span>
+          </div>
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-xs bg-[#d1fae5] dark:bg-[#062e22] border border-emerald-500 shrink-0" />
+            <span>Volunteer</span>
+          </div>
+        </div>
 
-        <button
-          type="button"
-          id="save-btn"
-          disabled={saveBtnProps.disabled}
-          onClick={() => executeSave()}
-          className={`flex-none text-[10px] font-bold px-3 py-1 rounded border transition-colors cursor-pointer ${saveBtnProps.className}`}
-        >
-          {saveBtnProps.text}
-        </button>
+        {/* Right: Sync Refresh & Theme Switch */}
+        <div className="justify-self-end flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleRefreshAppData}
+            className="px-2.5 sm:px-3 py-1 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-[#14141b] hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+            title="Sync Latest Data from Google Sheet"
+          >
+            <RefreshCw className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+            <span>Sync</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className="p-1 bg-transparent border-0 shadow-none text-base sm:text-lg leading-none hover:opacity-80 transition-opacity cursor-pointer"
+            title="Toggle Theme"
+          >
+            🌗
+          </button>
+        </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-grow overflow-hidden relative">
+      <main className="flex-grow overflow-hidden relative">
         {activeTab === 'roster' && (
           <RosterView
             roster={roster}
@@ -874,6 +1202,8 @@ export const App: React.FC = () => {
             onToggleGroup={handleToggleGroup}
             onCreateNewSession={handleCreateNewSession}
             onLoadSession={handleLoadSession}
+            onDeleteSession={handleDeleteSession}
+            onGoToBoats={() => setActiveTab('planning')}
           />
         )}
 
@@ -885,10 +1215,13 @@ export const App: React.FC = () => {
             currentSessionDate={currentSessionDate}
             canUndo={undoStack.length > 0}
             canRedo={redoStack.length > 0}
+            activeUsers={activeUsers}
+            currentClientId={clientId}
             onUndo={handleUndo}
             onRedo={handleRedo}
             onAddBoat={handleAddBoat}
             onRemoveBoat={handleRemoveBoat}
+            onClearBoatSeats={handleClearBoatSeats}
             onRunAutoBalance={handleRunAutoBalance}
             onShowAlgoInfo={() => setIsInfoModalOpen(true)}
             onSaveBoatCanvas={handleSaveBoatCanvas}
@@ -896,9 +1229,19 @@ export const App: React.FC = () => {
             onReturnToPool={handleReturnToPool}
             onDropMemberToSeat={handleDropMemberToSeat}
             onDropMemberToPool={handleDropMemberToPool}
+            onDragStateChange={(dragging) => {
+              isDraggingRef.current = dragging;
+            }}
           />
         )}
-      </div>
+
+        {/* Non-Intrusive Live Collaboration Toast */}
+        {toastMessage && (
+          <div className="fixed bottom-4 right-4 z-50 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 px-4 py-2.5 rounded-lg shadow-lg text-xs sm:text-sm font-bold pointer-events-none">
+            {toastMessage}
+          </div>
+        )}
+      </main>
 
       {/* Modals & Overlays */}
       <MemberModal
@@ -944,6 +1287,18 @@ export const App: React.FC = () => {
         isOpen={isLinkModalOpen}
         onClose={() => setIsLinkModalOpen(false)}
         driveUrl={driveUrl}
+        dataUrl={exportedDataUrl}
+        filename={exportedFilename}
+      />
+
+      <ConfirmModal
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        confirmLabel={confirmDialog.confirmLabel}
+        variant={confirmDialog.variant}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
       />
 
       <LoadingOverlay isLoading={isLoading} message={loadingText} />

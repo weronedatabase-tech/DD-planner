@@ -1,4 +1,5 @@
 import { Boat, Member } from '../types';
+import { calculateBoatWeight } from './balancer';
 
 export function generateBoatCanvasDataUrl(
   boat: Boat,
@@ -7,14 +8,14 @@ export function generateBoatCanvasDataUrl(
   memberMap: Map<string, Member>
 ): string {
   const scale = 3;
-  const canvasWidth = 280;
-  const rowHeight = 35;
-  const col1W = 40;
-  const seatW = 115;
-  const gap = 2;
+  const canvasWidth = 300;
+  const rowHeight = 36;
+  const col1W = 44;
+  const seatW = 120;
+  const gap = 3;
 
   const numRows = boat.type === 'standard' ? 10 : 5;
-  const totalHeight = 40 + (rowHeight + gap) * (numRows + 1) + rowHeight + 20;
+  const totalHeight = 48 + (rowHeight + gap) * (numRows + 2) + 34;
 
   const canvas = document.createElement('canvas');
   canvas.width = canvasWidth * scale;
@@ -25,81 +26,125 @@ export function generateBoatCanvasDataUrl(
   ctx.scale(scale, scale);
 
   // Background
-  ctx.fillStyle = '#f0f9ff';
+  ctx.fillStyle = '#09090b';
   ctx.fillRect(0, 0, canvasWidth, totalHeight);
 
   // Header
-  ctx.fillStyle = '#eff6ff';
-  ctx.fillRect(0, 0, canvasWidth, 40);
+  ctx.fillStyle = '#18181b';
+  ctx.fillRect(0, 0, canvasWidth, 42);
 
-  ctx.fillStyle = '#000000';
-  ctx.font = 'bold 16px sans-serif';
+  ctx.fillStyle = '#fafafa';
+  ctx.font = 'bold 14px sans-serif';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillText(boatTitle, 10, 20);
+  ctx.fillText(boatTitle, 10, 21);
 
-  ctx.font = '12px sans-serif';
-  ctx.fillStyle = '#6b7280';
+  ctx.font = '600 11px monospace';
+  ctx.fillStyle = '#a1a1aa';
   ctx.textAlign = 'right';
-  ctx.fillText(displayDate, canvasWidth - 10, 20);
+  ctx.fillText(displayDate, canvasWidth - 10, 21);
 
-  let currY = 40;
+  let currY = 48;
 
-  function drawBox(x: number, y: number, w: number, h: number, color: string, text: string) {
+  function drawBox(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    bgColor: string,
+    borderColor: string,
+    textColor: string,
+    text: string,
+    subText?: string
+  ) {
     if (!ctx) return;
-    ctx.fillStyle = color;
+    ctx.fillStyle = bgColor;
     ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+
     if (text) {
-      ctx.fillStyle = '#000000';
-      ctx.font = 'bold 12px sans-serif';
+      ctx.fillStyle = textColor;
+      ctx.font = 'bold 11px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      if (ctx.measureText(text).width > w - 10) {
-        const words = text.split(' ');
-        if (words.length >= 2) {
-          const mid = Math.floor(words.length / 2);
-          const line1 = words.slice(0, mid + 1).join(' ');
-          const line2 = words.slice(mid + 1).join(' ');
-          ctx.fillText(line1, x + w / 2, y + h / 2 - 7);
-          ctx.fillText(line2, x + w / 2, y + h / 2 + 7);
-          return;
+      const yOffset = subText ? -5 : 0;
+      let displayName = text;
+      if (ctx.measureText(displayName).width > w - 10) {
+        while (displayName.length > 4 && ctx.measureText(displayName + '…').width > w - 10) {
+          displayName = displayName.slice(0, -1);
         }
+        displayName += '…';
       }
-      ctx.fillText(text, x + w / 2, y + h / 2);
+      ctx.fillText(displayName, x + w / 2, y + h / 2 + yOffset);
+
+      if (subText) {
+        ctx.font = '600 9px monospace';
+        ctx.fillStyle = '#a1a1aa';
+        ctx.fillText(subText, x + w / 2, y + h / 2 + 8);
+      }
     }
   }
 
-  function getSeatInfo(occupantName: string | null | undefined): { name: string; color: string } {
-    if (!occupantName) return { name: '', color: '#ffffff' };
+  function getSeatInfo(occupantName: string | null | undefined): {
+    name: string;
+    sub: string;
+    bg: string;
+    border: string;
+    text: string;
+  } {
+    if (!occupantName) {
+      return { name: '', sub: '', bg: '#121216', border: '#27272a', text: '#71717a' };
+    }
     const member = memberMap.get(occupantName);
-    if (!member) return { name: occupantName, color: '#fde047' };
-    if (member.type === 'Volunteer') return { name: occupantName, color: '#bbf7d0' };
-    if (member.type === 'Paddler') return { name: occupantName, color: '#bae6fd' };
-    return { name: occupantName, color: '#fde047' };
+    if (!member) {
+      return { name: occupantName, sub: '', bg: '#1f1405', border: '#f59e0b', text: '#fef3c7' };
+    }
+    const sub = `${member.weight || 0}kg · ${member.side?.substring(0, 1) || 'A'}`;
+    if (member.type === 'Volunteer') {
+      return { name: occupantName, sub, bg: '#062219', border: '#10b981', text: '#d1fae5' };
+    }
+    if (member.type === 'Paddler') {
+      return { name: occupantName, sub, bg: '#081c2e', border: '#38bdf8', text: '#e0f2fe' };
+    }
+    return { name: occupantName, sub, bg: '#1f1405', border: '#f59e0b', text: '#fef3c7' };
   }
 
   // Row Coach / Drum
-  ctx.fillStyle = '#eff6ff';
-  ctx.fillRect(5, currY, col1W, rowHeight);
-  ctx.fillStyle = '#6b7280';
+  ctx.fillStyle = '#121216';
+  ctx.fillRect(6, currY, col1W, rowHeight);
+  ctx.fillStyle = '#a1a1aa';
   ctx.font = 'bold 9px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('Coach', 5 + col1W / 2, currY + 10);
-  ctx.fillText('Drum', 5 + col1W / 2, currY + 22);
+  ctx.fillText('COACH', 6 + col1W / 2, currY + 13);
+  ctx.fillText('DRUM', 6 + col1W / 2, currY + 24);
 
   const drummerSeat = boat.seats.find((s) => s.role === 'drummer');
   const drummerInfo = getSeatInfo(drummerSeat?.occupant);
-  drawBox(5 + col1W + gap, currY, seatW * 2 + gap, rowHeight, drummerInfo.name ? drummerInfo.color : '#fde047', drummerInfo.name);
+  drawBox(
+    6 + col1W + gap,
+    currY,
+    seatW * 2 + gap,
+    rowHeight,
+    drummerInfo.name ? drummerInfo.bg : '#1f1405',
+    '#f59e0b',
+    drummerInfo.name ? drummerInfo.text : '#fcd34d',
+    drummerInfo.name || 'Unassigned',
+    drummerInfo.sub
+  );
 
   currY += rowHeight + gap;
 
   // Numbered rows
   for (let i = 1; i <= numRows; i++) {
-    ctx.fillStyle = '#6b7280';
-    ctx.font = 'bold 14px sans-serif';
+    ctx.fillStyle = '#121216';
+    ctx.fillRect(6, currY, col1W, rowHeight);
+    ctx.fillStyle = '#a1a1aa';
+    ctx.font = 'bold 12px monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(String(i), 5 + col1W / 2, currY + rowHeight / 2);
+    ctx.fillText(String(i), 6 + col1W / 2, currY + rowHeight / 2);
 
     const leftSeat = boat.seats.find((s) => s.row === i && s.side === 'Left');
     const rightSeat = boat.seats.find((s) => s.row === i && s.side === 'Right');
@@ -107,21 +152,75 @@ export function generateBoatCanvasDataUrl(
     const leftInfo = getSeatInfo(leftSeat?.occupant);
     const rightInfo = getSeatInfo(rightSeat?.occupant);
 
-    drawBox(5 + col1W + gap, currY, seatW, rowHeight, leftInfo.color, leftInfo.name);
-    drawBox(5 + col1W + gap + seatW + gap, currY, seatW, rowHeight, rightInfo.color, rightInfo.name);
+    drawBox(
+      6 + col1W + gap,
+      currY,
+      seatW,
+      rowHeight,
+      leftInfo.bg,
+      leftInfo.border,
+      leftInfo.text,
+      leftInfo.name,
+      leftInfo.sub
+    );
+    drawBox(
+      6 + col1W + gap + seatW + gap,
+      currY,
+      seatW,
+      rowHeight,
+      rightInfo.bg,
+      rightInfo.border,
+      rightInfo.text,
+      rightInfo.name,
+      rightInfo.sub
+    );
 
     currY += rowHeight + gap;
   }
 
   // Steer row
-  ctx.fillStyle = '#6b7280';
-  ctx.font = 'bold 10px sans-serif';
+  ctx.fillStyle = '#121216';
+  ctx.fillRect(6, currY, col1W, rowHeight);
+  ctx.fillStyle = '#a1a1aa';
+  ctx.font = 'bold 9px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('Steer', 5 + col1W / 2, currY + rowHeight / 2);
+  ctx.fillText('STEER', 6 + col1W / 2, currY + rowHeight / 2);
 
   const helmSeat = boat.seats.find((s) => s.role === 'helm');
   const helmInfo = getSeatInfo(helmSeat?.occupant);
-  drawBox(5 + col1W + gap, currY, seatW * 2 + gap, rowHeight, helmInfo.name ? helmInfo.color : '#fde047', helmInfo.name);
+  drawBox(
+    6 + col1W + gap,
+    currY,
+    seatW * 2 + gap,
+    rowHeight,
+    helmInfo.name ? helmInfo.bg : '#1f1405',
+    '#f59e0b',
+    helmInfo.name ? helmInfo.text : '#fcd34d',
+    helmInfo.name || 'Unassigned',
+    helmInfo.sub
+  );
 
-  return canvas.toDataURL('image/jpeg', 1.0);
+  currY += rowHeight + gap + 4;
+
+  // Weight Balance Footer
+  const weights = calculateBoatWeight(boat, memberMap);
+  const lWt = Math.round(weights.left * 10) / 10;
+  const rWt = Math.round(weights.right * 10) / 10;
+  const diff = Math.round((lWt - rWt) * 10) / 10;
+  const balText = diff === 0 ? 'BALANCED' : diff > 0 ? `L +${diff}kg` : `R +${Math.abs(diff)}kg`;
+
+  ctx.fillStyle = '#18181b';
+  ctx.fillRect(6, currY, canvasWidth - 12, 24);
+  ctx.font = 'bold 10px monospace';
+  ctx.fillStyle = '#e4e4e7';
+  ctx.textAlign = 'left';
+  ctx.fillText(`PORT (L): ${lWt}kg`, 14, currY + 12);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = Math.abs(diff) > 10 ? '#f87171' : '#34d399';
+  ctx.fillText(balText, canvasWidth / 2, currY + 12);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#e4e4e7';
+  ctx.fillText(`STBD (R): ${rWt}kg`, canvasWidth - 14, currY + 12);
+
+  return canvas.toDataURL('image/jpeg', 0.96);
 }

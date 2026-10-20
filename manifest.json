@@ -3,8 +3,8 @@
   "short_name": "DD Planner",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#f3f4f6",
-  "theme_color": "#1e3a8a",
+  "background_color": "#000000",
+  "theme_color": "#09090b",
   "icons": [
     {
       "src": "icon-192.png",
