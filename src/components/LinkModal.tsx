@@ -1,5 +1,6 @@
 import React from 'react';
-import { CheckCircle2, Download, ExternalLink, X } from 'lucide-react';
+import { CheckCircle2, Download, ExternalLink, Share2, X } from 'lucide-react';
+import { dataUrlToImageFile } from '../utils/canvas';
 
 interface LinkModalProps {
   isOpen: boolean;
@@ -19,6 +20,21 @@ export const LinkModal: React.FC<LinkModalProps> = ({
   if (!isOpen) return null;
 
   const isDataUrl = driveUrl.startsWith('data:');
+  const canNativeShare =
+    typeof navigator !== 'undefined' && typeof navigator.share === 'function' && Boolean(dataUrl);
+
+  const handleNativeShare = async () => {
+    if (!dataUrl || typeof navigator === 'undefined' || !navigator.share) return;
+    try {
+      const file = dataUrlToImageFile(dataUrl, filename);
+      if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: filename.replace(/\.jpg$/i, ''),
+        });
+      }
+    } catch {}
+  };
 
   return (
     <div
@@ -33,7 +49,7 @@ export const LinkModal: React.FC<LinkModalProps> = ({
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-5 h-5 text-emerald-500" />
             <h3 className="font-display font-extrabold text-base sm:text-lg text-zinc-950 dark:text-white">
-              Boat Lineup Exported
+              Share Boat Lineup
             </h3>
           </div>
           <button
@@ -56,23 +72,16 @@ export const LinkModal: React.FC<LinkModalProps> = ({
           </div>
         )}
 
-        <p className="text-xs sm:text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-4 leading-relaxed">
-          {isDataUrl
-            ? 'Your high-resolution boat lineup image is ready to download.'
-            : 'The boat lineup image has been uploaded to Google Drive and is ready to share.'}
-        </p>
-
         <div className="flex flex-col gap-2">
-          {!isDataUrl && (
-            <a
-              href={driveUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-center gap-2 w-full bg-sky-600 hover:bg-sky-500 text-white py-2.5 px-4 rounded-lg font-bold text-xs sm:text-sm transition-colors no-underline"
+          {canNativeShare && (
+            <button
+              type="button"
+              onClick={handleNativeShare}
+              className="flex items-center justify-center gap-2 w-full bg-sky-600 hover:bg-sky-500 text-white py-2.5 px-4 rounded-lg font-bold text-xs sm:text-sm transition-colors cursor-pointer"
             >
-              <ExternalLink className="w-4 h-4" />
-              <span>Open in Google Drive</span>
-            </a>
+              <Share2 className="w-4 h-4" />
+              <span>Share to Other Apps</span>
+            </button>
           )}
 
           {(dataUrl || isDataUrl) && (
@@ -83,6 +92,18 @@ export const LinkModal: React.FC<LinkModalProps> = ({
             >
               <Download className="w-4 h-4" />
               <span>Download Image ({filename})</span>
+            </a>
+          )}
+
+          {!isDataUrl && (
+            <a
+              href={driveUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-center gap-2 w-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-950 dark:text-white py-2.5 px-4 rounded-lg font-bold text-xs sm:text-sm transition-colors no-underline"
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span>Open in Google Drive</span>
             </a>
           )}
 

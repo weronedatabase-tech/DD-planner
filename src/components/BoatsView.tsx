@@ -717,10 +717,10 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                           type="button"
                           onClick={() => onSaveBoatCanvas(boat.id)}
                           className="text-sky-700 dark:text-sky-300 border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
-                          title="Export Lineup Image"
+                          title="Share Lineup Image"
                         >
                           <Share2 className="w-3.5 h-3.5" />
-                          <span className="hidden sm:inline">Export</span>
+                          <span className="hidden sm:inline">Share</span>
                         </button>
                         <button
                           type="button"

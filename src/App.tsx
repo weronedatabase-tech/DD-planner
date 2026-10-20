@@ -30,7 +30,7 @@ import { LinkModal } from './components/LinkModal';
 import { ConfirmModal } from './components/ConfirmModal';
 import { LoadingOverlay } from './components/LoadingOverlay';
 import { runAutoBalanceBoats } from './utils/balancer';
-import { generateBoatCanvasDataUrl } from './utils/canvas';
+import { generateBoatCanvasDataUrl, dataUrlToImageFile } from './utils/canvas';
 import { formatDisplayDate } from './utils/date';
 import {
   RefreshCw,
@@ -825,7 +825,7 @@ export const App: React.FC = () => {
     handleReturnToPool(boatId, seat);
   };
 
-  // Export boat canvas
+  // Share / Export boat canvas
   const handleSaveBoatCanvas = async (boatId: string) => {
     const boat = boats.find((b) => b.id === boatId);
     if (!boat) return;
@@ -833,31 +833,56 @@ export const App: React.FC = () => {
     const boatIndex = boats.findIndex((b) => b.id === boatId);
     const boatTitle = `Boat ${boatIndex + 1} (${boat.type})`;
     const displayDate = formatDisplayDate(currentSessionDate);
+    const filename = `${currentSessionDate || 'boat'}_${boatTitle.replace(/\s+/g, '_')}.jpg`;
 
-    setIsLoading(true);
-    setLoadingText('Generating High-Res Boat Lineup...');
     try {
+      // Generate image and File synchronously to preserve browser user-gesture activation for navigator.share
       const dataUrl = generateBoatCanvasDataUrl(boat, boatTitle, displayDate, memberMap);
-      const filename = `${currentSessionDate || 'boat'}_${boatTitle.replace(/\s+/g, '_')}.jpg`;
+      const imageFile = dataUrlToImageFile(dataUrl, filename);
       setExportedDataUrl(dataUrl);
       setExportedFilename(filename);
 
-      const result = await apiCall<{ id: string }>('saveBoatImageToDrive', {
+      // Save copy to Google Drive in the background (non-blocking)
+      apiCall<{ id: string }>('saveBoatImageToDrive', {
         base64Data: dataUrl,
         filename,
-      });
+      })
+        .then((result) => {
+          if (result?.id && !result.id.startsWith('local_preview')) {
+            setDriveUrl(`https://drive.google.com/uc?export=view&id=${result.id}`);
+          } else {
+            setDriveUrl(dataUrl);
+          }
+        })
+        .catch(() => {
+          setDriveUrl(dataUrl);
+        });
 
-      if (result.id && !result.id.startsWith('local_preview')) {
-        setDriveUrl(`https://drive.google.com/uc?export=view&id=${result.id}`);
-      } else {
-        setDriveUrl(dataUrl);
+      // Directly open device's native "Share to other apps" sheet if supported
+      if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+        try {
+          const shareData: ShareData = {
+            files: [imageFile],
+            title: `${boatTitle}${displayDate ? ` — ${displayDate}` : ''}`,
+          };
+          if (!navigator.canShare || navigator.canShare({ files: [imageFile] })) {
+            await navigator.share(shareData);
+            return;
+          }
+        } catch (shareErr: any) {
+          if (shareErr?.name === 'AbortError') {
+            // User dismissed the native share sheet
+            return;
+          }
+        }
       }
+
+      // Fallback modal if browser/device does not support native file sharing
+      setDriveUrl(dataUrl);
       setIsLinkModalOpen(true);
     } catch (err: any) {
-      console.error('Error generating boat image:', err);
-      showToast('Failed to export boat image');
-    } finally {
-      setIsLoading(false);
+      console.error('Error sharing boat image:', err);
+      showToast('Failed to generate boat image');
     }
   };
 
