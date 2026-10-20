@@ -837,7 +837,13 @@ export const App: React.FC = () => {
 
     try {
       // Generate image and File synchronously to preserve browser user-gesture activation for navigator.share
-      const dataUrl = generateBoatCanvasDataUrl(boat, boatTitle, displayDate, memberMap);
+      const dataUrl = generateBoatCanvasDataUrl(
+        boat,
+        boatTitle,
+        displayDate,
+        memberMap,
+        isDarkMode
+      );
       const imageFile = dataUrlToImageFile(dataUrl, filename);
       setExportedDataUrl(dataUrl);
       setExportedFilename(filename);

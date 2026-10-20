@@ -17,7 +17,10 @@ export function generateBoatCanvasDataUrl(
   boat: Boat,
   boatTitle: string,
   displayDate: string,
-  memberMap: Map<string, Member>
+  memberMap: Map<string, Member>,
+  isDarkMode: boolean = typeof document !== 'undefined'
+    ? document.documentElement.classList.contains('dark')
+    : true
 ): string {
   const scale = 3;
   const canvasWidth = 300;
@@ -37,22 +40,76 @@ export function generateBoatCanvasDataUrl(
 
   ctx.scale(scale, scale);
 
+  const palette = isDarkMode
+    ? {
+        canvasBg: '#09090b',
+        headerBg: '#18181b',
+        headerBorder: '#27272a',
+        titleText: '#fafafa',
+        dateText: '#d4d4d8',
+        rowLabelBg: '#121216',
+        rowLabelBorder: '#27272a',
+        rowLabelText: '#d4d4d8',
+        emptyBg: '#121216',
+        emptyBorder: '#27272a',
+        emptyText: '#71717a',
+        paddlerBg: '#0a2540',
+        paddlerBorder: '#38bdf8',
+        paddlerText: '#f0f9ff',
+        volunteerBg: '#062e22',
+        volunteerBorder: '#34d399',
+        volunteerText: '#ecfdf5',
+        helmBg: '#2e1c05',
+        helmBorder: '#f59e0b',
+        helmText: '#fffbeb',
+        helmUnassignedText: '#fcd34d',
+      }
+    : {
+        canvasBg: '#ffffff',
+        headerBg: '#f4f4f5',
+        headerBorder: '#e4e4e7',
+        titleText: '#09090b',
+        dateText: '#3f3f46',
+        rowLabelBg: '#f4f4f5',
+        rowLabelBorder: '#e4e4e7',
+        rowLabelText: '#18181b',
+        emptyBg: '#f8fafc',
+        emptyBorder: '#cbd5e1',
+        emptyText: '#64748b',
+        paddlerBg: '#e0f2fe',
+        paddlerBorder: '#38bdf8',
+        paddlerText: '#082f49',
+        volunteerBg: '#d1fae5',
+        volunteerBorder: '#34d399',
+        volunteerText: '#022c22',
+        helmBg: '#fef3c7',
+        helmBorder: '#f59e0b',
+        helmText: '#451a03',
+        helmUnassignedText: '#92400e',
+      };
+
   // Background
-  ctx.fillStyle = '#09090b';
+  ctx.fillStyle = palette.canvasBg;
   ctx.fillRect(0, 0, canvasWidth, totalHeight);
 
   // Header
-  ctx.fillStyle = '#18181b';
+  ctx.fillStyle = palette.headerBg;
   ctx.fillRect(0, 0, canvasWidth, 42);
+  ctx.strokeStyle = palette.headerBorder;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, 42.5);
+  ctx.lineTo(canvasWidth, 42.5);
+  ctx.stroke();
 
-  ctx.fillStyle = '#fafafa';
+  ctx.fillStyle = palette.titleText;
   ctx.font = 'bold 14px sans-serif';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillText(boatTitle, 10, 21);
 
   ctx.font = '600 11px monospace';
-  ctx.fillStyle = '#d4d4d8';
+  ctx.fillStyle = palette.dateText;
   ctx.textAlign = 'right';
   ctx.fillText(displayDate, canvasWidth - 10, 21);
 
@@ -98,29 +155,68 @@ export function generateBoatCanvasDataUrl(
     text: string;
   } {
     if (!occupantName) {
-      return { name: '', bg: '#121216', border: '#27272a', text: '#71717a' };
+      return {
+        name: '',
+        bg: palette.emptyBg,
+        border: palette.emptyBorder,
+        text: palette.emptyText,
+      };
     }
     const member = memberMap.get(occupantName);
     if (!member) {
-      return { name: occupantName, bg: '#1f1405', border: '#f59e0b', text: '#fef3c7' };
+      return {
+        name: occupantName,
+        bg: palette.helmBg,
+        border: palette.helmBorder,
+        text: palette.helmText,
+      };
     }
     if (member.type === 'Volunteer') {
-      return { name: occupantName, bg: '#062219', border: '#10b981', text: '#ecfdf5' };
+      return {
+        name: occupantName,
+        bg: palette.volunteerBg,
+        border: palette.volunteerBorder,
+        text: palette.volunteerText,
+      };
     }
     if (member.type === 'Paddler') {
-      return { name: occupantName, bg: '#081c2e', border: '#38bdf8', text: '#f0f9ff' };
+      return {
+        name: occupantName,
+        bg: palette.paddlerBg,
+        border: palette.paddlerBorder,
+        text: palette.paddlerText,
+      };
     }
-    return { name: occupantName, bg: '#1f1405', border: '#f59e0b', text: '#fef3c7' };
+    return {
+      name: occupantName,
+      bg: palette.helmBg,
+      border: palette.helmBorder,
+      text: palette.helmText,
+    };
+  }
+
+  function drawRowLabelBox(y: number, line1: string, line2?: string) {
+    if (!ctx) return;
+    ctx.fillStyle = palette.rowLabelBg;
+    ctx.fillRect(6, y, col1W, rowHeight);
+    ctx.strokeStyle = palette.rowLabelBorder;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(6.5, y + 0.5, col1W - 1, rowHeight - 1);
+    ctx.fillStyle = palette.rowLabelText;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    if (line2) {
+      ctx.font = 'bold 9px sans-serif';
+      ctx.fillText(line1, 6 + col1W / 2, y + 13);
+      ctx.fillText(line2, 6 + col1W / 2, y + 24);
+    } else {
+      ctx.font = line1 === 'STEER' ? 'bold 9px sans-serif' : 'bold 12px monospace';
+      ctx.fillText(line1, 6 + col1W / 2, y + rowHeight / 2);
+    }
   }
 
   // Row Coach / Drum
-  ctx.fillStyle = '#121216';
-  ctx.fillRect(6, currY, col1W, rowHeight);
-  ctx.fillStyle = '#d4d4d8';
-  ctx.font = 'bold 9px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('COACH', 6 + col1W / 2, currY + 13);
-  ctx.fillText('DRUM', 6 + col1W / 2, currY + 24);
+  drawRowLabelBox(currY, 'COACH', 'DRUM');
 
   const drummerSeat = boat.seats.find((s) => s.role === 'drummer');
   const drummerInfo = getSeatInfo(drummerSeat?.occupant);
@@ -129,9 +225,9 @@ export function generateBoatCanvasDataUrl(
     currY,
     seatW * 2 + gap,
     rowHeight,
-    drummerInfo.name ? drummerInfo.bg : '#1f1405',
-    '#f59e0b',
-    drummerInfo.name ? drummerInfo.text : '#fcd34d',
+    drummerInfo.name ? drummerInfo.bg : palette.helmBg,
+    palette.helmBorder,
+    drummerInfo.name ? drummerInfo.text : palette.helmUnassignedText,
     drummerInfo.name || 'Unassigned'
   );
 
@@ -139,13 +235,7 @@ export function generateBoatCanvasDataUrl(
 
   // Numbered rows
   for (let i = 1; i <= numRows; i++) {
-    ctx.fillStyle = '#121216';
-    ctx.fillRect(6, currY, col1W, rowHeight);
-    ctx.fillStyle = '#d4d4d8';
-    ctx.font = 'bold 12px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(String(i), 6 + col1W / 2, currY + rowHeight / 2);
+    drawRowLabelBox(currY, String(i));
 
     const leftSeat = boat.seats.find((s) => s.row === i && s.side === 'Left');
     const rightSeat = boat.seats.find((s) => s.row === i && s.side === 'Right');
@@ -178,12 +268,7 @@ export function generateBoatCanvasDataUrl(
   }
 
   // Steer row
-  ctx.fillStyle = '#121216';
-  ctx.fillRect(6, currY, col1W, rowHeight);
-  ctx.fillStyle = '#d4d4d8';
-  ctx.font = 'bold 9px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('STEER', 6 + col1W / 2, currY + rowHeight / 2);
+  drawRowLabelBox(currY, 'STEER');
 
   const helmSeat = boat.seats.find((s) => s.role === 'helm');
   const helmInfo = getSeatInfo(helmSeat?.occupant);
@@ -192,9 +277,9 @@ export function generateBoatCanvasDataUrl(
     currY,
     seatW * 2 + gap,
     rowHeight,
-    helmInfo.name ? helmInfo.bg : '#1f1405',
-    '#f59e0b',
-    helmInfo.name ? helmInfo.text : '#fcd34d',
+    helmInfo.name ? helmInfo.bg : palette.helmBg,
+    palette.helmBorder,
+    helmInfo.name ? helmInfo.text : palette.helmUnassignedText,
     helmInfo.name || 'Unassigned'
   );
 

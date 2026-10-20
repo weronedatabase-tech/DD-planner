@@ -62,7 +62,7 @@ export const LinkModal: React.FC<LinkModalProps> = ({
         </div>
 
         {(dataUrl || isDataUrl) && (
-          <div className="mb-4 rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700 bg-black max-h-64 flex items-center justify-center">
+          <div className="mb-4 rounded-lg overflow-hidden border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-black max-h-64 flex items-center justify-center">
             <img
               src={dataUrl || driveUrl}
               alt="Boat Lineup Preview"
