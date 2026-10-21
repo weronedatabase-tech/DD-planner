@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dd-planner-23ae5826';
+const CACHE_NAME = 'dd-planner-840c4ea2';
 const STATIC_ASSETS = [
   './',
   './index.html',
