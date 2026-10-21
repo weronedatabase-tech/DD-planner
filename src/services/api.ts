@@ -202,6 +202,51 @@ async function fetchRosterFromSheetDirect(): Promise<Member[] | null> {
   return null;
 }
 
+export function normalizeBoatSeatsClient(b: any, idx: number, dateStr: string): Boat {
+  const type: 'standard' | 'small' = b?.type === 'small' ? 'small' : 'standard';
+  const numRows = type === 'standard' ? 10 : 5;
+  const canonicalSeats: Boat['seats'] = [{ role: 'drummer', occupant: null }];
+  for (let r = 1; r <= numRows; r++) {
+    canonicalSeats.push({ row: r, side: 'Left', occupant: null });
+    canonicalSeats.push({ row: r, side: 'Right', occupant: null });
+  }
+  canonicalSeats.push({ role: 'helm', occupant: null });
+
+  if (Array.isArray(b?.seats)) {
+    for (const savedSeat of b.seats) {
+      if (!savedSeat || !savedSeat.occupant) continue;
+      if (savedSeat.role) {
+        const match = canonicalSeats.find((s) => s.role === savedSeat.role);
+        if (match) match.occupant = String(savedSeat.occupant);
+      } else if (savedSeat.row !== undefined && savedSeat.side) {
+        const match = canonicalSeats.find(
+          (s) => Number(s.row) === Number(savedSeat.row) && s.side === savedSeat.side
+        );
+        if (match) match.occupant = String(savedSeat.occupant);
+      }
+    }
+  }
+
+  return {
+    id: b?.id || `boat-${dateStr || 'sess'}-${idx}`,
+    type,
+    seats: canonicalSeats,
+  };
+}
+
+const localMutationTimestamps: Record<string, number> = {};
+
+export function markLocalSessionMutation(dateStr: string | null | undefined) {
+  if (!dateStr) return;
+  localMutationTimestamps[dateStr] = Date.now();
+}
+
+export function wasRecentlyMutatedLocally(dateStr: string | null | undefined, windowMs = 25000): boolean {
+  if (!dateStr) return false;
+  const ts = localMutationTimestamps[dateStr] || 0;
+  return Date.now() - ts < windowMs;
+}
+
 async function fetchSessionsFromSheetDirect(): Promise<{
   list: SavedSessionSummary[];
   table: Record<string, SessionData>;
@@ -214,7 +259,7 @@ async function fetchSessionsFromSheetDirect(): Promise<{
 
   for (const r of rows) {
     const c = r?.c || [];
-    let rawDate = c[0]?.v ? String(c[0].v).trim().replace(/^'/, '') : '';
+    let rawDate = c[0]?.v ? String(c[0]?.v).trim().replace(/^'/, '') : '';
     if (!rawDate || rawDate.toLowerCase() === 'session date') continue;
     const displayDate = c[1]?.v ? String(c[1].v) : formatDisplayDate(rawDate);
     const updatedAt = c[2]?.v ? String(c[2].v) : '';
@@ -228,13 +273,20 @@ async function fetchSessionsFromSheetDirect(): Promise<{
       try {
         const parsed: SessionData = JSON.parse(jsonCell);
         const key = parsed.date || rawDate;
-        table[key] = {
-          ...parsed,
-          date: key,
-          version: Number(parsed.version) || version,
-          updatedAt: parsed.updatedAt || updatedAt,
-          updatedBy: parsed.updatedBy || updatedBy,
-        };
+        const existing = table[key];
+        // Do not overwrite local session cache if it was mutated locally recently
+        if (!existing || !wasRecentlyMutatedLocally(key, 60000)) {
+          table[key] = {
+            ...parsed,
+            date: key,
+            boats: Array.isArray(parsed.boats)
+              ? parsed.boats.map((b, idx) => normalizeBoatSeatsClient(b, idx, key))
+              : [],
+            version: Number(parsed.version) || version,
+            updatedAt: parsed.updatedAt || updatedAt,
+            updatedBy: parsed.updatedBy || updatedBy,
+          };
+        }
       } catch {}
     }
 
@@ -260,11 +312,9 @@ async function fetchSessionsFromSheetDirect(): Promise<{
 
 export function applyLocalDelta(session: SessionData, ops: SessionDeltaOp[], author: string): SessionData {
   let attendance = [...(session.attendance || []).map(String)];
-  let boats = (session.boats || []).map((b, idx) => ({
-    id: b.id || `boat-${idx}`,
-    type: b.type,
-    seats: (b.seats || []).map((s) => ({ ...s })),
-  }));
+  let boats = (session.boats || []).map((b, idx) =>
+    normalizeBoatSeatsClient(b, idx, session.date)
+  );
 
   for (const op of ops) {
     if (op.type === 'TOGGLE_ATTENDANCE') {
@@ -295,7 +345,7 @@ export function applyLocalDelta(session: SessionData, ops: SessionDeltaOp[], aut
       }
     } else if (op.type === 'ADD_BOAT') {
       if (!boats.some((b) => b.id === op.boat.id)) {
-        boats.push(op.boat);
+        boats.push(normalizeBoatSeatsClient(op.boat, boats.length, session.date));
       }
     } else if (op.type === 'REMOVE_BOAT') {
       boats = boats.filter((b, i) => (op.boatId && b.id ? b.id !== op.boatId : i !== op.boatIndex));
@@ -318,6 +368,7 @@ export function applyLocalDelta(session: SessionData, ops: SessionDeltaOp[], aut
         });
       });
 
+      let assigned = false;
       boats.forEach((b, bIdx) => {
         const isTarget = (targetBoatId && b.id === targetBoatId) || bIdx === targetBoatIndex;
         if (!isTarget) return;
@@ -328,12 +379,33 @@ export function applyLocalDelta(session: SessionData, ops: SessionDeltaOp[], aut
           if (isMatch) {
             const displaced = s.occupant;
             s.occupant = memberName;
+            assigned = true;
             if (displaced && swapWithOccupant && prevBoatIdx !== -1 && prevSeatIdx !== -1) {
               boats[prevBoatIdx].seats[prevSeatIdx].occupant = displaced;
             }
           }
         });
       });
+
+      if (!assigned && boats.length > 0) {
+        const fallbackBoat =
+          boats[typeof targetBoatIndex === 'number' && targetBoatIndex >= 0 ? targetBoatIndex : 0] ||
+          boats[0];
+        if (fallbackBoat) {
+          fallbackBoat.seats.forEach((s) => {
+            const isMatch = targetRole
+              ? s.role === targetRole
+              : Number(s.row) === Number(targetRow) && s.side === targetSide;
+            if (isMatch) {
+              const displaced = s.occupant;
+              s.occupant = memberName;
+              if (displaced && swapWithOccupant && prevBoatIdx !== -1 && prevSeatIdx !== -1) {
+                boats[prevBoatIdx].seats[prevSeatIdx].occupant = displaced;
+              }
+            }
+          });
+        }
+      }
     } else if (op.type === 'RETURN_TO_POOL') {
       boats.forEach((b) => {
         b.seats.forEach((s) => {
@@ -341,14 +413,12 @@ export function applyLocalDelta(session: SessionData, ops: SessionDeltaOp[], aut
         });
       });
     } else if (op.type === 'SET_BOATS') {
-      boats = op.boats;
+      boats = op.boats.map((b, idx) => normalizeBoatSeatsClient(b, idx, session.date));
     } else if (op.type === 'SET_FULL_STATE') {
       attendance = (op.state.attendance || []).map(String);
-      boats = (op.state.boats || []).map((b, i) => ({
-        id: b.id || `boat-${i}`,
-        type: b.type,
-        seats: b.seats.map((s) => ({ ...s })),
-      }));
+      boats = (op.state.boats || []).map((b, i) =>
+        normalizeBoatSeatsClient(b, i, session.date)
+      );
     }
   }
 
@@ -369,6 +439,93 @@ let localServerAvailable: boolean | null =
     : null;
 
 let activeForegroundCalls = 0;
+
+const clientGasSaveTimers: Record<string, ReturnType<typeof setTimeout>> = {};
+const pendingGasSaves: Record<string, SessionData> = {};
+
+function flushPendingGasSave(dateStr: string, useKeepalive = false) {
+  if (clientGasSaveTimers[dateStr]) {
+    clearTimeout(clientGasSaveTimers[dateStr]);
+    delete clientGasSaveTimers[dateStr];
+  }
+  const latest = pendingGasSaves[dateStr] || getLocalSessionsSheetTable()[dateStr];
+  if (!latest) return;
+  delete pendingGasSaves[dateStr];
+
+  const payload = JSON.stringify({
+    action: 'saveSessionToSheet',
+    data: {
+      dateStr,
+      jsonContent: JSON.stringify(latest),
+      updatedBy: latest.updatedBy || getClientIdentity().name,
+    },
+  });
+
+  if (useKeepalive) {
+    try {
+      fetch(API_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        body: payload,
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        keepalive: true,
+      }).catch(() => {});
+    } catch {}
+    return;
+  }
+
+  (async () => {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        if (attempt > 0) {
+          await new Promise((r) => setTimeout(r, 600 * attempt));
+        }
+        // Always read the very latest local snapshot in case newer edits happened before retry
+        const currentLatest = getLocalSessionsSheetTable()[dateStr] || latest;
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          body: JSON.stringify({
+            action: 'saveSessionToSheet',
+            data: {
+              dateStr,
+              jsonContent: JSON.stringify(currentLatest),
+              updatedBy: currentLatest.updatedBy || getClientIdentity().name,
+            },
+          }),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        });
+        const json = await res.json();
+        if (json?.status === 'success') {
+          markLocalSessionMutation(dateStr);
+          break;
+        }
+      } catch {
+        // Ignore background network hiccups; data is safely persisted in localStorage & retried on next save
+      }
+    }
+  })();
+}
+
+function scheduleClientBackgroundGasSave(dateStr: string, record: SessionData) {
+  pendingGasSaves[dateStr] = record;
+  if (clientGasSaveTimers[dateStr]) {
+    clearTimeout(clientGasSaveTimers[dateStr]);
+  }
+  clientGasSaveTimers[dateStr] = setTimeout(() => {
+    flushPendingGasSave(dateStr, false);
+  }, 300);
+}
+
+if (typeof window !== 'undefined') {
+  const flushAllOnUnload = () => {
+    Object.keys(pendingGasSaves).forEach((dateStr) => {
+      flushPendingGasSave(dateStr, true);
+    });
+  };
+  window.addEventListener('pagehide', flushAllOnUnload);
+  window.addEventListener('beforeunload', flushAllOnUnload);
+}
 
 export async function apiCall<T = any>(action: string, data: any = {}): Promise<T> {
   const isBackgroundSync = action === 'syncState';
@@ -408,7 +565,65 @@ export async function apiCall<T = any>(action: string, data: any = {}): Promise<
       }
     }
 
-    // 2. Fast-path for read operations on GitHub Pages / static hosting:
+    // 2. Instant Write Fast-Path on GitHub Pages / static hosting:
+    // Commit immediately to memory + localStorage (~1ms) so UI save is instant,
+    // and flush to Google Sheets via Google Apps Script asynchronously in the background.
+    if (action === 'saveSessionToSheet' || action === 'saveSessionToDrive') {
+      const { dateStr, jsonContent, updatedBy } = data;
+      const cleanDate = String(dateStr || '').replace('.json', '').trim();
+      const table = getLocalSessionsSheetTable();
+      const parsed = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
+      const prevVer = table[cleanDate]?.version || 0;
+      const rawBoats = Array.isArray(parsed?.boats) ? parsed.boats : [];
+      const record: SessionData = {
+        ...parsed,
+        date: cleanDate,
+        attendance: Array.isArray(parsed?.attendance) ? parsed.attendance.map(String) : [],
+        boats: rawBoats.map((b: any, i: number) => normalizeBoatSeatsClient(b, i, cleanDate)),
+        version: Math.max(prevVer + 1, (Number(parsed?.version) || 0) + 1),
+        updatedAt: new Date().toISOString(),
+        updatedBy: updatedBy || parsed?.updatedBy || getClientIdentity().name,
+      };
+      table[cleanDate] = record;
+      saveLocalSessionsSheetTable(table);
+      markLocalSessionMutation(cleanDate);
+      scheduleClientBackgroundGasSave(cleanDate, record);
+      return record as unknown as T;
+    }
+
+    if (action === 'applySessionDelta') {
+      const dateStr = String(data.date || '').trim();
+      const table = getLocalSessionsSheetTable();
+      const current: SessionData = data.fullState ||
+        table[dateStr] || {
+          date: dateStr,
+          attendance: [],
+          boats: [],
+          version: 0,
+        };
+      const ops: SessionDeltaOp[] = Array.isArray(data.ops) ? data.ops : [data.op];
+      const updated: SessionData = data.fullState
+        ? {
+            ...data.fullState,
+            date: dateStr,
+            boats: Array.isArray(data.fullState.boats)
+              ? data.fullState.boats.map((b: any, i: number) =>
+                  normalizeBoatSeatsClient(b, i, dateStr)
+                )
+              : [],
+            version: Math.max(table[dateStr]?.version || 0, Number(data.fullState.version) || 0) + 1,
+            updatedAt: new Date().toISOString(),
+            updatedBy: data.updatedBy || getClientIdentity().name,
+          }
+        : applyLocalDelta(current, ops, data.updatedBy || getClientIdentity().name);
+      table[dateStr] = updated;
+      saveLocalSessionsSheetTable(table);
+      markLocalSessionMutation(dateStr);
+      scheduleClientBackgroundGasSave(dateStr, updated);
+      return { session: updated, activeUsers: [] } as unknown as T;
+    }
+
+    // 3. Fast-path for read operations on GitHub Pages / static hosting:
     // Use direct Google Sheets gviz read in parallel or ahead of GAS to avoid GAS cold-start / rate-limiting
     if (action === 'listSessions') {
       const direct = await fetchSessionsFromSheetDirect();
@@ -440,7 +655,7 @@ export async function apiCall<T = any>(action: string, data: any = {}): Promise<
       }
     }
 
-    // 3. Call Google Apps Script Web App directly (with retry for transient GAS concurrency limits)
+    // 4. Call Google Apps Script Web App directly (with retry for transient GAS concurrency limits)
     const maxAttempts = isBackgroundSync ? 1 : 2;
     let lastError: any = null;
 
@@ -473,7 +688,7 @@ export async function apiCall<T = any>(action: string, data: any = {}): Promise<
       }
     }
 
-    // 4. Offline / Google Sheet fallback mirror
+    // 5. Offline / Google Sheet fallback mirror
     return await handleOfflineSheetFallback<T>(action, data, lastError);
   } finally {
     if (!isBackgroundSync) {
@@ -867,6 +1082,9 @@ export class CollaborationManager {
 
   public broadcastSessionSwitch(date: string, session: SessionData | null) {
     this.currentSessionDate = date;
+    if (session?.version) {
+      this.currentSessionVersion = Number(session.version);
+    }
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(
         JSON.stringify({
@@ -903,26 +1121,42 @@ export class CollaborationManager {
     }
   }
 
-  public async dispatchDelta(date: string, ops: SessionDeltaOp[]): Promise<SessionData | null> {
+  public async dispatchDelta(
+    date: string,
+    ops: SessionDeltaOp[],
+    fullState?: SessionData
+  ): Promise<SessionData | null> {
     if (!date || ops.length === 0) return null;
 
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(
-        JSON.stringify({
-          type: 'session:delta',
-          date,
-          ops,
-          clientId: this.identity.clientId,
-          updatedBy: this.identity.name,
-        })
-      );
-    }
+    markLocalSessionMutation(date);
+
+    // Update local session cache immediately so any local read has the latest state
+    try {
+      const table = getLocalSessionsSheetTable();
+      const base = fullState || table[date] || {
+        date,
+        attendance: [],
+        boats: [],
+        version: this.currentSessionVersion,
+      };
+      const optimistic = fullState
+        ? {
+            ...fullState,
+            version: Math.max(this.currentSessionVersion, Number(fullState.version) || 0) + 1,
+            updatedAt: new Date().toISOString(),
+            updatedBy: this.identity.name,
+          }
+        : applyLocalDelta(base, ops, this.identity.name);
+      table[date] = optimistic;
+      saveLocalSessionsSheetTable(table);
+    } catch {}
 
     const res = await apiCall<{ session: SessionData; activeUsers?: CollaboratorPresence[] }>(
       'applySessionDelta',
       {
         date,
         ops,
+        fullState,
         clientId: this.identity.clientId,
         clientName: this.identity.name,
         clientColor: this.identity.color,
@@ -933,6 +1167,7 @@ export class CollaborationManager {
     );
 
     if (res?.session) {
+      markLocalSessionMutation(date);
       this.currentSessionVersion = Math.max(
         this.currentSessionVersion,
         Number(res.session.version) || 0
@@ -955,6 +1190,7 @@ export class CollaborationManager {
     const poll = async () => {
       if (this.isDestroyed || this.isPolling || activeForegroundCalls > 0) return;
       if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+      if (wasRecentlyMutatedLocally(this.currentSessionDate, 10000)) return;
 
       this.isPolling = true;
       try {
@@ -984,7 +1220,11 @@ export class CollaborationManager {
             this.currentRosterVersion = res.rosterVersion;
             this.callbacks.onRosterUpdated(res.roster);
           }
-          if (res.session && Number(res.session.version) > this.currentSessionVersion) {
+          if (
+            res.session &&
+            !wasRecentlyMutatedLocally(this.currentSessionDate, 10000) &&
+            Number(res.session.version) > this.currentSessionVersion
+          ) {
             this.currentSessionVersion = Number(res.session.version);
             this.callbacks.onSessionUpdated(res.session, 'remote_sync');
           }

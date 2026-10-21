@@ -38,6 +38,8 @@ import {
   Users,
   Check,
   CloudUpload,
+  Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import logo192 from '../icon-192.png';
 import logo512 from '../icon-512.png';
@@ -113,13 +115,29 @@ export const App: React.FC = () => {
   const pendingOpsRef = useRef<SessionDeltaOp[]>([]);
   const isRestoringRef = useRef<boolean>(false);
   const isDraggingRef = useRef<boolean>(false);
+  const lastLocalEditTimeRef = useRef<number>(0);
   const collabRef = useRef<CollaborationManager | null>(null);
   const currentSessionDateRef = useRef<string | null>(null);
+  const sessionVersionRef = useRef<number>(1);
+  const attendanceRef = useRef<string[]>([]);
+  const boatsRef = useRef<Boat[]>([]);
   const rosterRef = useRef<Member[]>([]);
 
   useEffect(() => {
     currentSessionDateRef.current = currentSessionDate;
   }, [currentSessionDate]);
+
+  useEffect(() => {
+    sessionVersionRef.current = sessionVersion;
+  }, [sessionVersion]);
+
+  useEffect(() => {
+    attendanceRef.current = attendance;
+  }, [attendance]);
+
+  useEffect(() => {
+    boatsRef.current = boats;
+  }, [boats]);
 
   useEffect(() => {
     rosterRef.current = roster;
@@ -157,8 +175,11 @@ export const App: React.FC = () => {
   const restoreState = useCallback((data: SessionData) => {
     isRestoringRef.current = true;
     setCurrentSessionDate(data.date);
+    currentSessionDateRef.current = data.date;
     if (data.version) {
-      setSessionVersion(Number(data.version));
+      const ver = Number(data.version);
+      setSessionVersion(ver);
+      sessionVersionRef.current = ver;
     }
 
     const restoredBoats: Boat[] = (data.boats || []).map((b, idx) => {
@@ -195,6 +216,8 @@ export const App: React.FC = () => {
       restoredBoats,
       rosterRef.current
     );
+    attendanceRef.current = restoredAttendance;
+    boatsRef.current = restoredBoats;
     setAttendance(restoredAttendance);
     setBoats(restoredBoats);
     isRestoringRef.current = false;
@@ -244,8 +267,20 @@ export const App: React.FC = () => {
         const myId = manager.getIdentity().clientId;
         if (senderId === myId) {
           if (incomingSession.version) {
-            setSessionVersion(Number(incomingSession.version));
+            const ver = Number(incomingSession.version);
+            setSessionVersion(ver);
+            sessionVersionRef.current = ver;
           }
+          return;
+        }
+        // Ignore stale or self-echoed remote syncs right after a local edit
+        if (Date.now() - lastLocalEditTimeRef.current < 10000) {
+          return;
+        }
+        if (
+          incomingSession.version &&
+          Number(incomingSession.version) <= sessionVersionRef.current
+        ) {
           return;
         }
         // Only apply if for the currently active session
@@ -313,12 +348,12 @@ export const App: React.FC = () => {
   const memberMap = new Map<string, Member>();
   roster.forEach((m) => memberMap.set(m.name, m));
 
-  // Serialize current state
+  // Serialize current state from live refs so async callbacks always see the latest state
   const serializeState = useCallback((): SessionData => {
     return {
-      date: currentSessionDate || '',
-      attendance: attendance,
-      boats: boats.map((b) => ({
+      date: currentSessionDateRef.current || currentSessionDate || '',
+      attendance: attendanceRef.current,
+      boats: boatsRef.current.map((b) => ({
         id: b.id,
         type: b.type,
         seats: b.seats.map((s) => ({
@@ -328,9 +363,9 @@ export const App: React.FC = () => {
           occupant: s.occupant,
         })),
       })),
-      version: sessionVersion,
+      version: sessionVersionRef.current,
     };
-  }, [currentSessionDate, attendance, boats, sessionVersion]);
+  }, [currentSessionDate]);
 
   // Execute Full Save to Google Sheet ('Sessions' tab)
   const executeSave = useCallback(
@@ -338,6 +373,7 @@ export const App: React.FC = () => {
       const data = overrideData || serializeState();
       if (!data.date) return;
 
+      lastLocalEditTimeRef.current = Date.now();
       if (autosaveTimerRef.current) {
         clearTimeout(autosaveTimerRef.current);
         autosaveTimerRef.current = null;
@@ -348,13 +384,15 @@ export const App: React.FC = () => {
         const saved = await apiCall<SessionData>('saveSessionToSheet', {
           dateStr: data.date,
           jsonContent: JSON.stringify(data),
+          clientId: collabRef.current?.getIdentity().clientId,
         });
         if (saved?.version) {
-          setSessionVersion(Number(saved.version));
+          const ver = Number(saved.version);
+          setSessionVersion(ver);
+          sessionVersionRef.current = ver;
         }
         collabRef.current?.broadcastSessionUpdate(saved || data);
         setSaveStatus('saved');
-        loadSessionList();
         setTimeout(() => {
           setSaveStatus((prev) => (prev === 'saved' ? 'idle' : prev));
         }, 2000);
@@ -363,15 +401,16 @@ export const App: React.FC = () => {
         setSaveStatus('error');
       }
     },
-    [serializeState, loadSessionList]
+    [serializeState]
   );
 
   // Queue atomic collaborative delta operation for instant multi-user sync
   const queueDelta = useCallback(
     (op: SessionDeltaOp, fallbackFullState?: SessionData) => {
-      const targetDate = fallbackFullState?.date || currentSessionDate;
+      const targetDate = fallbackFullState?.date || currentSessionDateRef.current || currentSessionDate;
       if (!targetDate) return;
 
+      lastLocalEditTimeRef.current = Date.now();
       pendingOpsRef.current.push(op);
       setSaveStatus('waiting');
 
@@ -381,24 +420,31 @@ export const App: React.FC = () => {
         pendingOpsRef.current = [];
         if (opsToSend.length === 0) return;
 
+        lastLocalEditTimeRef.current = Date.now();
+        const latestFullState = fallbackFullState || serializeState();
         setSaveStatus('saving');
         try {
-          const updatedSession = await collabRef.current?.dispatchDelta(targetDate, opsToSend);
+          const updatedSession = await collabRef.current?.dispatchDelta(
+            targetDate,
+            opsToSend,
+            latestFullState
+          );
           if (updatedSession?.version) {
-            setSessionVersion(Number(updatedSession.version));
+            const ver = Number(updatedSession.version);
+            setSessionVersion(ver);
+            sessionVersionRef.current = ver;
           }
           setSaveStatus('saved');
-          loadSessionList();
           setTimeout(() => {
             setSaveStatus((prev) => (prev === 'saved' ? 'idle' : prev));
           }, 1800);
         } catch (err) {
           console.error('Delta sync failed, falling back to full save:', err);
-          await executeSave(fallbackFullState);
+          await executeSave(latestFullState);
         }
-      }, 180);
+      }, 40);
     },
-    [currentSessionDate, executeSave, loadSessionList]
+    [currentSessionDate, executeSave, serializeState]
   );
 
   // Push to Undo
@@ -648,7 +694,11 @@ export const App: React.FC = () => {
       seats: initialSeats,
     };
 
-    setBoats((prev) => [...prev, newBoat]);
+    setBoats((prev) => {
+      const next = [...prev, newBoat];
+      boatsRef.current = next;
+      return next;
+    });
     queueDelta({ type: 'ADD_BOAT', boat: newBoat });
   };
 
@@ -664,7 +714,11 @@ export const App: React.FC = () => {
       onConfirm: () => {
         setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
         pushUndo();
-        setBoats((prev) => prev.filter((b) => b.id !== boatId));
+        setBoats((prev) => {
+          const next = prev.filter((b) => b.id !== boatId);
+          boatsRef.current = next;
+          return next;
+        });
         queueDelta({ type: 'REMOVE_BOAT', boatId, boatIndex: boatIdx });
       },
     });
@@ -682,6 +736,7 @@ export const App: React.FC = () => {
           ),
         };
       });
+      boatsRef.current = next;
       queueDelta({ type: 'SET_BOATS', boats: next });
       return next;
     });
@@ -696,6 +751,7 @@ export const App: React.FC = () => {
       .filter((m): m is Member => !!m);
 
     const balancedBoats = runAutoBalanceBoats(boats, attendeeMembers, mode, memberMap);
+    boatsRef.current = balancedBoats;
     setBoats(balancedBoats);
     queueDelta({ type: 'SET_BOATS', boats: balancedBoats });
     showToast(
@@ -715,53 +771,52 @@ export const App: React.FC = () => {
     fromBoatId?: string | null
   ) => {
     pushUndo();
-    const targetBoatIndex = boats.findIndex((b) => b.id === targetBoatId);
+    const targetBoatIndex = boatsRef.current.findIndex((b) => b.id === targetBoatId);
     const shouldSwap = Boolean(fromBoatId);
 
-    setBoats((prevBoats) => {
-      const nextBoats = prevBoats.map((b) => ({
-        ...b,
-        seats: b.seats.map((s) => ({ ...s })),
-      }));
+    const nextBoats = boatsRef.current.map((b) => ({
+      ...b,
+      seats: b.seats.map((s) => ({ ...s })),
+    }));
 
-      // Find previous seat of memberName in case we swap
-      let prevBoatIdx = -1;
-      let prevSeatIdx = -1;
-      nextBoats.forEach((b, bIdx) => {
-        b.seats.forEach((s, sIdx) => {
-          if (s.occupant === memberName) {
-            prevBoatIdx = bIdx;
-            prevSeatIdx = sIdx;
-          }
-        });
+    // Find previous seat of memberName in case we swap
+    let prevBoatIdx = -1;
+    let prevSeatIdx = -1;
+    nextBoats.forEach((b, bIdx) => {
+      b.seats.forEach((s, sIdx) => {
+        if (s.occupant === memberName) {
+          prevBoatIdx = bIdx;
+          prevSeatIdx = sIdx;
+        }
       });
-
-      // Clear memberName from previous seat
-      nextBoats.forEach((b) => {
-        b.seats.forEach((s) => {
-          if (s.occupant === memberName) s.occupant = null;
-        });
-      });
-
-      // Assign to target seat (and swap if occupied and dragged from another seat)
-      nextBoats.forEach((b) => {
-        if (b.id !== targetBoatId) return;
-        b.seats.forEach((s) => {
-          const isTarget = targetRole
-            ? s.role === targetRole
-            : s.row === targetRow && s.side === targetSide;
-          if (isTarget) {
-            const displaced = s.occupant;
-            s.occupant = memberName;
-            if (displaced && shouldSwap && prevBoatIdx !== -1 && prevSeatIdx !== -1) {
-              nextBoats[prevBoatIdx].seats[prevSeatIdx].occupant = displaced;
-            }
-          }
-        });
-      });
-
-      return nextBoats;
     });
+
+    // Clear memberName from previous seat
+    nextBoats.forEach((b) => {
+      b.seats.forEach((s) => {
+        if (s.occupant === memberName) s.occupant = null;
+      });
+    });
+
+    // Assign to target seat (and swap if occupied and dragged from another seat)
+    nextBoats.forEach((b) => {
+      if (b.id !== targetBoatId) return;
+      b.seats.forEach((s) => {
+        const isTarget = targetRole
+          ? s.role === targetRole
+          : Number(s.row) === Number(targetRow) && s.side === targetSide;
+        if (isTarget) {
+          const displaced = s.occupant;
+          s.occupant = memberName;
+          if (displaced && shouldSwap && prevBoatIdx !== -1 && prevSeatIdx !== -1) {
+            nextBoats[prevBoatIdx].seats[prevSeatIdx].occupant = displaced;
+          }
+        }
+      });
+    });
+
+    boatsRef.current = nextBoats;
+    setBoats(nextBoats);
 
     queueDelta({
       type: 'ASSIGN_SEAT',
@@ -777,12 +832,12 @@ export const App: React.FC = () => {
 
   const handleDropMemberToPool = (memberName: string) => {
     pushUndo();
-    setBoats((prevBoats) =>
-      prevBoats.map((b) => ({
-        ...b,
-        seats: b.seats.map((s) => (s.occupant === memberName ? { ...s, occupant: null } : s)),
-      }))
-    );
+    const nextBoats = boatsRef.current.map((b) => ({
+      ...b,
+      seats: b.seats.map((s) => (s.occupant === memberName ? { ...s, occupant: null } : s)),
+    }));
+    boatsRef.current = nextBoats;
+    setBoats(nextBoats);
     queueDelta({ type: 'RETURN_TO_POOL', memberName });
   };
 
@@ -790,20 +845,20 @@ export const App: React.FC = () => {
     if (!seat.occupant) return;
     const occName = seat.occupant;
     pushUndo();
-    setBoats((prevBoats) =>
-      prevBoats.map((b) => {
-        if (b.id !== boatId) return b;
-        return {
-          ...b,
-          seats: b.seats.map((s) => {
-            const isMatch = s.role
-              ? s.role === seat.role
-              : s.row === seat.row && s.side === seat.side;
-            return isMatch ? { ...s, occupant: null } : s;
-          }),
-        };
-      })
-    );
+    const nextBoats = boatsRef.current.map((b) => {
+      if (b.id !== boatId) return b;
+      return {
+        ...b,
+        seats: b.seats.map((s) => {
+          const isMatch = s.role
+            ? s.role === seat.role
+            : Number(s.row) === Number(seat.row) && s.side === seat.side;
+          return isMatch ? { ...s, occupant: null } : s;
+        }),
+      };
+    });
+    boatsRef.current = nextBoats;
+    setBoats(nextBoats);
     queueDelta({ type: 'RETURN_TO_POOL', memberName: occName });
   };
 
@@ -1052,36 +1107,43 @@ export const App: React.FC = () => {
     switch (saveStatus) {
       case 'waiting':
         return {
-          text: 'Sync...',
+          title: 'Changes queued to sync...',
           className:
-            'bg-amber-500/15 text-amber-600 dark:text-amber-300 border-amber-500/30',
+            'bg-amber-500 hover:bg-amber-400 text-zinc-950 border-amber-300 ring-2 ring-amber-400/60 shadow-sm shadow-amber-500/30',
+          dotClassName: 'bg-white animate-ping',
           disabled: false,
         };
       case 'saving':
         return {
-          text: 'Save...',
-          className: 'bg-sky-500/15 text-sky-600 dark:text-sky-300 border-sky-500/30',
+          title: 'Saving to Google Sheet...',
+          className:
+            'bg-sky-500 text-white border-sky-300 ring-2 ring-sky-400/60 shadow-sm shadow-sky-500/30',
+          dotClassName: 'bg-white animate-ping',
           disabled: true,
         };
       case 'saved':
         return {
-          text: 'Saved',
+          title: 'Saved',
           className:
-            'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30',
+            'bg-emerald-500 hover:bg-emerald-400 text-white border-emerald-300 ring-2 ring-emerald-400/70 shadow-sm shadow-emerald-500/40 scale-105',
+          dotClassName: 'bg-white',
           disabled: false,
         };
       case 'error':
         return {
-          text: 'Retry',
-          className: 'bg-red-500/15 text-red-600 dark:text-red-300 border-red-500/30',
+          title: 'Save failed — tap to retry',
+          className:
+            'bg-red-600 hover:bg-red-500 text-white border-red-400 ring-2 ring-red-500/70 shadow-sm shadow-red-600/40 animate-bounce',
+          dotClassName: 'bg-red-200 animate-ping',
           disabled: false,
         };
       case 'idle':
       default:
         return {
-          text: 'Save',
+          title: 'Save Session',
           className:
-            'bg-zinc-900 text-white border-zinc-800 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:border-zinc-200 dark:hover:bg-white',
+            'bg-zinc-900 text-white border-zinc-700 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 dark:border-zinc-300 dark:hover:bg-white',
+          dotClassName: null,
           disabled: false,
         };
     }
@@ -1091,9 +1153,9 @@ export const App: React.FC = () => {
   const onlineCount = Math.max(1, activeUsers.length);
 
   return (
-    <div className="bg-zinc-50 dark:bg-black text-zinc-950 dark:text-zinc-50 select-none flex flex-col h-full w-full">
+    <div className="bg-zinc-50 dark:bg-black text-zinc-950 dark:text-zinc-50 select-none flex flex-col h-full w-full max-w-full overflow-x-hidden">
       {/* Main Top Bar (Strict 3-Zone Contract) */}
-      <header className="flex-none z-30 grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-4 px-2.5 sm:px-6 py-1.5 sm:py-2 bg-white dark:bg-black border-b border-zinc-200 dark:border-zinc-800">
+      <header className="flex-none z-30 grid grid-cols-[1fr_auto_1fr] items-center gap-1.5 sm:gap-4 px-2 sm:px-6 py-1.5 sm:py-2 bg-white dark:bg-black border-b border-zinc-200 dark:border-zinc-800 w-full max-w-full overflow-hidden">
         {/* Zone 1: Brand Logo */}
         <a
           href="#top"
@@ -1150,27 +1212,39 @@ export const App: React.FC = () => {
           </div>
         </nav>
 
-        {/* Zone 3: 1 Primary Action */}
+        {/* Zone 3: 1 Primary Action — Icon-only Save Button/Indicator */}
         <div className="justify-self-end flex items-center shrink-0">
           <button
             type="button"
             id="save-btn"
             disabled={saveBtnProps.disabled}
             onClick={() => executeSave()}
-            className={`justify-center text-xs sm:text-sm font-bold px-2.5 sm:px-3 py-1.5 rounded-lg border transition-colors cursor-pointer flex items-center gap-1 sm:gap-1.5 whitespace-nowrap shrink-0 ${saveBtnProps.className}`}
+            title={saveBtnProps.title}
+            aria-label={saveBtnProps.title}
+            className={`relative justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg border transition-all duration-200 cursor-pointer flex items-center shrink-0 ${saveBtnProps.className}`}
           >
             {saveStatus === 'saved' ? (
-              <Check className="w-3.5 h-3.5 shrink-0" />
+              <Check className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[3] shrink-0" />
+            ) : saveStatus === 'saving' ? (
+              <Loader2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.5] animate-spin shrink-0" />
+            ) : saveStatus === 'waiting' ? (
+              <RefreshCw className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.5] animate-spin shrink-0" />
+            ) : saveStatus === 'error' ? (
+              <AlertTriangle className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.5] shrink-0" />
             ) : (
-              <CloudUpload className="w-3.5 h-3.5 shrink-0" />
+              <CloudUpload className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.25] shrink-0" />
             )}
-            <span>{saveBtnProps.text}</span>
+            {saveBtnProps.dotClassName && (
+              <span
+                className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${saveBtnProps.dotClassName}`}
+              />
+            )}
           </button>
         </div>
       </header>
 
       {/* Secondary Workspace Toolbar (Legend, Live Count, Sheet Link, Theme Toggle) */}
-      <div className="flex-none bg-zinc-100 dark:bg-[#09090b] border-b border-zinc-200 dark:border-zinc-800 py-1.5 px-2.5 sm:px-6 z-20 flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between gap-2 sm:gap-3 text-xs sm:text-sm">
+      <div className="flex-none bg-zinc-100 dark:bg-[#09090b] border-b border-zinc-200 dark:border-zinc-800 py-1.5 px-2 sm:px-6 z-20 flex md:grid md:grid-cols-[1fr_auto_1fr] items-center justify-between gap-1.5 sm:gap-3 text-xs sm:text-sm w-full max-w-full overflow-hidden">
         {/* Left: Sheet Link & Live Count */}
         <div className="justify-self-start flex items-center gap-2 sm:gap-3 shrink-0">
           {sheetUrl !== '#' && (

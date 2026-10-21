@@ -726,7 +726,7 @@ function applySessionDelta(payload) {
     date: dateStr,
     attendance: attendance,
     boats: boats,
-    version: (Number(currentObj.version) || 0) + 1
+    version: Number(currentObj.version) || 0
   };
 
   if (payload.clientId) {

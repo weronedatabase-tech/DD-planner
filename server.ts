@@ -185,8 +185,60 @@ async function callGoogleAppsScript(action: string, data: any): Promise<any | nu
 }
 
 const PROD_SHEET_ID = '1JKHOx-53BbL3XfP1RqYQ7QLmb2vg1q_rlvnXda5ervw';
+const locallyModifiedSessions = new Map<string, number>();
+const sheetSyncTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
-async function syncSessionsFromSheetDirect(): Promise<boolean> {
+function scheduleBackgroundSheetSave(dateStr: string) {
+  const existingTimer = sheetSyncTimers.get(dateStr);
+  if (existingTimer) clearTimeout(existingTimer);
+
+  const timer = setTimeout(() => {
+    sheetSyncTimers.delete(dateStr);
+    const current = state.sessions[dateStr];
+    if (!current) return;
+    callGoogleAppsScript('saveSessionToSheet', {
+      dateStr,
+      jsonContent: JSON.stringify(current),
+      updatedBy: current.updatedBy || 'Collaborator',
+    }).catch(() => {});
+  }, 600);
+
+  sheetSyncTimers.set(dateStr, timer);
+}
+
+function normalizeBoatSeats(b: any, idx: number, dateStr: string): BoatData {
+  const type: 'standard' | 'small' = b?.type === 'small' ? 'small' : 'standard';
+  const numRows = type === 'standard' ? 10 : 5;
+  const canonicalSeats: SeatData[] = [{ role: 'drummer', occupant: null }];
+  for (let r = 1; r <= numRows; r++) {
+    canonicalSeats.push({ row: r, side: 'Left', occupant: null });
+    canonicalSeats.push({ row: r, side: 'Right', occupant: null });
+  }
+  canonicalSeats.push({ role: 'helm', occupant: null });
+
+  if (Array.isArray(b?.seats)) {
+    for (const savedSeat of b.seats) {
+      if (!savedSeat || !savedSeat.occupant) continue;
+      if (savedSeat.role) {
+        const match = canonicalSeats.find((s) => s.role === savedSeat.role);
+        if (match) match.occupant = String(savedSeat.occupant);
+      } else if (savedSeat.row !== undefined && savedSeat.side) {
+        const match = canonicalSeats.find(
+          (s) => Number(s.row) === Number(savedSeat.row) && s.side === savedSeat.side
+        );
+        if (match) match.occupant = String(savedSeat.occupant);
+      }
+    }
+  }
+
+  return {
+    id: b?.id || `boat-${dateStr || 'sess'}-${idx}`,
+    type,
+    seats: canonicalSeats,
+  };
+}
+
+async function syncSessionsFromSheetDirect(forceOverwrite = false): Promise<boolean> {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 8000);
@@ -218,12 +270,21 @@ async function syncSessionsFromSheetDirect(): Promise<boolean> {
           const existing = state.sessions[dKey];
           const isPlaceholder =
             existing && existing.attendance.length === 0 && existing.boats.length === 0;
-          if (!existing || isPlaceholder || (Number(sessObj.version) || 1) >= existing.version) {
+          const lastLocalMod = locallyModifiedSessions.get(dKey) || 0;
+          const recentlyModifiedLocally = Date.now() - lastLocalMod < 120000;
+
+          // Never overwrite an active/locally-modified session unless forceOverwrite is true
+          if (
+            !existing ||
+            isPlaceholder ||
+            (forceOverwrite && !recentlyModifiedLocally)
+          ) {
+            const rawBoats = Array.isArray(sessObj.boats) ? sessObj.boats : [];
             state.sessions[dKey] = {
               date: dKey,
               attendance: Array.isArray(sessObj.attendance) ? sessObj.attendance.map(String) : [],
-              boats: Array.isArray(sessObj.boats) ? sessObj.boats : [],
-              version: Number(sessObj.version) || version,
+              boats: rawBoats.map((b: any, i: number) => normalizeBoatSeats(b, i, dKey)),
+              version: Math.max(existing?.version || 0, Number(sessObj.version) || version),
               updatedAt: sessObj.updatedAt || updatedAt,
               updatedBy: sessObj.updatedBy || updatedBy,
             };
@@ -255,12 +316,23 @@ function getActiveCollaborators(): CollaboratorPresence[] {
   return list;
 }
 
-function applyDeltaToSession(session: SessionRecord, ops: any[], author: string): SessionRecord {
+function applyDeltaToSession(
+  session: SessionRecord,
+  ops: any[],
+  author: string,
+  clientFullState?: any
+): SessionRecord {
   let attendance = [...session.attendance];
-  let boats: BoatData[] = session.boats.map((b) => ({
-    ...b,
-    seats: b.seats.map((s) => ({ ...s })),
-  }));
+  let boats: BoatData[] = session.boats.map((b, idx) =>
+    normalizeBoatSeats(b, idx, session.date)
+  );
+
+  // If server session had no boats yet but client sent a full state with boats, seed boats before applying ops
+  if (boats.length === 0 && Array.isArray(clientFullState?.boats) && clientFullState.boats.length > 0) {
+    boats = clientFullState.boats.map((b: any, idx: number) =>
+      normalizeBoatSeats(b, idx, session.date)
+    );
+  }
 
   for (const op of ops) {
     if (!op || !op.type) continue;
@@ -294,7 +366,7 @@ function applyDeltaToSession(session: SessionRecord, ops: any[], author: string)
     } else if (op.type === 'ADD_BOAT') {
       const newBoat = op.boat as BoatData;
       if (newBoat && !boats.some((b) => b.id === newBoat.id)) {
-        boats.push(newBoat);
+        boats.push(normalizeBoatSeats(newBoat, boats.length, session.date));
       }
     } else if (op.type === 'REMOVE_BOAT') {
       boats = boats.filter((b, idx) => (op.boatId && b.id ? b.id !== op.boatId : idx !== op.boatIndex));
@@ -318,6 +390,7 @@ function applyDeltaToSession(session: SessionRecord, ops: any[], author: string)
         });
       });
 
+      let assigned = false;
       boats.forEach((b, bIdx) => {
         const isTarget = (targetBoatId && b.id === targetBoatId) || bIdx === targetBoatIndex;
         if (!isTarget) return;
@@ -328,12 +401,34 @@ function applyDeltaToSession(session: SessionRecord, ops: any[], author: string)
           if (match) {
             const displaced = s.occupant;
             s.occupant = memberName;
+            assigned = true;
             if (displaced && swapWithOccupant && prevBoatIdx !== -1 && prevSeatIdx !== -1) {
               boats[prevBoatIdx].seats[prevSeatIdx].occupant = displaced;
             }
           }
         });
       });
+
+      // Fallback if target boat ID differed on client: match by index or first boat
+      if (!assigned && boats.length > 0) {
+        const fallbackBoat =
+          boats[typeof targetBoatIndex === 'number' && targetBoatIndex >= 0 ? targetBoatIndex : 0] ||
+          boats[0];
+        if (fallbackBoat) {
+          fallbackBoat.seats.forEach((s) => {
+            const match = targetRole
+              ? s.role === targetRole
+              : Number(s.row) === Number(targetRow) && s.side === targetSide;
+            if (match) {
+              const displaced = s.occupant;
+              s.occupant = memberName;
+              if (displaced && swapWithOccupant && prevBoatIdx !== -1 && prevSeatIdx !== -1) {
+                boats[prevBoatIdx].seats[prevSeatIdx].occupant = displaced;
+              }
+            }
+          });
+        }
+      }
     } else if (op.type === 'RETURN_TO_POOL') {
       const targetName = op.memberName;
       boats.forEach((b) => {
@@ -343,12 +438,18 @@ function applyDeltaToSession(session: SessionRecord, ops: any[], author: string)
       });
     } else if (op.type === 'SET_BOATS') {
       if (Array.isArray(op.boats)) {
-        boats = op.boats;
+        boats = op.boats.map((b: any, idx: number) =>
+          normalizeBoatSeats(b, idx, session.date)
+        );
       }
     } else if (op.type === 'SET_FULL_STATE') {
       if (op.state) {
         if (Array.isArray(op.state.attendance)) attendance = op.state.attendance.map(String);
-        if (Array.isArray(op.state.boats)) boats = op.state.boats;
+        if (Array.isArray(op.state.boats)) {
+          boats = op.state.boats.map((b: any, idx: number) =>
+            normalizeBoatSeats(b, idx, session.date)
+          );
+        }
       }
     }
   }
@@ -448,9 +549,15 @@ async function startServer() {
             updatedBy: msg.updatedBy || 'Collaborator',
           };
           const ops = Array.isArray(msg.ops) ? msg.ops : [msg.op];
-          const updated = applyDeltaToSession(existing, ops, msg.updatedBy || 'Collaborator');
+          const updated = applyDeltaToSession(
+            existing,
+            ops,
+            msg.updatedBy || 'Collaborator',
+            msg.fullState
+          );
           state.sessions[dateStr] = updated;
           state.activeSessionDate = dateStr;
+          locallyModifiedSessions.set(dateStr, Date.now());
           persistState();
 
           // Broadcast to all connected clients (including sender for version confirmation)
@@ -461,14 +568,8 @@ async function startServer() {
             lastOpType: ops[0]?.type || 'UPDATE',
           });
 
-          // Sync to Google Sheet in background
-          callGoogleAppsScript('applySessionDelta', {
-            date: dateStr,
-            ops,
-            updatedBy: msg.updatedBy,
-            clientId: msg.clientId,
-            clientName: msg.updatedBy,
-          }).catch(() => {});
+          // Debounced sync to Google Sheet in background
+          scheduleBackgroundSheetSave(dateStr);
         } else if (msg.type === 'session:select') {
           const dateStr = String(msg.date || '');
           if (!dateStr) return;
@@ -603,7 +704,12 @@ async function startServer() {
       }
 
       if (action === 'listSessions') {
-        await syncSessionsFromSheetDirect();
+        if (Object.keys(state.sessions).length === 0) {
+          await syncSessionsFromSheetDirect(false);
+        } else {
+          // Non-blocking background check for any newly added dates in Sheet
+          syncSessionsFromSheetDirect(false).catch(() => {});
+        }
         const list = Object.values(state.sessions)
           .sort((a, b) => b.date.localeCompare(a.date))
           .map((s) => ({
@@ -634,15 +740,21 @@ async function startServer() {
           state.sessions[dateStr] &&
           (state.sessions[dateStr].attendance.length > 0 || state.sessions[dateStr].boats.length > 0)
         ) {
+          state.sessions[dateStr].boats = state.sessions[dateStr].boats.map((b, i) =>
+            normalizeBoatSeats(b, i, dateStr)
+          );
           state.activeSessionDate = dateStr;
           persistState();
           return res.json({ status: 'success', data: JSON.stringify(state.sessions[dateStr]) });
         }
-        await syncSessionsFromSheetDirect();
+        await syncSessionsFromSheetDirect(false);
         if (
           state.sessions[dateStr] &&
           (state.sessions[dateStr].attendance.length > 0 || state.sessions[dateStr].boats.length > 0)
         ) {
+          state.sessions[dateStr].boats = state.sessions[dateStr].boats.map((b, i) =>
+            normalizeBoatSeats(b, i, dateStr)
+          );
           state.activeSessionDate = dateStr;
           persistState();
           return res.json({ status: 'success', data: JSON.stringify(state.sessions[dateStr]) });
@@ -652,10 +764,11 @@ async function startServer() {
           try {
             const parsed = typeof remote === 'string' ? JSON.parse(remote) : remote;
             const dKey = parsed.date || dateStr;
+            const rawBoats = Array.isArray(parsed.boats) ? parsed.boats : [];
             state.sessions[dKey] = {
               date: dKey,
               attendance: Array.isArray(parsed.attendance) ? parsed.attendance.map(String) : [],
-              boats: Array.isArray(parsed.boats) ? parsed.boats : [],
+              boats: rawBoats.map((b: any, i: number) => normalizeBoatSeats(b, i, dKey)),
               version: Number(parsed.version) || 1,
               updatedAt: parsed.updatedAt || new Date().toISOString(),
               updatedBy: parsed.updatedBy || 'Google Sheet',
@@ -677,28 +790,27 @@ async function startServer() {
         const cleanDate = String(dateStr || '').replace('.json', '').trim();
         const parsed = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
         const prevVer = state.sessions[cleanDate]?.version || 0;
+        const rawBoats = Array.isArray(parsed.boats) ? parsed.boats : [];
         const nextRecord: SessionRecord = {
           date: cleanDate,
           attendance: Array.isArray(parsed.attendance) ? parsed.attendance.map(String) : [],
-          boats: Array.isArray(parsed.boats) ? parsed.boats : [],
+          boats: rawBoats.map((b: any, i: number) => normalizeBoatSeats(b, i, cleanDate)),
           version: Math.max(prevVer + 1, (Number(parsed.version) || 0) + 1),
           updatedAt: new Date().toISOString(),
           updatedBy: updatedBy || parsed.updatedBy || 'Collaborator',
         };
         state.sessions[cleanDate] = nextRecord;
         state.activeSessionDate = cleanDate;
+        locallyModifiedSessions.set(cleanDate, Date.now());
         persistState();
 
         broadcast({
           type: 'session:updated',
           session: nextRecord,
+          senderId: data.clientId,
         });
 
-        callGoogleAppsScript('saveSessionToSheet', {
-          dateStr: cleanDate,
-          jsonContent: JSON.stringify(nextRecord),
-          updatedBy: nextRecord.updatedBy,
-        }).catch(() => {});
+        scheduleBackgroundSheetSave(cleanDate);
 
         return res.json({ status: 'success', data: nextRecord });
       }
@@ -714,9 +826,15 @@ async function startServer() {
           updatedBy: data.updatedBy || 'Collaborator',
         };
         const ops = Array.isArray(data.ops) ? data.ops : [data.op];
-        const updated = applyDeltaToSession(existing, ops, data.updatedBy || data.clientName || 'Collaborator');
+        const updated = applyDeltaToSession(
+          existing,
+          ops,
+          data.updatedBy || data.clientName || 'Collaborator',
+          data.fullState
+        );
         state.sessions[dateStr] = updated;
         state.activeSessionDate = dateStr;
+        locallyModifiedSessions.set(dateStr, Date.now());
         persistState();
 
         broadcast({
@@ -726,7 +844,7 @@ async function startServer() {
           lastOpType: ops[0]?.type || 'UPDATE',
         });
 
-        callGoogleAppsScript('applySessionDelta', data).catch(() => {});
+        scheduleBackgroundSheetSave(dateStr);
 
         return res.json({
           status: 'success',

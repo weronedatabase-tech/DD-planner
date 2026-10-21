@@ -526,13 +526,16 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
   const displayDateStr = formatDisplayDate(currentSessionDate);
 
   return (
-    <div id="view-planning" className="h-full flex flex-col w-full max-w-[1440px] mx-auto">
-      {/* Top Action & Telemetry Bar — maximized horizontal space across 2 tight rows on mobile, 1 row on desktop */}
-      <div className="flex-none z-20 bg-white dark:bg-[#09090b] border-b border-zinc-200 dark:border-zinc-800 px-1.5 sm:px-2.5 py-1 flex flex-col xl:flex-row xl:items-center justify-between gap-1">
-        {/* Row 1: Pool & Total Metrics + Add Boat Controls */}
-        <div className="flex items-center justify-between gap-1 w-full xl:w-auto">
-          <div className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-[#14141b] border border-zinc-300 dark:border-zinc-700 text-[11px] sm:text-xs font-mono font-bold tabular-nums text-zinc-900 dark:text-zinc-100 shrink-0">
-            <div className="flex items-center gap-0.5 sm:gap-1">
+    <div
+      id="view-planning"
+      className="h-full flex flex-col w-full max-w-[1440px] mx-auto overflow-x-hidden"
+    >
+      {/* Top Action & Telemetry Bar — maximized horizontal space across 2 tight rows, strictly bounded within screen edges */}
+      <div className="flex-none z-20 bg-white dark:bg-[#09090b] border-b border-zinc-200 dark:border-zinc-800 px-1.5 sm:px-3 py-1 flex flex-col gap-1 w-full max-w-full overflow-hidden">
+        {/* Row 1: Pool & Total Metrics (stretches to fill row) + Compact Distinct Add Boat Controls */}
+        <div className="flex items-center justify-between gap-1 sm:gap-2 w-full min-w-0">
+          <div className="flex-1 min-w-0 flex items-center justify-around sm:justify-evenly gap-1 sm:gap-3 px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-md bg-zinc-100 dark:bg-[#14141b] border border-zinc-300 dark:border-zinc-700 text-[11px] sm:text-xs font-mono font-bold tabular-nums text-zinc-900 dark:text-zinc-100 overflow-hidden">
+            <div className="flex items-center gap-0.5 sm:gap-1.5 min-w-0 truncate">
               <span className="text-zinc-700 dark:text-zinc-200">Pool:</span>
               <span>
                 P:<b id="pool-paddlers" className="text-sky-700 dark:text-sky-300 ml-0.5">{poolPaddlersCount}</b>
@@ -541,8 +544,8 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                 V:<b id="pool-vols" className="text-emerald-700 dark:text-emerald-300 ml-0.5">{poolVolunteersCount}</b>
               </span>
             </div>
-            <span className="text-zinc-400 dark:text-zinc-600">|</span>
-            <div className="flex items-center gap-0.5 sm:gap-1">
+            <span className="text-zinc-400 dark:text-zinc-600 shrink-0">|</span>
+            <div className="flex items-center gap-0.5 sm:gap-1.5 min-w-0 truncate">
               <span className="text-zinc-700 dark:text-zinc-200">Total:</span>
               <span>
                 P:<b id="total-paddlers" className="text-sky-700 dark:text-sky-300 ml-0.5">{totalPaddlers}</b>
@@ -553,70 +556,72 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-1 flex-1 sm:flex-initial justify-end">
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => onAddBoat('standard')}
-              className="flex-1 sm:flex-initial justify-center bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-white text-white dark:text-zinc-950 px-2 sm:px-2.5 py-1 rounded-md text-[11px] sm:text-xs font-bold transition-colors cursor-pointer flex items-center gap-0.5 sm:gap-1 whitespace-nowrap shrink-0"
+              className="justify-center bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white border border-violet-400/60 shadow-2xs px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs font-extrabold transition-colors cursor-pointer flex items-center gap-0.5 whitespace-nowrap shrink-0"
+              title="Add Standard 20-Paddler Boat"
             >
-              <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-              <span>Standard (20)</span>
+              <Plus className="w-3 h-3 stroke-[2.5] shrink-0" />
+              <span>Std (20)</span>
             </button>
             <button
               type="button"
               onClick={() => onAddBoat('small')}
-              className="flex-1 sm:flex-initial justify-center bg-zinc-100 dark:bg-[#181820] hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-950 dark:text-white border border-zinc-300 dark:border-zinc-700 px-2 sm:px-2.5 py-1 rounded-md text-[11px] sm:text-xs font-bold transition-colors cursor-pointer flex items-center gap-0.5 sm:gap-1 whitespace-nowrap shrink-0"
+              className="justify-center bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white border border-orange-400/60 shadow-2xs px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[11px] sm:text-xs font-extrabold transition-colors cursor-pointer flex items-center gap-0.5 whitespace-nowrap shrink-0"
+              title="Add Small 10-Paddler Boat"
             >
-              <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+              <Plus className="w-3 h-3 stroke-[2.5] shrink-0" />
               <span>Small (10)</span>
             </button>
           </div>
         </div>
 
-        {/* Row 2: Undo/Redo + Auto-Balancing Controls */}
-        <div className="flex items-center justify-between gap-1 w-full xl:w-auto">
-          <div className="flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-[#14141b] p-0.5 shrink-0">
+        {/* Row 2: High-Visibility Undo/Redo + Auto-Balancing Controls */}
+        <div className="flex items-center justify-between gap-1 sm:gap-2 w-full min-w-0">
+          <div className="flex items-center gap-1 shrink-0">
             <button
               type="button"
               id="undo-btn"
               onClick={onUndo}
               disabled={!canUndo}
-              className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer ${
+              className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md border text-[11px] sm:text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer whitespace-nowrap ${
                 canUndo
-                  ? 'text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800'
-                  : 'opacity-40 pointer-events-none text-zinc-500 dark:text-zinc-400'
+                  ? 'bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-zinc-950 border-amber-500 shadow-xs ring-1 ring-amber-400/50'
+                  : 'bg-zinc-200/90 dark:bg-zinc-800/90 text-zinc-500 dark:text-zinc-400 border-zinc-300 dark:border-zinc-700 opacity-70 pointer-events-none'
               }`}
               title="Undo (Ctrl+Z)"
             >
-              <Undo2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Undo</span>
+              <Undo2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5] shrink-0" />
+              <span>Undo</span>
             </button>
             <button
               type="button"
               id="redo-btn"
               onClick={onRedo}
               disabled={!canRedo}
-              className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer ${
+              className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md border text-[11px] sm:text-xs font-extrabold flex items-center gap-1 transition-all cursor-pointer whitespace-nowrap ${
                 canRedo
-                  ? 'text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800'
-                  : 'opacity-40 pointer-events-none text-zinc-500 dark:text-zinc-400'
+                  ? 'bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-zinc-950 border-amber-500 shadow-xs ring-1 ring-amber-400/50'
+                  : 'bg-zinc-200/90 dark:bg-zinc-800/90 text-zinc-500 dark:text-zinc-400 border-zinc-300 dark:border-zinc-700 opacity-70 pointer-events-none'
               }`}
               title="Redo (Ctrl+Y)"
             >
-              <Redo2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Redo</span>
+              <Redo2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5] shrink-0" />
+              <span>Redo</span>
             </button>
           </div>
 
           <div className="flex items-center gap-1 flex-1 bg-zinc-100 dark:bg-[#14141b] px-1.5 sm:px-2 py-0.5 rounded-md border border-zinc-300 dark:border-zinc-700 min-w-0">
-            <span className="text-[11px] sm:text-xs font-bold text-zinc-800 dark:text-zinc-100 whitespace-nowrap shrink-0">
+            <span className="hidden sm:inline text-xs font-bold text-zinc-800 dark:text-zinc-100 whitespace-nowrap shrink-0">
               Auto-Balance:
             </span>
             <select
               id="balance-mode"
               value={balanceMode}
               onChange={(e) => setBalanceMode(e.target.value as BalanceMode)}
-              className="flex-1 min-w-0 text-[11px] sm:text-xs px-1.5 py-0.5 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-[#09090b] font-bold text-zinc-950 dark:text-white focus:outline-none focus:border-sky-500"
+              className="flex-1 min-w-0 text-[11px] sm:text-xs px-1 sm:px-1.5 py-0.5 border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-[#09090b] font-bold text-zinc-950 dark:text-white focus:outline-none focus:border-sky-500"
             >
               <option value="stability">Stability (L/R)</option>
               <option value="rocket">Rocket (Engine)</option>
@@ -635,7 +640,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
               disabled={boats.length === 0}
               className="bg-sky-600 hover:bg-sky-500 disabled:opacity-40 text-white px-2 sm:px-2.5 py-0.5 sm:py-1 rounded text-[11px] sm:text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
             >
-              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
               <span>Balance</span>
             </button>
           </div>
@@ -744,16 +749,16 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
                 <button
                   type="button"
                   onClick={() => onAddBoat('standard')}
-                  className="bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors cursor-pointer"
+                  className="bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white border border-violet-400/60 shadow-xs px-3 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold transition-colors cursor-pointer"
                 >
-                  + Standard Boat (20)
+                  + Std (20)
                 </button>
                 <button
                   type="button"
                   onClick={() => onAddBoat('small')}
-                  className="bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 text-zinc-950 dark:text-white px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors cursor-pointer"
+                  className="bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white border border-orange-400/60 shadow-xs px-3 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold transition-colors cursor-pointer"
                 >
-                  + Small Boat (10)
+                  + Small (10)
                 </button>
               </div>
             </div>
