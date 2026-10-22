@@ -225,21 +225,6 @@ export const SessionView: React.FC<SessionViewProps> = ({
                 >
                   Load
                 </button>
-                {onDeleteSession && (
-                  <button
-                    type="button"
-                    id="delete-selected-session-btn"
-                    onClick={() => {
-                      if (selectedLoadId) onDeleteSession(selectedLoadId);
-                    }}
-                    disabled={!selectedLoadId}
-                    title="Delete selected session"
-                    className="bg-red-600 hover:bg-red-500 active:bg-red-700 disabled:opacity-35 text-white px-2.5 sm:px-3 rounded-lg text-xs font-bold transition-colors h-full cursor-pointer inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0"
-                  >
-                    <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                    <span className="hidden sm:inline">Delete</span>
-                  </button>
-                )}
               </div>
             </div>
           )}
