@@ -609,27 +609,39 @@ export const App: React.FC = () => {
 
   // Session management: delete from Google Sheet
   const handleDeleteSession = (sessionId: string) => {
+    const cleanId = String(sessionId || '').replace('.json', '').trim();
+    if (!cleanId) return;
     setConfirmDialog({
       isOpen: true,
-      title: 'Delete Saved Session',
-      description: `Remove session ${formatDisplayDate(sessionId)} from the Google Sheet? This cannot be undone.`,
+      title: 'Delete Session',
+      description: `Are you sure you want to permanently delete session ${formatDisplayDate(cleanId)}? This action cannot be undone.`,
       confirmLabel: 'Delete Session',
       variant: 'danger',
       onConfirm: async () => {
         setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
         setIsLoading(true);
-        setLoadingText('Removing from Google Sheet...');
+        setLoadingText('Deleting session...');
         try {
-          await apiCall('deleteSession', sessionId);
-          if (currentSessionDate === sessionId) {
+          await apiCall('deleteSession', cleanId);
+          setSavedSessions((prev) =>
+            prev.filter((s) => (s.rawDate || s.id) !== cleanId && s.id !== cleanId)
+          );
+          if (currentSessionDate === cleanId || currentSessionDateRef.current === cleanId) {
+            currentSessionDateRef.current = null;
+            attendanceRef.current = [];
+            boatsRef.current = [];
             setCurrentSessionDate(null);
             setAttendance([]);
             setBoats([]);
+            setUndoStack([]);
+            setRedoStack([]);
+            setSessionVersion(0);
           }
           await loadSessionList();
-          showToast(`Deleted session ${formatDisplayDate(sessionId)}`);
+          showToast(`Deleted session ${formatDisplayDate(cleanId)}`);
         } catch (err) {
           console.error('Delete session error:', err);
+          showToast('Could not delete session');
         } finally {
           setIsLoading(false);
         }

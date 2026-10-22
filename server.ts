@@ -186,6 +186,7 @@ async function callGoogleAppsScript(action: string, data: any): Promise<any | nu
 
 const PROD_SHEET_ID = '1JKHOx-53BbL3XfP1RqYQ7QLmb2vg1q_rlvnXda5ervw';
 const locallyModifiedSessions = new Map<string, number>();
+const deletedSessions = new Map<string, number>();
 const sheetSyncTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
 function scheduleBackgroundSheetSave(dateStr: string) {
@@ -258,6 +259,7 @@ async function syncSessionsFromSheetDirect(forceOverwrite = false): Promise<bool
       const c = r?.c || [];
       const rawDate = c[0]?.v ? String(c[0].v).trim().replace(/^'/, '') : '';
       if (!rawDate || rawDate.toLowerCase() === 'session date') continue;
+      if (Date.now() - (deletedSessions.get(rawDate) || 0) < 120000) continue;
       const updatedAt = c[2]?.v ? String(c[2].v) : '';
       const version = Number(c[3]?.v) || 1;
       const updatedBy = c[4]?.v ? String(c[4].v) : 'Google Sheet';
@@ -267,6 +269,7 @@ async function syncSessionsFromSheetDirect(forceOverwrite = false): Promise<bool
         try {
           const sessObj = JSON.parse(jsonCell);
           const dKey = sessObj.date || rawDate;
+          if (Date.now() - (deletedSessions.get(dKey) || 0) < 120000) continue;
           const existing = state.sessions[dKey];
           const isPlaceholder =
             existing && existing.attendance.length === 0 && existing.boats.length === 0;
@@ -802,6 +805,7 @@ async function startServer() {
         state.sessions[cleanDate] = nextRecord;
         state.activeSessionDate = cleanDate;
         locallyModifiedSessions.set(cleanDate, Date.now());
+        deletedSessions.delete(cleanDate);
         persistState();
 
         broadcast({
@@ -835,6 +839,7 @@ async function startServer() {
         state.sessions[dateStr] = updated;
         state.activeSessionDate = dateStr;
         locallyModifiedSessions.set(dateStr, Date.now());
+        deletedSessions.delete(dateStr);
         persistState();
 
         broadcast({
@@ -857,6 +862,13 @@ async function startServer() {
 
       if (action === 'deleteSession') {
         const cleanDate = String(data || '').replace('.json', '').trim();
+        const pendingTimer = sheetSyncTimers.get(cleanDate);
+        if (pendingTimer) {
+          clearTimeout(pendingTimer);
+          sheetSyncTimers.delete(cleanDate);
+        }
+        deletedSessions.set(cleanDate, Date.now());
+        locallyModifiedSessions.delete(cleanDate);
         delete state.sessions[cleanDate];
         if (state.activeSessionDate === cleanDate) {
           const remaining = Object.keys(state.sessions).sort((a, b) => b.localeCompare(a));

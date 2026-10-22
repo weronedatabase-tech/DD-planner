@@ -235,15 +235,23 @@ export function normalizeBoatSeatsClient(b: any, idx: number, dateStr: string): 
 }
 
 const localMutationTimestamps: Record<string, number> = {};
+const deletedSessionTimestamps: Record<string, number> = {};
 
 export function markLocalSessionMutation(dateStr: string | null | undefined) {
   if (!dateStr) return;
   localMutationTimestamps[dateStr] = Date.now();
+  delete deletedSessionTimestamps[dateStr];
 }
 
 export function wasRecentlyMutatedLocally(dateStr: string | null | undefined, windowMs = 25000): boolean {
   if (!dateStr) return false;
   const ts = localMutationTimestamps[dateStr] || 0;
+  return Date.now() - ts < windowMs;
+}
+
+export function wasRecentlyDeletedLocally(dateStr: string | null | undefined, windowMs = 90000): boolean {
+  if (!dateStr) return false;
+  const ts = deletedSessionTimestamps[dateStr] || 0;
   return Date.now() - ts < windowMs;
 }
 
@@ -261,6 +269,11 @@ async function fetchSessionsFromSheetDirect(): Promise<{
     const c = r?.c || [];
     let rawDate = c[0]?.v ? String(c[0]?.v).trim().replace(/^'/, '') : '';
     if (!rawDate || rawDate.toLowerCase() === 'session date') continue;
+    if (wasRecentlyDeletedLocally(rawDate)) {
+      delete table[rawDate];
+      delete memorySessionsTable[rawDate];
+      continue;
+    }
     const displayDate = c[1]?.v ? String(c[1].v) : formatDisplayDate(rawDate);
     const updatedAt = c[2]?.v ? String(c[2].v) : '';
     const version = Number(c[3]?.v) || 1;
@@ -273,6 +286,11 @@ async function fetchSessionsFromSheetDirect(): Promise<{
       try {
         const parsed: SessionData = JSON.parse(jsonCell);
         const key = parsed.date || rawDate;
+        if (wasRecentlyDeletedLocally(key)) {
+          delete table[key];
+          delete memorySessionsTable[key];
+          continue;
+        }
         const existing = table[key];
         // Do not overwrite local session cache if it was mutated locally recently
         if (!existing || !wasRecentlyMutatedLocally(key, 60000)) {
@@ -303,6 +321,21 @@ async function fetchSessionsFromSheetDirect(): Promise<{
         boatsSummary,
       });
     }
+  }
+
+  // Include any locally created sessions that haven't appeared in the gviz cache yet
+  for (const [key, localSess] of Object.entries(table)) {
+    if (!key || seenIds.has(key) || wasRecentlyDeletedLocally(key)) continue;
+    seenIds.add(key);
+    list.push({
+      id: key,
+      name: formatDisplayDate(key) || key,
+      rawDate: key,
+      updatedAt: localSess.updatedAt || '',
+      version: localSess.version || 1,
+      updatedBy: localSess.updatedBy || '',
+      attendanceCount: (localSess.attendance || []).length,
+    });
   }
 
   saveLocalSessionsSheetTable(table);
@@ -623,11 +656,47 @@ export async function apiCall<T = any>(action: string, data: any = {}): Promise<
       return { session: updated, activeUsers: [] } as unknown as T;
     }
 
+    if (action === 'deleteSession') {
+      const cleanDate = String(data || '').replace('.json', '').trim();
+      if (clientGasSaveTimers[cleanDate]) {
+        clearTimeout(clientGasSaveTimers[cleanDate]);
+        delete clientGasSaveTimers[cleanDate];
+      }
+      delete pendingGasSaves[cleanDate];
+      deletedSessionTimestamps[cleanDate] = Date.now();
+      delete localMutationTimestamps[cleanDate];
+      const table = getLocalSessionsSheetTable();
+      delete table[cleanDate];
+      delete memorySessionsTable[cleanDate];
+      saveLocalSessionsSheetTable(table);
+      try {
+        localStorage.removeItem(`dd_session_${cleanDate}`);
+      } catch {}
+
+      (async () => {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            if (attempt > 0) await new Promise((r) => setTimeout(r, 800 * attempt));
+            const res = await fetch(API_URL, {
+              method: 'POST',
+              redirect: 'follow',
+              body: JSON.stringify({ action: 'deleteSession', data: cleanDate }),
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            });
+            const json = await res.json();
+            if (json.status === 'success') break;
+          } catch {}
+        }
+      })();
+
+      return { deleted: true, date: cleanDate } as unknown as T;
+    }
+
     // 3. Fast-path for read operations on GitHub Pages / static hosting:
     // Use direct Google Sheets gviz read in parallel or ahead of GAS to avoid GAS cold-start / rate-limiting
     if (action === 'listSessions') {
       const direct = await fetchSessionsFromSheetDirect();
-      if (direct && direct.list.length > 0) {
+      if (direct) {
         return direct.list as unknown as T;
       }
     }
@@ -701,6 +770,22 @@ function mirrorToLocalStorage(action: string, reqData: any, resData: any) {
   try {
     if (action === 'getRosterData' && Array.isArray(resData)) {
       localStorage.setItem('dd_roster_cache', JSON.stringify(resData));
+    } else if (action === 'deleteSession') {
+      const cleanDate = String(reqData || resData?.date || '').replace('.json', '').trim();
+      if (cleanDate) {
+        if (clientGasSaveTimers[cleanDate]) {
+          clearTimeout(clientGasSaveTimers[cleanDate]);
+          delete clientGasSaveTimers[cleanDate];
+        }
+        delete pendingGasSaves[cleanDate];
+        deletedSessionTimestamps[cleanDate] = Date.now();
+        delete localMutationTimestamps[cleanDate];
+        const table = getLocalSessionsSheetTable();
+        delete table[cleanDate];
+        delete memorySessionsTable[cleanDate];
+        saveLocalSessionsSheetTable(table);
+        localStorage.removeItem(`dd_session_${cleanDate}`);
+      }
     } else if (action === 'listSessions' && Array.isArray(resData)) {
       const table = getLocalSessionsSheetTable();
       let updated = false;
@@ -709,7 +794,7 @@ function mirrorToLocalStorage(action: string, reqData: any, resData: any) {
           try {
             const parsed = JSON.parse(item.sessionJson);
             const key = parsed.date || item.rawDate || item.id;
-            if (key) {
+            if (key && !wasRecentlyDeletedLocally(key)) {
               table[key] = parsed;
               updated = true;
             }

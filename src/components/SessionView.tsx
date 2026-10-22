@@ -1,7 +1,7 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Member, SessionSubTab, SavedSessionSummary } from '../types';
 import { formatDisplayDate } from '../utils/date';
-import { Calendar, FolderOpen, Search, ArrowRight } from 'lucide-react';
+import { Calendar, FolderOpen, Search, ArrowRight, Trash2 } from 'lucide-react';
 
 interface SessionViewProps {
   sessionSubTab: SessionSubTab;
@@ -29,6 +29,7 @@ export const SessionView: React.FC<SessionViewProps> = ({
   onToggleGroup,
   onCreateNewSession,
   onLoadSession,
+  onDeleteSession,
   onGoToBoats,
 }) => {
   const [pickedDate, setPickedDate] = useState<string>('');
@@ -36,6 +37,15 @@ export const SessionView: React.FC<SessionViewProps> = ({
   const [attendanceSearch, setAttendanceSearch] = useState<string>('');
   const [dateWarning, setDateWarning] = useState<string | null>(null);
   const dateInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (
+      selectedLoadId &&
+      !savedSessions.some((s) => s.id === selectedLoadId || s.rawDate === selectedLoadId)
+    ) {
+      setSelectedLoadId('');
+    }
+  }, [savedSessions, selectedLoadId]);
 
   const paddlers = useMemo(
     () =>
@@ -211,10 +221,25 @@ export const SessionView: React.FC<SessionViewProps> = ({
                   type="button"
                   onClick={handleLoad}
                   disabled={!selectedLoadId}
-                  className="bg-sky-600 hover:bg-sky-500 disabled:opacity-40 text-white px-3.5 sm:px-4 rounded-lg text-xs font-bold transition-colors h-full cursor-pointer whitespace-nowrap shrink-0"
+                  className="bg-sky-600 hover:bg-sky-500 disabled:opacity-40 text-white px-3 sm:px-4 rounded-lg text-xs font-bold transition-colors h-full cursor-pointer whitespace-nowrap shrink-0"
                 >
                   Load
                 </button>
+                {onDeleteSession && (
+                  <button
+                    type="button"
+                    id="delete-selected-session-btn"
+                    onClick={() => {
+                      if (selectedLoadId) onDeleteSession(selectedLoadId);
+                    }}
+                    disabled={!selectedLoadId}
+                    title="Delete selected session"
+                    className="bg-red-600 hover:bg-red-500 active:bg-red-700 disabled:opacity-35 text-white px-2.5 sm:px-3 rounded-lg text-xs font-bold transition-colors h-full cursor-pointer inline-flex items-center justify-center gap-1 whitespace-nowrap shrink-0"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                    <span className="hidden sm:inline">Delete</span>
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -250,15 +275,31 @@ export const SessionView: React.FC<SessionViewProps> = ({
               {currentSessionDate ? formatDisplayDate(currentSessionDate) : 'None selected'}
             </span>
           </div>
-          {currentSessionDate && onGoToBoats && (
-            <button
-              type="button"
-              onClick={onGoToBoats}
-              className="bg-sky-600 hover:bg-sky-500 active:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-400 text-white dark:text-zinc-950 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-lg text-xs font-extrabold shadow-sm ring-2 ring-sky-500/25 transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
-            >
-              <span>Plan Boats</span>
-              <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
-            </button>
+          {currentSessionDate && (
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              {onDeleteSession && (
+                <button
+                  type="button"
+                  id="delete-active-session-btn"
+                  onClick={() => onDeleteSession(currentSessionDate)}
+                  title="Delete active session"
+                  className="bg-red-50 hover:bg-red-100 active:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/70 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800/80 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-xs font-extrabold transition-colors cursor-pointer inline-flex items-center gap-1 whitespace-nowrap shrink-0"
+                >
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Delete</span>
+                </button>
+              )}
+              {onGoToBoats && (
+                <button
+                  type="button"
+                  onClick={onGoToBoats}
+                  className="bg-sky-600 hover:bg-sky-500 active:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-400 text-white dark:text-zinc-950 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-lg text-xs font-extrabold shadow-sm ring-2 ring-sky-500/25 transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
+                >
+                  <span>Plan Boats</span>
+                  <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
