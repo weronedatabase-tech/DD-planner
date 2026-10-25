@@ -268,10 +268,10 @@ export const SessionView: React.FC<SessionViewProps> = ({
                   id="delete-active-session-btn"
                   onClick={() => onDeleteSession(currentSessionDate)}
                   title="Delete active session"
-                  className="bg-red-50 hover:bg-red-100 active:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/70 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800/80 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-xs font-extrabold transition-colors cursor-pointer inline-flex items-center gap-1 whitespace-nowrap shrink-0"
+                  aria-label="Delete active session"
+                  className="bg-red-50 hover:bg-red-100 active:bg-red-200 dark:bg-red-950/60 dark:hover:bg-red-900/70 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800/80 p-1.5 sm:p-2 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center shrink-0"
                 >
-                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
-                  <span>Delete</span>
+                  <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                 </button>
               )}
               {onGoToBoats && (
