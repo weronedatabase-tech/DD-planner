@@ -13,6 +13,7 @@ import {
   RotateCcw,
   Search,
   X,
+  Link2,
 } from 'lucide-react';
 
 interface BoatsViewProps {
@@ -701,6 +702,7 @@ export const BoatsView: React.FC<BoatsViewProps> = ({
               linkedVolunteers.length > 0 ? (
                 <div key={paddler.name} className="pool-group">
                   <div className="pool-group-label">
+                    <Link2 className="w-3 h-3 shrink-0 stroke-[2.5]" />
                     <span>Linked</span>
                   </div>
                   {renderSeatNode(paddler, seatedNames.has(paddler.name))}

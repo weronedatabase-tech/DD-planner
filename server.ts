@@ -486,7 +486,7 @@ async function startServer() {
 
   // Initial background sync from Google Sheet on server startup
   (async () => {
-    await syncSessionsFromSheetDirect();
+    await syncSessionsFromSheetDirect(true);
     const remoteRoster = await callGoogleAppsScript('getRosterData', {});
     if (Array.isArray(remoteRoster) && remoteRoster.length > 0) {
       state.roster = remoteRoster;
@@ -707,12 +707,7 @@ async function startServer() {
       }
 
       if (action === 'listSessions') {
-        if (Object.keys(state.sessions).length === 0) {
-          await syncSessionsFromSheetDirect(false);
-        } else {
-          // Non-blocking background check for any newly added dates in Sheet
-          syncSessionsFromSheetDirect(false).catch(() => {});
-        }
+        await syncSessionsFromSheetDirect(true);
         const list = Object.values(state.sessions)
           .sort((a, b) => b.date.localeCompare(a.date))
           .map((s) => ({
@@ -731,6 +726,7 @@ async function startServer() {
 
       if (action === 'checkSessionExists') {
         const dateStr = String(data || '').replace('.json', '').trim();
+        await syncSessionsFromSheetDirect(true);
         const existsLocal = !!state.sessions[dateStr];
         if (existsLocal) return res.json({ status: 'success', data: true });
         const existsRemote = await callGoogleAppsScript('checkSessionExists', dateStr);
@@ -739,18 +735,10 @@ async function startServer() {
 
       if (action === 'loadSessionFile' || action === 'loadSession') {
         const dateStr = String(data || '').replace('.json', '').trim();
-        if (
-          state.sessions[dateStr] &&
-          (state.sessions[dateStr].attendance.length > 0 || state.sessions[dateStr].boats.length > 0)
-        ) {
-          state.sessions[dateStr].boats = state.sessions[dateStr].boats.map((b, i) =>
-            normalizeBoatSeats(b, i, dateStr)
-          );
-          state.activeSessionDate = dateStr;
-          persistState();
-          return res.json({ status: 'success', data: JSON.stringify(state.sessions[dateStr]) });
+        const recentlyModified = Date.now() - (locallyModifiedSessions.get(dateStr) || 0) < 30000;
+        if (!recentlyModified) {
+          await syncSessionsFromSheetDirect(true);
         }
-        await syncSessionsFromSheetDirect(false);
         if (
           state.sessions[dateStr] &&
           (state.sessions[dateStr].attendance.length > 0 || state.sessions[dateStr].boats.length > 0)

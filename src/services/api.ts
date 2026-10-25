@@ -292,8 +292,8 @@ async function fetchSessionsFromSheetDirect(): Promise<{
           continue;
         }
         const existing = table[key];
-        // Do not overwrite local session cache if it was mutated locally recently
-        if (!existing || !wasRecentlyMutatedLocally(key, 60000)) {
+        // Overwrite local session cache with latest Sheet data unless mutated locally very recently
+        if (!existing || !wasRecentlyMutatedLocally(key, 25000)) {
           table[key] = {
             ...parsed,
             date: key,
@@ -323,19 +323,30 @@ async function fetchSessionsFromSheetDirect(): Promise<{
     }
   }
 
-  // Include any locally created sessions that haven't appeared in the gviz cache yet
+  // Only keep local sessions that are in the Sheet or were just created/mutated locally
   for (const [key, localSess] of Object.entries(table)) {
-    if (!key || seenIds.has(key) || wasRecentlyDeletedLocally(key)) continue;
-    seenIds.add(key);
-    list.push({
-      id: key,
-      name: formatDisplayDate(key) || key,
-      rawDate: key,
-      updatedAt: localSess.updatedAt || '',
-      version: localSess.version || 1,
-      updatedBy: localSess.updatedBy || '',
-      attendanceCount: (localSess.attendance || []).length,
-    });
+    if (!key || wasRecentlyDeletedLocally(key)) {
+      delete table[key];
+      delete memorySessionsTable[key];
+      continue;
+    }
+    if (!seenIds.has(key)) {
+      if (wasRecentlyMutatedLocally(key, 60000)) {
+        seenIds.add(key);
+        list.push({
+          id: key,
+          name: formatDisplayDate(key) || key,
+          rawDate: key,
+          updatedAt: localSess.updatedAt || '',
+          version: localSess.version || 1,
+          updatedBy: localSess.updatedBy || '',
+          attendanceCount: (localSess.attendance || []).length,
+        });
+      } else {
+        delete table[key];
+        delete memorySessionsTable[key];
+      }
+    }
   }
 
   saveLocalSessionsSheetTable(table);
@@ -705,6 +716,7 @@ export async function apiCall<T = any>(action: string, data: any = {}): Promise<
       const cleanDate = String(data || '').replace('.json', '').trim();
       const cachedTable = getLocalSessionsSheetTable();
       if (
+        wasRecentlyMutatedLocally(cleanDate, 25000) &&
         cachedTable[cleanDate] &&
         ((cachedTable[cleanDate].attendance && cachedTable[cleanDate].attendance.length > 0) ||
           (cachedTable[cleanDate].boats && cachedTable[cleanDate].boats.length > 0))
@@ -714,6 +726,13 @@ export async function apiCall<T = any>(action: string, data: any = {}): Promise<
       const direct = await fetchSessionsFromSheetDirect();
       if (direct && direct.table[cleanDate]) {
         return JSON.stringify(direct.table[cleanDate]) as unknown as T;
+      }
+      if (
+        cachedTable[cleanDate] &&
+        ((cachedTable[cleanDate].attendance && cachedTable[cleanDate].attendance.length > 0) ||
+          (cachedTable[cleanDate].boats && cachedTable[cleanDate].boats.length > 0))
+      ) {
+        return JSON.stringify(cachedTable[cleanDate]) as unknown as T;
       }
     }
 

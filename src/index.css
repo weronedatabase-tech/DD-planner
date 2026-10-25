@@ -183,32 +183,40 @@
 }
 
 .pool-group {
-  border: 1px solid #cbd5e1;
-  background-color: #ffffff;
-  padding: 3px;
-  border-radius: 6px;
-  margin-bottom: 2px;
+  border: 2px solid #f59e0b;
+  background-color: rgba(254, 243, 199, 0.45);
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.2);
+  padding: 5px;
+  border-radius: 8px;
+  margin-bottom: 6px;
 }
 
 .dark .pool-group {
-  border-color: #27272a;
-  background-color: #0d0d12;
+  border: 2px solid #fbbf24;
+  background-color: rgba(245, 158, 11, 0.08);
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.25), 0 0 10px rgba(245, 158, 11, 0.12);
+}
+
+.pool-group .seat:last-child {
+  margin-bottom: 0;
 }
 
 .pool-group-label {
   font-size: 10px;
-  line-height: 1.15;
-  color: #334155;
-  font-weight: 700;
-  margin-bottom: 2px;
-  padding-left: 2px;
+  line-height: 1.2;
+  color: #b45309;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+  padding: 1px 3px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 4px;
 }
 
 .dark .pool-group-label {
-  color: #d4d4d8;
+  color: #fcd34d;
 }
 
 .nav-btn {

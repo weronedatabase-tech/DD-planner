@@ -246,7 +246,39 @@ export const App: React.FC = () => {
     }
   }, []);
 
-  // Initialize Real-Time Collaboration Manager & Initial Data
+  // Non-disruptive live data refresh from Google Sheet
+  const handleRefreshAppData = useCallback(
+    async (options?: { silent?: boolean }) => {
+      const silent = Boolean(options?.silent);
+      if (!silent) {
+        setIsLoading(true);
+        setLoadingText('Syncing Latest Data from Sheet...');
+      }
+      try {
+        await Promise.all([loadRoster(), loadSessionList()]);
+        const activeDate = currentSessionDateRef.current;
+        if (activeDate && Date.now() - lastLocalEditTimeRef.current >= 10000) {
+          const raw = await apiCall<string | SessionData>('loadSessionFile', activeDate);
+          if (raw) {
+            const parsed: SessionData = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            restoreState(parsed);
+          }
+        }
+        if (!silent) {
+          showToast('Synced latest Roster & Sessions from Sheet');
+        }
+      } catch (err) {
+        console.error('Refresh error:', err);
+      } finally {
+        if (!silent) {
+          setIsLoading(false);
+        }
+      }
+    },
+    [loadRoster, loadSessionList, restoreState, showToast]
+  );
+
+  // Initialize Real-Time Collaboration Manager & Auto-Sync on App Open
   useEffect(() => {
     let mounted = true;
     const manager = new CollaborationManager({
@@ -318,14 +350,25 @@ export const App: React.FC = () => {
     const ident = manager.getIdentity();
     setClientId(ident.clientId);
 
-    // Fetch Roster & Google Sheet Sessions list in parallel (do not auto-activate a session until Create & Start or Load is pressed)
-    Promise.all([loadRoster(), loadSessionList()]).catch(() => {});
+    // Auto-run full Sync immediately whenever the app is opened so the user always sees the latest info
+    handleRefreshAppData();
+
+    // Also auto-sync whenever the user reopens/focuses the app tab or PWA window
+    const onVisibilityOrPageShow = () => {
+      if (document.visibilityState === 'visible') {
+        handleRefreshAppData({ silent: true });
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityOrPageShow);
+    window.addEventListener('pageshow', onVisibilityOrPageShow);
 
     return () => {
       mounted = false;
+      document.removeEventListener('visibilitychange', onVisibilityOrPageShow);
+      window.removeEventListener('pageshow', onVisibilityOrPageShow);
       manager.destroy();
     };
-  }, [loadRoster, loadSessionList, restoreState, showToast]);
+  }, [handleRefreshAppData, restoreState, showToast]);
 
   // Keep CollaborationManager context in sync
   useEffect(() => {
@@ -1089,27 +1132,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Non-disruptive live data refresh from Google Sheet
-  const handleRefreshAppData = async () => {
-    setIsLoading(true);
-    setLoadingText('Syncing Latest Data from Sheet...');
-    try {
-      await Promise.all([loadRoster(), loadSessionList()]);
-      if (currentSessionDate) {
-        const raw = await apiCall<string | SessionData>('loadSessionFile', currentSessionDate);
-        if (raw) {
-          const parsed: SessionData = typeof raw === 'string' ? JSON.parse(raw) : raw;
-          restoreState(parsed);
-        }
-      }
-      showToast('Synced latest Roster & Sessions from Sheet');
-    } catch (err) {
-      console.error('Refresh error:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const activeConfig = FRONTEND_CONFIG[ENV as keyof typeof FRONTEND_CONFIG];
   const sheetUrl = activeConfig?.SHEET_ID
     ? `https://docs.google.com/spreadsheets/d/${activeConfig.SHEET_ID}`
@@ -1298,7 +1320,7 @@ export const App: React.FC = () => {
         <div className="justify-self-end flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             type="button"
-            onClick={handleRefreshAppData}
+            onClick={() => handleRefreshAppData()}
             className="px-2.5 sm:px-3 py-1 rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-[#14141b] hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-[11px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
             title="Sync Latest Data from Google Sheet"
           >
